@@ -433,6 +433,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyPolicyOpenExternal => 'Open Privacy Policy';
 
   @override
+  String get termsConditionsMenu => 'Terms & Conditions';
+
+  @override
+  String get termsConditionsNotConfigured => 'Terms & Conditions URL is not configured yet. Set it in lib/utils/app_links.dart.';
+
+  @override
+  String get termsConditionsInvalidUrl => 'Terms & Conditions URL is invalid. Please use a valid http/https URL.';
+
+  @override
+  String get termsConditionsLoadFailed => 'Failed to load Terms & Conditions page. Please try again later.';
+
+  @override
   String get drawerSectionSecurity => 'Security';
 
   @override

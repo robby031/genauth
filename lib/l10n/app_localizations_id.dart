@@ -433,6 +433,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get privacyPolicyOpenExternal => 'Buka Kebijakan Privasi';
 
   @override
+  String get termsConditionsMenu => 'Syarat & Ketentuan';
+
+  @override
+  String get termsConditionsNotConfigured => 'URL Syarat & Ketentuan belum dikonfigurasi. Atur di lib/utils/app_links.dart.';
+
+  @override
+  String get termsConditionsInvalidUrl => 'URL Syarat & Ketentuan tidak valid. Gunakan URL http/https yang benar.';
+
+  @override
+  String get termsConditionsLoadFailed => 'Halaman Syarat & Ketentuan gagal dimuat. Silakan coba lagi nanti.';
+
+  @override
   String get drawerSectionSecurity => 'Keamanan';
 
   @override

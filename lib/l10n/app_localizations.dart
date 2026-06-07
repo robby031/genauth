@@ -899,6 +899,30 @@ abstract class AppLocalizations {
   /// **'Open Privacy Policy'**
   String get privacyPolicyOpenExternal;
 
+  /// No description provided for @termsConditionsMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get termsConditionsMenu;
+
+  /// No description provided for @termsConditionsNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions URL is not configured yet. Set it in lib/utils/app_links.dart.'**
+  String get termsConditionsNotConfigured;
+
+  /// No description provided for @termsConditionsInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions URL is invalid. Please use a valid http/https URL.'**
+  String get termsConditionsInvalidUrl;
+
+  /// No description provided for @termsConditionsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load Terms & Conditions page. Please try again later.'**
+  String get termsConditionsLoadFailed;
+
   /// No description provided for @drawerSectionSecurity.
   ///
   /// In en, this message translates to:

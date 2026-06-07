@@ -162,6 +162,48 @@ class _DrawerScreenState extends State<DrawerScreen> {
     }
   }
 
+  Future<void> _openTermsConditionsDirect() async {
+    Navigator.pop(context);
+
+    final raw = AppLinks.termsConditionsUrl.trim();
+    if (raw.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsNotConfigured),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final uri = Uri.tryParse(raw);
+    if (uri == null ||
+        !(uri.hasScheme && (uri.scheme == 'https' || uri.scheme == 'http'))) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsInvalidUrl),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsLoadFailed),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+    }
+  }
+
   Widget _menuTile({
     required BuildContext context,
     required IconData icon,
@@ -263,9 +305,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
     return Drawer(
       width: 292,
       child: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: double.infinity,
@@ -385,6 +428,12 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 title: context.l10n.privacyPolicyMenu,
                 onTap: _openPrivacyPolicyDirect,
               ),
+              _menuTile(
+                context: context,
+                icon: Icons.gavel_outlined,
+                title: context.l10n.termsConditionsMenu,
+                onTap: _openTermsConditionsDirect,
+              ),
               const SizedBox(height: 6),
               _sectionHeader(context, context.l10n.drawerSectionApp),
               _menuTile(
@@ -420,7 +469,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   );
                 },
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
