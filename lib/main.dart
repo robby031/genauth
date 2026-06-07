@@ -4,6 +4,8 @@ import 'package:genauth/l10n/app_localizations.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'screens/lock_screen.dart';
 
+const _brandSeedColor = Color(0xFF2F6BDE);
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -26,14 +28,16 @@ class GenAuthApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF5C6BC0),
+              seedColor: _brandSeedColor,
+              dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
             ),
             useMaterial3: true,
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF5C6BC0),
+              seedColor: _brandSeedColor,
               brightness: Brightness.dark,
+              dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
             ),
             useMaterial3: true,
           ),

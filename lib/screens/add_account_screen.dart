@@ -56,8 +56,6 @@ class _AddAccountScreenState extends State<AddAccountScreen>
   }
 }
 
-// ---- QR scanner tab ----
-
 class _ScanTab extends StatefulWidget {
   const _ScanTab({required this.controller});
 
@@ -378,8 +376,6 @@ class _CornerAccent extends StatelessWidget {
     );
   }
 }
-
-// ---- Manual entry tab ----
 
 class _ManualTab extends StatefulWidget {
   const _ManualTab({required this.controller});
