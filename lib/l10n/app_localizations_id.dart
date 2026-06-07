@@ -142,6 +142,27 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingDesc3 => 'Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.';
 
   @override
+  String get onboardingGuideTitle1 => 'Cara kerja GenAuth';
+
+  @override
+  String get onboardingGuideDesc1 => 'Tambah akun via Scan QR atau Manual Entry, lalu kode OTP akan dibuat otomatis di halaman utama.';
+
+  @override
+  String get onboardingGuideTitle2 => 'Kelola akun dengan mudah';
+
+  @override
+  String get onboardingGuideDesc2 => 'Gunakan pencarian, filter tag, dan drag untuk merapikan urutan akun sesuai kebutuhan kamu.';
+
+  @override
+  String get onboardingGuideTitle3 => 'Keamanan dan cadangan data';
+
+  @override
+  String get onboardingGuideDesc3 => 'Aktifkan PIN untuk perlindungan tambahan, dan gunakan Backup & Restore agar data akun tetap aman.';
+
+  @override
+  String get onboardingDone => 'Selesai';
+
+  @override
   String get backupAndRestore => 'Cadangkan & Pulihkan';
 
   @override
@@ -215,6 +236,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get backupEncrypting => 'Mengenkripsi...';
+
+  @override
+  String get backupShareSubject => 'Backup GenAuth';
+
+  @override
+  String backupSavedPath(Object fileName) {
+    return 'Backup tersimpan: Files -> On My iPhone -> GenAuth -> $fileName';
+  }
 
   @override
   String get backupNoAccounts => 'Tidak ada akun untuk diekspor.';
@@ -309,6 +338,48 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get removePinOption => 'Hapus PIN';
+
+  @override
+  String get setPanicPinOption => 'Atur Panic PIN';
+
+  @override
+  String get removePanicPinOption => 'Hapus Panic PIN';
+
+  @override
+  String get panicPinOptionSubtitle => 'PIN darurat penghancur data';
+
+  @override
+  String get panicPinRemoved => 'Panic PIN dihapus';
+
+  @override
+  String get panicPinSetupTitle => 'Atur Panic PIN';
+
+  @override
+  String get panicPinConfirmTitle => 'Konfirmasi Panic PIN';
+
+  @override
+  String get panicPinSetupDesc => 'PIN darurat ini akan menghapus seluruh data OTP saat dipakai';
+
+  @override
+  String get panicPinConfirmDesc => 'Masukkan ulang Panic PIN yang sama untuk konfirmasi';
+
+  @override
+  String get panicPinSaved => 'Panic PIN berhasil disimpan';
+
+  @override
+  String get panicCorruptedTitle => 'Kesalahan Database';
+
+  @override
+  String get panicCorruptedDesc => 'Aplikasi tidak dapat memuat data lokal karena kerusakan integritas penyimpanan.';
+
+  @override
+  String get panicCorruptedHelp => 'Silakan pulihkan dari backup yang tersedia atau instal ulang aplikasi.';
+
+  @override
+  String get quickActions => 'Aksi Cepat';
+
+  @override
+  String get close => 'Tutup';
 
   @override
   String get tags => 'Tag';

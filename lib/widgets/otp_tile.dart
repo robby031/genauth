@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/clipboard_security_service.dart';
 import 'package:genauth/services/otp_service.dart';
 import 'package:genauth/widgets/service_icon.dart';
 import 'package:genauth/widgets/tag_editor_sheet.dart';
@@ -49,13 +49,18 @@ class _OtpTileState extends State<OtpTile> {
     }
   }
 
-  void _onTap() {
-    Clipboard.setData(ClipboardData(text: widget.code));
+  Future<void> _onTap() async {
+    await ClipboardSecurityService.instance.copyOtp(
+      code: widget.code,
+      period: widget.account.period,
+      isHotp: widget.account.isHotp,
+    );
     setState(() => _revealed = true);
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 10), () {
       if (mounted) setState(() => _revealed = false);
     });
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentMaterialBanner()
       ..showSnackBar(

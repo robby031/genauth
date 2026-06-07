@@ -29,6 +29,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   );
 
   bool _hasPin = false;
+  bool _hasPanicPin = false;
 
   @override
   void initState() {
@@ -38,7 +39,13 @@ class _DrawerScreenState extends State<DrawerScreen> {
 
   Future<void> _refreshPinState() async {
     final has = await StorageService().hasPin();
-    if (mounted) setState(() => _hasPin = has);
+    final hasPanic = await StorageService().hasPanicPin();
+    if (mounted) {
+      setState(() {
+        _hasPin = has;
+        _hasPanicPin = hasPanic;
+      });
+    }
   }
 
   Future<void> _openPinSetup() async {
@@ -58,6 +65,33 @@ class _DrawerScreenState extends State<DrawerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(context.l10n.pinRemoved),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openPanicPinSetup() async {
+    Navigator.pop(context);
+    final ok = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const PinScreen(mode: PinMode.panicSetup),
+      ),
+    );
+    if (ok == true) _refreshPinState();
+  }
+
+  Future<void> _removePanicPin() async {
+    Navigator.pop(context);
+    await StorageService().clearPanicPin();
+    _refreshPinState();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.panicPinRemoved),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -247,6 +281,15 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     ? context.l10n.removePinOption
                     : context.l10n.setPinOption,
                 onTap: _hasPin ? _removePin : _openPinSetup,
+              ),
+              _menuTile(
+                context: context,
+                icon: Icons.warning_amber_outlined,
+                title: _hasPanicPin
+                    ? context.l10n.removePanicPinOption
+                    : context.l10n.setPanicPinOption,
+                subtitle: context.l10n.panicPinOptionSubtitle,
+                onTap: _hasPanicPin ? _removePanicPin : _openPanicPinSetup,
               ),
               _menuTile(
                 context: context,

@@ -353,6 +353,48 @@ abstract class AppLocalizations {
   /// **'Your app is protected with device authentication before you enter.'**
   String get onboardingDesc3;
 
+  /// No description provided for @onboardingGuideTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'How GenAuth Works'**
+  String get onboardingGuideTitle1;
+
+  /// No description provided for @onboardingGuideDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.'**
+  String get onboardingGuideDesc1;
+
+  /// No description provided for @onboardingGuideTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Accounts Easily'**
+  String get onboardingGuideTitle2;
+
+  /// No description provided for @onboardingGuideDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Use search, tag filters, and drag to organize account order based on your needs.'**
+  String get onboardingGuideDesc2;
+
+  /// No description provided for @onboardingGuideTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Security and Backup'**
+  String get onboardingGuideTitle3;
+
+  /// No description provided for @onboardingGuideDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.'**
+  String get onboardingGuideDesc3;
+
+  /// No description provided for @onboardingDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get onboardingDone;
+
   /// No description provided for @backupAndRestore.
   ///
   /// In en, this message translates to:
@@ -490,6 +532,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Encrypting...'**
   String get backupEncrypting;
+
+  /// No description provided for @backupShareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'GenAuth Backup'**
+  String get backupShareSubject;
+
+  /// No description provided for @backupSavedPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved: Files -> On My iPhone -> GenAuth -> {fileName}'**
+  String backupSavedPath(Object fileName);
 
   /// No description provided for @backupNoAccounts.
   ///
@@ -658,6 +712,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove PIN'**
   String get removePinOption;
+
+  /// No description provided for @setPanicPinOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Panic PIN'**
+  String get setPanicPinOption;
+
+  /// No description provided for @removePanicPinOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Panic PIN'**
+  String get removePanicPinOption;
+
+  /// No description provided for @panicPinOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency self-destruct PIN'**
+  String get panicPinOptionSubtitle;
+
+  /// No description provided for @panicPinRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic PIN removed'**
+  String get panicPinRemoved;
+
+  /// No description provided for @panicPinSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Panic PIN'**
+  String get panicPinSetupTitle;
+
+  /// No description provided for @panicPinConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Panic PIN'**
+  String get panicPinConfirmTitle;
+
+  /// No description provided for @panicPinSetupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This emergency PIN will wipe all OTP data when used'**
+  String get panicPinSetupDesc;
+
+  /// No description provided for @panicPinConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the same Panic PIN again to confirm'**
+  String get panicPinConfirmDesc;
+
+  /// No description provided for @panicPinSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic PIN set successfully'**
+  String get panicPinSaved;
+
+  /// No description provided for @panicCorruptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Database Error'**
+  String get panicCorruptedTitle;
+
+  /// No description provided for @panicCorruptedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The app cannot load local data due to a storage integrity failure.'**
+  String get panicCorruptedDesc;
+
+  /// No description provided for @panicCorruptedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Please restore from an available backup or reinstall the application.'**
+  String get panicCorruptedHelp;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
 
   /// No description provided for @tags.
   ///

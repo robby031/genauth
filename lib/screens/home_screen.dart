@@ -4,6 +4,7 @@ import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/widgets/otp_tile.dart';
 import 'package:genauth/widgets/tag_filter_bar.dart';
 import 'package:genauth/screens/add_account_screen.dart';
+import 'package:genauth/screens/backup_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/drawer_screen.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
@@ -21,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _searchController = TextEditingController();
   late final HomeController _controller;
+  bool _bubbleExpanded = false;
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openAdd() async {
+    _collapseBubble();
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => const AddAccountScreen()),
@@ -47,7 +50,16 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result == true) await _controller.loadAndRefresh();
   }
 
+  Future<void> _openBackup() async {
+    _collapseBubble();
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const BackupScreen()),
+    );
+  }
+
   void _startSearch() {
+    _collapseBubble();
     _searchController.clear();
     _controller.startSearch();
   }
@@ -88,6 +100,16 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => const OnboardingScreen(fromDrawer: true),
       ),
     );
+  }
+
+  void _toggleBubble() {
+    setState(() => _bubbleExpanded = !_bubbleExpanded);
+  }
+
+  void _collapseBubble() {
+    if (_bubbleExpanded) {
+      setState(() => _bubbleExpanded = false);
+    }
   }
 
   @override
@@ -222,12 +244,93 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           floatingActionButton: _controller.isSearching
               ? null
-              : FloatingActionButton(
-                  onPressed: _openAdd,
-                  child: const Icon(Icons.add),
+              : _SmartFloatingBubble(
+                  expanded: _bubbleExpanded,
+                  onToggle: _toggleBubble,
+                  onAdd: _openAdd,
+                  onSearch: _startSearch,
+                  onBackup: _openBackup,
+                  addLabel: context.l10n.addAccount,
+                  searchLabel: context.l10n.searchHint,
+                  backupLabel: context.l10n.backupAndRestore,
                 ),
         );
       },
+    );
+  }
+}
+
+class _SmartFloatingBubble extends StatelessWidget {
+  const _SmartFloatingBubble({
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onSearch,
+    required this.onBackup,
+    required this.addLabel,
+    required this.searchLabel,
+    required this.backupLabel,
+  });
+
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final VoidCallback onSearch;
+  final VoidCallback onBackup;
+  final String addLabel;
+  final String searchLabel;
+  final String backupLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (expanded) ...[
+            FloatingActionButton.small(
+              heroTag: 'bubble-backup',
+              onPressed: onBackup,
+              tooltip: backupLabel,
+              child: const Icon(Icons.backup_outlined),
+            ),
+            const SizedBox(height: 8),
+            FloatingActionButton.small(
+              heroTag: 'bubble-search',
+              onPressed: onSearch,
+              tooltip: searchLabel,
+              child: const Icon(Icons.search),
+            ),
+            const SizedBox(height: 8),
+            FloatingActionButton.small(
+              heroTag: 'bubble-add',
+              onPressed: onAdd,
+              tooltip: addLabel,
+              child: const Icon(Icons.add),
+            ),
+            const SizedBox(height: 10),
+          ],
+          FloatingActionButton(
+            heroTag: 'bubble-main',
+            onPressed: onToggle,
+            tooltip: expanded ? context.l10n.close : context.l10n.quickActions,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: Icon(
+                expanded
+                    ? Icons.keyboard_arrow_down_rounded
+                    : Icons.bolt_rounded,
+                key: ValueKey(expanded),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

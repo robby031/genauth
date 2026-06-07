@@ -15,6 +15,9 @@ class StorageService {
   static const _onboardingKey = 'genauth_onboarding_done';
   static const _pinHashKey = 'genauth_pin_hash';
   static const _pinSaltKey = 'genauth_pin_salt';
+  static const _panicPinHashKey = 'genauth_panic_pin_hash';
+  static const _panicPinSaltKey = 'genauth_panic_pin_salt';
+  static const _panicTriggeredKey = 'genauth_panic_triggered';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -98,6 +101,41 @@ class StorageService {
   Future<void> clearPin() async {
     await _storage.delete(key: _pinHashKey);
     await _storage.delete(key: _pinSaltKey);
+  }
+
+  Future<bool> hasPanicPin() async =>
+      (await _storage.read(key: _panicPinHashKey)) != null;
+
+  Future<void> savePanicPin(String pin) async {
+    final salt = List.generate(16, (_) => Random.secure().nextInt(256));
+    final hash = await _hashPin(pin, salt);
+    await _storage.write(key: _panicPinHashKey, value: base64Encode(hash));
+    await _storage.write(key: _panicPinSaltKey, value: base64Encode(salt));
+  }
+
+  Future<bool> verifyPanicPin(String pin) async {
+    final storedHash = await _storage.read(key: _panicPinHashKey);
+    final storedSalt = await _storage.read(key: _panicPinSaltKey);
+    if (storedHash == null || storedSalt == null) return false;
+    final hash = await _hashPin(pin, base64Decode(storedSalt));
+    return base64Encode(hash) == storedHash;
+  }
+
+  Future<void> clearPanicPin() async {
+    await _storage.delete(key: _panicPinHashKey);
+    await _storage.delete(key: _panicPinSaltKey);
+  }
+
+  Future<bool> isPanicTriggered() async {
+    final raw = await _storage.read(key: _panicTriggeredKey);
+    return raw == 'true';
+  }
+
+  Future<void> triggerPanicDestruct() async {
+    await _storage.delete(key: _key);
+    await clearPin();
+    await clearPanicPin();
+    await _storage.write(key: _panicTriggeredKey, value: 'true');
   }
 
   static Future<List<int>> _hashPin(String pin, List<int> salt) async {
