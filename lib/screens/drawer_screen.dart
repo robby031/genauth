@@ -11,7 +11,13 @@ import 'package:genauth/services/storage_service.dart';
 class DrawerScreen extends StatefulWidget {
   final VoidCallback onLock;
   final VoidCallback onAbout;
-  const DrawerScreen({super.key, required this.onLock, required this.onAbout});
+  final VoidCallback onOpenOnboarding;
+  const DrawerScreen({
+    super.key,
+    required this.onLock,
+    required this.onAbout,
+    required this.onOpenOnboarding,
+  });
 
   @override
   State<DrawerScreen> createState() => _DrawerScreenState();
@@ -259,6 +265,12 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 icon: Icons.info_outline,
                 title: context.l10n.about,
                 onTap: widget.onAbout,
+              ),
+              _menuTile(
+                context: context,
+                icon: Icons.rocket_launch_outlined,
+                title: context.l10n.getStarted,
+                onTap: widget.onOpenOnboarding,
               ),
               ValueListenableBuilder<Locale>(
                 valueListenable: LocaleService.localeNotifier,

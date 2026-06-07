@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/locale_service.dart';
@@ -9,14 +13,49 @@ import 'package:genauth/screens/lock_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
   runApp(const GenAuthApp());
 }
 
-class GenAuthApp extends StatelessWidget {
+class GenAuthApp extends StatefulWidget {
   const GenAuthApp({super.key});
+
+  @override
+  State<GenAuthApp> createState() => _GenAuthAppState();
+}
+
+class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
+  AppLifecycleState? _lifecycleState;
+
+  bool get _shouldObscureForPrivacy {
+    final state = _lifecycleState ?? WidgetsBinding.instance.lifecycleState;
+    if (state == null) return false;
+    return state != AppLifecycleState.resumed;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _lifecycleState = WidgetsBinding.instance.lifecycleState;
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+    setState(() => _lifecycleState = state);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +100,27 @@ class GenAuthApp extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
             ),
           ),
+          builder: (context, child) {
+            if (!_shouldObscureForPrivacy || child == null) {
+              return child ?? const SizedBox.shrink();
+            }
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                child,
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      child: ColoredBox(
+                        color: Colors.black.withValues(alpha: 0.35),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
           home: const _AppEntryScreen(),
         );
       },

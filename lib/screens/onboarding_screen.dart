@@ -4,7 +4,9 @@ import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/lock_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.fromDrawer = false});
+
+  final bool fromDrawer;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -13,6 +15,11 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
+
+  String _localizedText({required String id, required String en}) {
+    final code = Localizations.localeOf(context).languageCode;
+    return code == 'id' ? id : en;
+  }
 
   @override
   void dispose() {
@@ -23,14 +30,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     await StorageService.instance.setOnboardingCompleted(true);
     if (!mounted) return;
+    if (widget.fromDrawer) {
+      Navigator.pop(context);
+      return;
+    }
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const LockScreen()),
     );
   }
 
-  void _nextPage() {
-    if (_currentPage == 2) {
+  void _nextPage(int lastIndex) {
+    if (_currentPage == lastIndex) {
       _completeOnboarding();
       return;
     }
@@ -42,23 +53,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      _OnboardingData(
-        title: context.l10n.onboardingTitle1,
-        description: context.l10n.onboardingDesc1,
-        icon: Icons.security_outlined,
-      ),
-      _OnboardingData(
-        title: context.l10n.onboardingTitle2,
-        description: context.l10n.onboardingDesc2,
-        icon: Icons.qr_code_scanner,
-      ),
-      _OnboardingData(
-        title: context.l10n.onboardingTitle3,
-        description: context.l10n.onboardingDesc3,
-        icon: Icons.lock_person_outlined,
-      ),
-    ];
+    final pages = widget.fromDrawer
+        ? [
+            _OnboardingData(
+              title: _localizedText(
+                id: 'Cara kerja GenAuth',
+                en: 'How GenAuth Works',
+              ),
+              description: _localizedText(
+                id: 'Tambah akun via Scan QR atau Manual Entry, lalu kode OTP akan dibuat otomatis di halaman utama.',
+                en: 'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.',
+              ),
+              icon: Icons.qr_code_scanner,
+            ),
+            _OnboardingData(
+              title: _localizedText(
+                id: 'Kelola akun dengan mudah',
+                en: 'Manage Accounts Easily',
+              ),
+              description: _localizedText(
+                id: 'Gunakan pencarian, filter tag, dan drag untuk merapikan urutan akun sesuai kebutuhan kamu.',
+                en: 'Use search, tag filters, and drag to organize account order based on your needs.',
+              ),
+              icon: Icons.dashboard_customize_outlined,
+            ),
+            _OnboardingData(
+              title: _localizedText(
+                id: 'Keamanan dan cadangan data',
+                en: 'Security and Backup',
+              ),
+              description: _localizedText(
+                id: 'Aktifkan PIN untuk perlindungan tambahan, dan gunakan Backup & Restore agar data akun tetap aman.',
+                en: 'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.',
+              ),
+              icon: Icons.lock_person_outlined,
+            ),
+          ]
+        : [
+            _OnboardingData(
+              title: context.l10n.onboardingTitle1,
+              description: context.l10n.onboardingDesc1,
+              icon: Icons.security_outlined,
+            ),
+            _OnboardingData(
+              title: context.l10n.onboardingTitle2,
+              description: context.l10n.onboardingDesc2,
+              icon: Icons.qr_code_scanner,
+            ),
+            _OnboardingData(
+              title: context.l10n.onboardingTitle3,
+              description: context.l10n.onboardingDesc3,
+              icon: Icons.lock_person_outlined,
+            ),
+          ];
 
     final scheme = Theme.of(context).colorScheme;
     final isLast = _currentPage == pages.length - 1;
@@ -73,7 +120,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: _completeOnboarding,
-                  child: Text(context.l10n.skip),
+                  child: Text(
+                    widget.fromDrawer ? context.l10n.cancel : context.l10n.skip,
+                  ),
                 ),
               ),
               Expanded(
@@ -144,7 +193,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: _nextPage,
+                  onPressed: () => _nextPage(pages.length - 1),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(
@@ -152,7 +201,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   child: Text(
-                    isLast ? context.l10n.getStarted : context.l10n.next,
+                    isLast
+                        ? (widget.fromDrawer
+                              ? _localizedText(id: 'Selesai', en: 'Done')
+                              : context.l10n.getStarted)
+                        : context.l10n.next,
                   ),
                 ),
               ),
