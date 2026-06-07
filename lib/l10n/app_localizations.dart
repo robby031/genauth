@@ -797,6 +797,66 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @auditLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Log'**
+  String get auditLogTitle;
+
+  /// No description provided for @auditLogMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Activity'**
+  String get auditLogMenu;
+
+  /// No description provided for @auditLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity has been recorded yet.'**
+  String get auditLogEmpty;
+
+  /// No description provided for @auditLogClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all logs'**
+  String get auditLogClearAll;
+
+  /// No description provided for @auditLogClearConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear audit logs?'**
+  String get auditLogClearConfirmTitle;
+
+  /// No description provided for @auditLogClearConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove all local audit records.'**
+  String get auditLogClearConfirmDesc;
+
+  /// No description provided for @auditLogStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get auditLogStatus;
+
+  /// No description provided for @auditLogDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get auditLogDetail;
+
+  /// No description provided for @auditLogMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata'**
+  String get auditLogMetadata;
+
+  /// No description provided for @auditLogCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit logs cleared'**
+  String get auditLogCleared;
+
   /// No description provided for @tags.
   ///
   /// In en, this message translates to:

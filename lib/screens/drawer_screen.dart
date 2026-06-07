@@ -5,6 +5,7 @@ import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/backup_screen.dart';
+import 'package:genauth/screens/audit_log_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/services/storage_service.dart';
 
@@ -300,6 +301,18 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const BackupScreen()),
+                  );
+                },
+              ),
+              _menuTile(
+                context: context,
+                icon: Icons.history_edu_outlined,
+                title: context.l10n.auditLogMenu,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuditLogScreen()),
                   );
                 },
               ),

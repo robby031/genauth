@@ -382,6 +382,36 @@ class AppLocalizationsId extends AppLocalizations {
   String get close => 'Tutup';
 
   @override
+  String get auditLogTitle => 'Log Audit';
+
+  @override
+  String get auditLogMenu => 'Aktivitas Audit';
+
+  @override
+  String get auditLogEmpty => 'Belum ada aktivitas yang tercatat.';
+
+  @override
+  String get auditLogClearAll => 'Hapus semua log';
+
+  @override
+  String get auditLogClearConfirmTitle => 'Hapus log audit?';
+
+  @override
+  String get auditLogClearConfirmDesc => 'Tindakan ini akan menghapus permanen semua catatan audit lokal.';
+
+  @override
+  String get auditLogStatus => 'Status';
+
+  @override
+  String get auditLogDetail => 'Detail';
+
+  @override
+  String get auditLogMetadata => 'Metadata';
+
+  @override
+  String get auditLogCleared => 'Log audit dihapus';
+
+  @override
   String get tags => 'Tag';
 
   @override

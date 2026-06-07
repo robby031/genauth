@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/backup_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -46,6 +47,7 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
   bool _loading = false;
 
   Future<void> _openImport() async {
+    await AuditLogService.instance.log('google_auth_import_opened');
     await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -56,10 +58,16 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
 
   Future<void> _openExport() async {
     setState(() => _loading = true);
+    await AuditLogService.instance.log('google_auth_export_attempt');
     try {
       final accounts = await StorageService().loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
+        await AuditLogService.instance.log(
+          'google_auth_export_blocked',
+          status: 'failed',
+          detail: 'no_accounts',
+        );
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -80,6 +88,10 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
         MaterialPageRoute(
           builder: (_) => GoogleAuthExportScreen(accounts: accounts),
         ),
+      );
+      await AuditLogService.instance.log(
+        'google_auth_export_opened',
+        metadata: {'accountCount': accounts.length},
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -166,6 +178,7 @@ class _ExportCardState extends State<_ExportCard> {
   Future<void> _export() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
+    await AuditLogService.instance.log('backup_export_attempt');
 
     try {
       final accounts = await StorageService().loadAccounts();
@@ -198,6 +211,10 @@ class _ExportCardState extends State<_ExportCard> {
       _formKey.currentState!.reset();
       _pwCtrl.clear();
       _confirmCtrl.clear();
+      await AuditLogService.instance.log(
+        'backup_export_success',
+        metadata: {'fileName': name, 'accountCount': accounts.length},
+      );
       ScaffoldMessenger.of(context)
         ..hideCurrentMaterialBanner()
         ..showSnackBar(
@@ -227,6 +244,11 @@ class _ExportCardState extends State<_ExportCard> {
           ),
         );
     } catch (e) {
+      await AuditLogService.instance.log(
+        'backup_export_failed',
+        status: 'failed',
+        detail: e.toString(),
+      );
       if (mounted) _showSnack(context.l10n.backupExportFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -385,6 +407,7 @@ class _ImportCardState extends State<_ImportCard> {
     }
 
     setState(() => _loading = true);
+    await AuditLogService.instance.log('backup_restore_attempt');
 
     try {
       final imported = await BackupService.import(_pickedBytes!, _pwCtrl.text);
@@ -396,6 +419,10 @@ class _ImportCardState extends State<_ImportCard> {
       final storage = StorageService();
       if (action == _RestoreAction.replace) {
         await storage.saveAccounts(imported);
+        await AuditLogService.instance.log(
+          'backup_restore_success',
+          metadata: {'mode': 'replace', 'importedCount': imported.length},
+        );
       } else {
         final existing = await storage.loadAccounts();
         final existingIds = existing.map((a) => a.id).toSet();
@@ -404,6 +431,10 @@ class _ImportCardState extends State<_ImportCard> {
           ...imported.where((a) => !existingIds.contains(a.id)),
         ];
         await storage.saveAccounts(merged);
+        await AuditLogService.instance.log(
+          'backup_restore_success',
+          metadata: {'mode': 'merge', 'importedCount': imported.length},
+        );
       }
 
       if (!mounted) return;
@@ -441,8 +472,18 @@ class _ImportCardState extends State<_ImportCard> {
         _pwCtrl.clear();
       });
     } on FormatException catch (e) {
+      await AuditLogService.instance.log(
+        'backup_restore_failed',
+        status: 'failed',
+        detail: e.message,
+      );
       if (mounted) _showSnack(context.l10n.backupInvalidFile(e.message));
     } catch (_) {
+      await AuditLogService.instance.log(
+        'backup_restore_failed',
+        status: 'failed',
+        detail: 'wrong_password_or_corrupted_file',
+      );
       if (mounted) _showSnack(context.l10n.backupWrongPassword);
     } finally {
       if (mounted) setState(() => _loading = false);

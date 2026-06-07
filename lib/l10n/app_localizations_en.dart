@@ -382,6 +382,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get auditLogTitle => 'Audit Log';
+
+  @override
+  String get auditLogMenu => 'Audit Activity';
+
+  @override
+  String get auditLogEmpty => 'No activity has been recorded yet.';
+
+  @override
+  String get auditLogClearAll => 'Clear all logs';
+
+  @override
+  String get auditLogClearConfirmTitle => 'Clear audit logs?';
+
+  @override
+  String get auditLogClearConfirmDesc => 'This will permanently remove all local audit records.';
+
+  @override
+  String get auditLogStatus => 'Status';
+
+  @override
+  String get auditLogDetail => 'Detail';
+
+  @override
+  String get auditLogMetadata => 'Metadata';
+
+  @override
+  String get auditLogCleared => 'Audit logs cleared';
+
+  @override
   String get tags => 'Tags';
 
   @override

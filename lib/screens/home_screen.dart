@@ -9,6 +9,7 @@ import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/drawer_screen.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
@@ -70,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _lockApp() {
+    AuditLogService.instance.log('app_locked_by_user');
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LockScreen()),
