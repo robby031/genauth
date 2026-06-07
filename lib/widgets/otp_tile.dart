@@ -10,6 +10,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
 class OtpTile extends StatefulWidget {
+  final int? reorderIndex;
   final OtpAccount account;
   final String code;
   final VoidCallback onDelete;
@@ -19,6 +20,7 @@ class OtpTile extends StatefulWidget {
 
   const OtpTile({
     super.key,
+    this.reorderIndex,
     required this.account,
     required this.code,
     required this.onDelete,
@@ -220,10 +222,13 @@ class _OtpTileState extends State<OtpTile> {
                   _TotpProgress(period: widget.account.period),
                 if (widget.showDragHandle) ...[
                   const SizedBox(width: 8),
-                  Icon(
-                    Icons.drag_indicator,
-                    color: scheme.onSurface.withValues(alpha: 0.3),
-                    size: 20,
+                  ReorderableDragStartListener(
+                    index: widget.reorderIndex ?? 0,
+                    child: Icon(
+                      Icons.drag_indicator,
+                      color: scheme.onSurface.withValues(alpha: 0.3),
+                      size: 20,
+                    ),
                   ),
                 ],
               ],

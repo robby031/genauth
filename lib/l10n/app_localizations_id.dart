@@ -36,6 +36,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get authFailed => 'Autentikasi gagal. Silakan coba lagi.';
 
   @override
+  String get deviceAuthUnsupported => 'Perangkat ini tidak mendukung autentikasi perangkat.';
+
+  @override
   String get english => 'Inggris';
 
   @override
@@ -250,8 +253,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get backupShareSubject => 'Backup GenAuth';
 
   @override
-  String backupSavedPath(Object fileName) {
-    return 'Backup tersimpan: Files -> On My iPhone -> GenAuth -> $fileName';
+  String backupSavedFile(Object fileName) {
+    return 'Backup berhasil dibuat: $fileName';
   }
 
   @override

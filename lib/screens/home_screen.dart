@@ -10,6 +10,7 @@ import 'package:genauth/screens/drawer_screen.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/services/audit_log_service.dart';
+import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
@@ -79,12 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showAbout() {
+  Future<void> _showAbout() async {
     Navigator.pop(context);
+    final version = await AppInfoService.versionLabel();
+    if (!mounted) return;
     showAboutDialog(
       context: context,
       applicationName: context.l10n.appTitle,
-      applicationVersion: '1.0.0',
+      applicationVersion: version,
       applicationIcon: Image.asset(
         AppAssets.logoNoBackground,
         width: 48,
@@ -161,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
 
         final accountList = ReorderableListView.builder(
+          buildDefaultDragHandles: false,
           padding: EdgeInsets.zero,
           physics: const AlwaysScrollableScrollPhysics(),
           onReorderItem: _controller.isSearching
@@ -180,6 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 OtpTile(
+                  reorderIndex: i,
                   account: account,
                   code: _controller.codeFor(account.id),
                   onDelete: () => _controller.deleteAccount(account.id),

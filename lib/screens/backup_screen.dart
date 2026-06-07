@@ -235,7 +235,7 @@ class _ExportCardState extends State<_ExportCard> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    context.l10n.backupSavedPath(name),
+                    context.l10n.backupSavedFile(name),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

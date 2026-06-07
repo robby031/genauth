@@ -28,7 +28,6 @@ class _LockScreenState extends State<LockScreen> {
   final _controller = LockController();
   final _storage = StorageService.instance;
   bool _ready = false;
-  bool _supportsBiometric = false;
   bool _hasPin = false;
 
   NavigatorState? get _navigator {
@@ -54,24 +53,67 @@ class _LockScreenState extends State<LockScreen> {
   }
 
   Future<void> _bootstrap() async {
-    final supportsBiometric = await AuthService.hasEnrolledBiometrics();
     final hasPin = await _storage.hasPin();
     if (!mounted) return;
 
     setState(() {
-      _supportsBiometric = supportsBiometric;
       _hasPin = hasPin;
       _ready = true;
     });
-
-    if (supportsBiometric) {
-      await _authenticateAndRoute(reportFailure: false);
-    }
   }
 
   Future<void> _authenticateAndRoute({bool reportFailure = true}) async {
+    final isAvailable = await AuthService.isAvailable();
+    if (!mounted) return;
+    if (!isAvailable) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            content: Text(context.l10n.deviceAuthUnsupported),
+          ),
+        );
+      return;
+    }
+
     final ok = await _controller.authenticate(reportFailure: reportFailure);
     if (!mounted) return;
+
+    if (!ok && reportFailure) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: Colors.red.shade600,
+            duration: const Duration(seconds: 3),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    context.l10n.authFailed,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+    }
 
     if (ok) {
       widget.onAuthenticated?.call();
@@ -112,9 +154,6 @@ class _LockScreenState extends State<LockScreen> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final showUnlock = _supportsBiometric;
-        final showPin = true;
-
         return Scaffold(
           body: SafeArea(
             child: Center(
@@ -150,33 +189,21 @@ class _LockScreenState extends State<LockScreen> {
                       if (!_ready || _controller.authenticating)
                         const Center(child: CircularProgressIndicator())
                       else ...[
-                        if (_controller.hasError) ...[
-                          Text(
-                            context.l10n.authFailed,
-                            style: TextStyle(color: scheme.error),
-                            textAlign: TextAlign.center,
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: _authenticateAndRoute,
+                            child: Text(context.l10n.unlock),
                           ),
-                          const SizedBox(height: 20),
-                        ],
-                        if (showUnlock)
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: _authenticateAndRoute,
-                              child: Text(context.l10n.unlock),
-                            ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            onPressed: _openPin,
+                            child: Text(context.l10n.usePin),
                           ),
-                        if (showUnlock && showPin) ...[
-                          const SizedBox(height: 12),
-                        ],
-                        if (showPin)
-                          SizedBox(
-                            width: double.infinity,
-                            child: TextButton(
-                              onPressed: _openPin,
-                              child: Text(context.l10n.usePin),
-                            ),
-                          ),
+                        ),
                       ],
                     ],
                   ),

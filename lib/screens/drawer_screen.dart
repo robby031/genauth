@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/app_links.dart';
@@ -28,11 +29,13 @@ class DrawerScreen extends StatefulWidget {
 class _DrawerScreenState extends State<DrawerScreen> {
   bool _hasPin = false;
   bool _hasPanicPin = false;
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     _refreshPinState();
+    _loadAppVersion();
   }
 
   Future<void> _refreshPinState() async {
@@ -44,6 +47,12 @@ class _DrawerScreenState extends State<DrawerScreen> {
         _hasPanicPin = hasPanic;
       });
     }
+  }
+
+  Future<void> _loadAppVersion() async {
+    final version = await AppInfoService.versionLabel();
+    if (!mounted) return;
+    setState(() => _appVersion = version);
   }
 
   Future<void> _openPinSetup() async {
@@ -505,7 +514,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
               ),
               Text(
-                context.l10n.versionLabel('1.0.0'),
+                context.l10n.versionLabel(
+                  _appVersion.isEmpty ? '...' : _appVersion,
+                ),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 10,
                   color: scheme.outlineVariant,

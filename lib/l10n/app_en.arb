@@ -8,6 +8,7 @@
   "authenticator": "Authenticator",
   "unlock": "Unlock",
   "authFailed": "Authentication failed. Please try again.",
+  "deviceAuthUnsupported": "This device does not support device authentication.",
   "english": "English",
   "indonesian": "Bahasa Indonesia",
   "aboutDescription": "A secure TOTP/2FA authenticator powered by genotp-go.",
@@ -102,8 +103,8 @@
   "backupExportShare": "Export & Share",
   "backupEncrypting": "Encrypting...",
   "backupShareSubject": "GenAuth Backup",
-  "backupSavedPath": "Backup saved: Files -> On My iPhone -> GenAuth -> {fileName}",
-  "@backupSavedPath": {
+  "backupSavedFile": "Backup created successfully: {fileName}",
+  "@backupSavedFile": {
     "placeholders": {
       "fileName": {}
     }

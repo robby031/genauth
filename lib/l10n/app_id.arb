@@ -8,6 +8,7 @@
   "authenticator": "Autentikator",
   "unlock": "Buka Kunci",
   "authFailed": "Autentikasi gagal. Silakan coba lagi.",
+  "deviceAuthUnsupported": "Perangkat ini tidak mendukung autentikasi perangkat.",
   "english": "Inggris",
   "indonesian": "Bahasa Indonesia",
   "aboutDescription": "Aplikasi autentikator TOTP/2FA aman yang didukung genotp-go.",
@@ -102,8 +103,8 @@
   "backupExportShare": "Ekspor & Bagikan",
   "backupEncrypting": "Mengenkripsi...",
   "backupShareSubject": "Backup GenAuth",
-  "backupSavedPath": "Backup tersimpan: Files -> On My iPhone -> GenAuth -> {fileName}",
-  "@backupSavedPath": {
+  "backupSavedFile": "Backup berhasil dibuat: {fileName}",
+  "@backupSavedFile": {
     "placeholders": {
       "fileName": {}
     }

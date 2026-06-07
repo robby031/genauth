@@ -149,6 +149,12 @@ abstract class AppLocalizations {
   /// **'Authentication failed. Please try again.'**
   String get authFailed;
 
+  /// No description provided for @deviceAuthUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device does not support device authentication.'**
+  String get deviceAuthUnsupported;
+
   /// No description provided for @english.
   ///
   /// In en, this message translates to:
@@ -557,11 +563,11 @@ abstract class AppLocalizations {
   /// **'GenAuth Backup'**
   String get backupShareSubject;
 
-  /// No description provided for @backupSavedPath.
+  /// No description provided for @backupSavedFile.
   ///
   /// In en, this message translates to:
-  /// **'Backup saved: Files -> On My iPhone -> GenAuth -> {fileName}'**
-  String backupSavedPath(Object fileName);
+  /// **'Backup created successfully: {fileName}'**
+  String backupSavedFile(Object fileName);
 
   /// No description provided for @backupNoAccounts.
   ///
