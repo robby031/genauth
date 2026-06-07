@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -78,14 +79,22 @@ class _ScanQrTab extends StatefulWidget {
   State<_ScanQrTab> createState() => _ScanQrTabState();
 }
 
-class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
+class _ScanQrTabState extends State<_ScanQrTab>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   bool _done = false;
+  bool _isStartingScanner = false;
   late final AnimationController _scanLineController;
   late final AnimationController _framePulseController;
+  late final MobileScannerController _scannerController;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _scannerController = MobileScannerController(
+      autoStart: false,
+      formats: const [BarcodeFormat.qrCode],
+    );
     _scanLineController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -96,13 +105,63 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
       lowerBound: 0.0,
       upperBound: 1.0,
     )..repeat(reverse: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_startScanner());
+    });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scanLineController.dispose();
     _framePulseController.dispose();
+    unawaited(_scannerController.dispose());
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_done) return;
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        unawaited(_startScanner());
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        unawaited(_scannerController.pause());
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  Future<void> _startScanner() async {
+    if (!mounted ||
+        _done ||
+        _isStartingScanner ||
+        _scannerController.value.isRunning) {
+      return;
+    }
+
+    _isStartingScanner = true;
+    try {
+      await _scannerController.start();
+    } catch (_) {
+      // The scanner widget reflects startup errors through controller state.
+    } finally {
+      _isStartingScanner = false;
+      if (mounted && _scannerController.value.error == null) {
+        _scanLineController.repeat();
+        _framePulseController.repeat(reverse: true);
+      }
+    }
+  }
+
+  Future<void> _restartScanner() async {
+    if (!mounted) return;
+    _done = false;
+    await _scannerController.stop();
+    await _startScanner();
   }
 
   Future<void> _onDetect(BarcodeCapture capture) async {
@@ -187,18 +246,106 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
           320.0,
         );
 
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            MobileScanner(onDetect: _onDetect),
-            CamScanOverlay(
-              scanAnimation: _scanLineController,
-              framePulseAnimation: _framePulseController,
-              scanBoxSize: scanBoxSize,
-            ),
-          ],
+        return ValueListenableBuilder<MobileScannerState>(
+          valueListenable: _scannerController,
+          builder: (context, scannerState, _) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                MobileScanner(
+                  controller: _scannerController,
+                  onDetect: _onDetect,
+                  errorBuilder: (context, error) {
+                    return _ScannerErrorView(
+                      title: context.l10n.scannerUnavailableTitle,
+                      message:
+                          error.errorDetails?.message?.isNotEmpty == true
+                              ? error.errorDetails!.message!
+                              : context.l10n.scannerUnavailableMessage,
+                      actionLabel: context.l10n.scannerRetry,
+                      onRetry: _restartScanner,
+                    );
+                  },
+                ),
+                if (scannerState.error == null)
+                  CamScanOverlay(
+                    scanAnimation: _scanLineController,
+                    framePulseAnimation: _framePulseController,
+                    scanBoxSize: scanBoxSize,
+                  ),
+              ],
+            );
+          },
         );
       },
+    );
+  }
+}
+
+class _ScannerErrorView extends StatelessWidget {
+  const _ScannerErrorView({
+    required this.title,
+    required this.message,
+    required this.actionLabel,
+    required this.onRetry,
+  });
+
+  final String title;
+  final String message;
+  final String actionLabel;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Card(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.qr_code_scanner_rounded,
+                    size: 40,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () {
+                      unawaited(onRetry());
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(actionLabel),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

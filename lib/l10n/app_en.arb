@@ -16,6 +16,9 @@
   "tapToAddFirstAccount": "Tap + to add your first account",
   "addAccount": "Add account",
   "scanQr": "Scan QR",
+  "scannerUnavailableTitle": "Scanner unavailable",
+  "scannerUnavailableMessage": "The camera scanner could not be started. Please try again.",
+  "scannerRetry": "Try again",
   "manualEntry": "Manual entry",
   "invalidQr": "Invalid QR: {error}",
   "@invalidQr": {

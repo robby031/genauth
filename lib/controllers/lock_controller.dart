@@ -9,7 +9,13 @@ class LockController extends ChangeNotifier {
   bool get authenticating => _authenticating;
   bool get hasError => _hasError;
 
-  Future<bool> authenticate() async {
+  void clearError() {
+    if (!_hasError) return;
+    _hasError = false;
+    notifyListeners();
+  }
+
+  Future<bool> authenticate({bool reportFailure = true}) async {
     if (_authenticating) return false;
 
     await AuditLogService.instance.log('auth_biometric_attempt');
@@ -21,7 +27,7 @@ class LockController extends ChangeNotifier {
     final ok = await AuthService.authenticate();
 
     _authenticating = false;
-    _hasError = !ok;
+    _hasError = reportFailure && !ok;
     notifyListeners();
 
     await AuditLogService.instance.log(

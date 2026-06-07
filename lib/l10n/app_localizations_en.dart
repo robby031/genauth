@@ -60,6 +60,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanQr => 'Scan QR';
 
   @override
+  String get scannerUnavailableTitle => 'Scanner unavailable';
+
+  @override
+  String get scannerUnavailableMessage => 'The camera scanner could not be started. Please try again.';
+
+  @override
+  String get scannerRetry => 'Try again';
+
+  @override
   String get manualEntry => 'Manual entry';
 
   @override

@@ -60,6 +60,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get scanQr => 'Pindai QR';
 
   @override
+  String get scannerUnavailableTitle => 'Pemindai tidak tersedia';
+
+  @override
+  String get scannerUnavailableMessage => 'Pemindai kamera tidak dapat dijalankan. Silakan coba lagi.';
+
+  @override
+  String get scannerRetry => 'Coba lagi';
+
+  @override
   String get manualEntry => 'Input manual';
 
   @override

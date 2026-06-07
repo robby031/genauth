@@ -16,6 +16,9 @@
   "tapToAddFirstAccount": "Ketuk + untuk menambahkan akun pertama",
   "addAccount": "Tambah akun",
   "scanQr": "Pindai QR",
+  "scannerUnavailableTitle": "Pemindai tidak tersedia",
+  "scannerUnavailableMessage": "Pemindai kamera tidak dapat dijalankan. Silakan coba lagi.",
+  "scannerRetry": "Coba lagi",
   "manualEntry": "Input manual",
   "invalidQr": "QR tidak valid: {error}",
   "@invalidQr": {

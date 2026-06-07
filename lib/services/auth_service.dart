@@ -7,6 +7,15 @@ class AuthService {
     return await _auth.canCheckBiometrics || await _auth.isDeviceSupported();
   }
 
+  static Future<bool> hasEnrolledBiometrics() async {
+    try {
+      final biometrics = await _auth.getAvailableBiometrics();
+      return biometrics.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> authenticate() async {
     try {
       return await _auth.authenticate(

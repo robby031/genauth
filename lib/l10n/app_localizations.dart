@@ -197,6 +197,24 @@ abstract class AppLocalizations {
   /// **'Scan QR'**
   String get scanQr;
 
+  /// No description provided for @scannerUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanner unavailable'**
+  String get scannerUnavailableTitle;
+
+  /// No description provided for @scannerUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera scanner could not be started. Please try again.'**
+  String get scannerUnavailableMessage;
+
+  /// No description provided for @scannerRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get scannerRetry;
+
   /// No description provided for @manualEntry.
   ///
   /// In en, this message translates to:
