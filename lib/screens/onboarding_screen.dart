@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
-import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 import 'lock_screen.dart';
 
