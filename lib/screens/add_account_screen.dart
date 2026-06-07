@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../models/otp_account.dart';
+import '../controllers/add_account_controller.dart';
 import '../services/storage_service.dart';
-import '../services/otp_service.dart';
 import '../utils/l10n_extensions.dart';
 
 class AddAccountScreen extends StatefulWidget {
@@ -15,16 +14,19 @@ class AddAccountScreen extends StatefulWidget {
 class _AddAccountScreenState extends State<AddAccountScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
+  late final AddAccountController _controller;
 
   @override
   void initState() {
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
+    _controller = AddAccountController(storage: StorageService.instance);
   }
 
   @override
   void dispose() {
     _tabs.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -43,7 +45,10 @@ class _AddAccountScreenState extends State<AddAccountScreen>
       ),
       body: TabBarView(
         controller: _tabs,
-        children: const [_ScanTab(), _ManualTab()],
+        children: [
+          _ScanTab(controller: _controller),
+          _ManualTab(controller: _controller),
+        ],
       ),
     );
   }
@@ -52,7 +57,9 @@ class _AddAccountScreenState extends State<AddAccountScreen>
 // ---- QR scanner tab ----
 
 class _ScanTab extends StatefulWidget {
-  const _ScanTab();
+  const _ScanTab({required this.controller});
+
+  final AddAccountController controller;
 
   @override
   State<_ScanTab> createState() => _ScanTabState();
@@ -68,8 +75,7 @@ class _ScanTabState extends State<_ScanTab> {
 
     _done = true;
     try {
-      final account = OtpAccount.fromUri(code);
-      await StorageService().addAccount(account);
+      await widget.controller.saveFromQrCode(code);
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       _done = false;
@@ -90,7 +96,9 @@ class _ScanTabState extends State<_ScanTab> {
 // ---- Manual entry tab ----
 
 class _ManualTab extends StatefulWidget {
-  const _ManualTab();
+  const _ManualTab({required this.controller});
+
+  final AddAccountController controller;
 
   @override
   State<_ManualTab> createState() => _ManualTabState();
@@ -105,7 +113,6 @@ class _ManualTabState extends State<_ManualTab> {
   int _digits = 6;
   int _period = 30;
   bool _isHotp = false;
-  bool _saving = false;
 
   @override
   void dispose() {
@@ -117,25 +124,20 @@ class _ManualTabState extends State<_ManualTab> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
-
-    final account = OtpAccount(
-      id: OtpAccount.newId(),
-      label: _labelCtrl.text.trim(),
-      issuer: _issuerCtrl.text.trim(),
-      secretB32: _secretCtrl.text.trim().toUpperCase().replaceAll(' ', ''),
+    await widget.controller.saveManualAccount(
+      label: _labelCtrl.text,
+      issuer: _issuerCtrl.text,
+      secret: _secretCtrl.text,
       algorithm: _algorithm,
       digits: _digits,
       period: _period,
       isHotp: _isHotp,
     );
-
-    await StorageService().addAccount(account);
     if (mounted) Navigator.pop(context, true);
   }
 
   Future<void> _generateSecret() async {
-    final s = await OtpService.generateSecret();
+    final s = await widget.controller.generateSecret();
     setState(() => _secretCtrl.text = s);
   }
 
@@ -235,15 +237,20 @@ class _ManualTabState extends State<_ManualTab> {
               ),
             ],
             const SizedBox(height: 28),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(context.l10n.addAccount),
+            AnimatedBuilder(
+              animation: widget.controller,
+              builder: (context, child) {
+                return FilledButton(
+                  onPressed: widget.controller.saving ? null : _save,
+                  child: widget.controller.saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(context.l10n.addAccount),
+                );
+              },
             ),
           ],
         ),
