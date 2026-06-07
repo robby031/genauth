@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../models/otp_account.dart';
-import 'google_auth_migration_service.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/google_auth_migration_service.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._internal();

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/otp_account.dart';
-import '../services/otp_service.dart';
-import '../widgets/service_icon.dart';
-import '../widgets/tag_editor_sheet.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/otp_service.dart';
+import 'package:genauth/widgets/service_icon.dart';
+import 'package:genauth/widgets/tag_editor_sheet.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 class OtpTile extends StatefulWidget {
   final OtpAccount account;

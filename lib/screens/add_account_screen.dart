@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../controllers/add_account_controller.dart';
-import '../services/storage_service.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/controllers/add_account_controller.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({super.key});

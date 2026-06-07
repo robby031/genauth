@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/storage_service.dart';
-import '../utils/l10n_extensions.dart';
-import 'lock_screen.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/screens/lock_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

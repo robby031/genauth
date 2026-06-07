@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/storage_service.dart';
-import '../utils/app_assets.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 enum PinMode { setup, verify }
 
@@ -26,7 +26,9 @@ class _PinScreenState extends State<PinScreen> {
 
   String get _title {
     if (widget.mode == PinMode.verify) return context.l10n.pinEnterTitle;
-    return _isConfirming ? context.l10n.pinConfirmTitle : context.l10n.pinSetupTitle;
+    return _isConfirming
+        ? context.l10n.pinConfirmTitle
+        : context.l10n.pinSetupTitle;
   }
 
   String get _subtitle {
@@ -122,23 +124,27 @@ class _PinScreenState extends State<PinScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.mode == PinMode.verify) ...[
-                  Image.asset(AppAssets.logoNoBackground, width: 72, height: 72),
+                  Image.asset(
+                    AppAssets.logoNoBackground,
+                    width: 72,
+                    height: 72,
+                  ),
                   const SizedBox(height: 16),
                 ],
                 Text(
                   _title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 if (_subtitle.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
                     _subtitle,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.outline,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: scheme.outline),
                   ),
                 ],
                 const SizedBox(height: 32),
@@ -168,7 +174,9 @@ class _PinScreenState extends State<PinScreen> {
                   Text(
                     _errorMessage!,
                     style: TextStyle(
-                        color: scheme.error, fontWeight: FontWeight.w500),
+                      color: scheme.error,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 32),
@@ -262,13 +270,16 @@ class _NumKey extends StatelessWidget {
               : null,
           child: Center(
             child: isBackspace
-                ? Icon(Icons.backspace_outlined,
-                    color: scheme.onSurface, size: 22)
+                ? Icon(
+                    Icons.backspace_outlined,
+                    color: scheme.onSurface,
+                    size: 22,
+                  )
                 : Text(
                     label,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
           ),
         ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../controllers/lock_controller.dart';
-import '../services/storage_service.dart';
-import '../utils/app_assets.dart';
-import '../utils/l10n_extensions.dart';
-import 'home_screen.dart';
-import 'pin_screen.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/screens/home_screen.dart';
+import 'package:genauth/screens/pin_screen.dart';
 
 class LockScreen extends StatefulWidget {
   const LockScreen({super.key});

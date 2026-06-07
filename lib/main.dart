@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
-import 'screens/onboarding_screen.dart';
-import 'screens/lock_screen.dart';
+import 'package:genauth/screens/onboarding_screen.dart';
+import 'package:genauth/screens/lock_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
 
