@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag to release (example: v1.2.3 or v1.2.3-beta.1)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -17,10 +22,79 @@ jobs:
   build-and-release:
     name: Build and Publish Release
     runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release metadata
+        id: release_meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="${{ github.event.inputs.release_tag }}"
+          fi
+
+          if [[ -z "$TAG" ]]; then
+            echo "Release tag is empty"
+            exit 1
+          fi
+
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TRACK="stable"
+            PRERELEASE="false"
+          elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-beta(\.[0-9]+)?$ ]]; then
+            TRACK="beta"
+            PRERELEASE="true"
+          else
+            echo "Invalid tag format: $TAG"
+            echo "Allowed stable: vX.Y.Z"
+            echo "Allowed beta: vX.Y.Z-beta or vX.Y.Z-beta.N"
+            exit 1
+          fi
+
+          VERSION_FROM_TAG="${TAG#v}"
+          VERSION_FROM_PUBSPEC=$(grep '^version:' pubspec.yaml | head -n1 | awk '{print $2}')
+          VERSION_FROM_PUBSPEC_BASE="${VERSION_FROM_PUBSPEC%%+*}"
+
+          if [[ "$VERSION_FROM_PUBSPEC_BASE" != "$VERSION_FROM_TAG" ]]; then
+            echo "Tag version does not match pubspec.yaml"
+            echo "tag: $VERSION_FROM_TAG"
+            echo "pubspec: $VERSION_FROM_PUBSPEC_BASE"
+            exit 1
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "track=$TRACK" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "release_name=GenAuth $TAG ($TRACK)" >> "$GITHUB_OUTPUT"
+
+      - name: Guard main-only release
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          TAG_COMMIT=$(git rev-list -n 1 "${{ steps.release_meta.outputs.tag }}")
+
+          if [[ -z "$TAG_COMMIT" ]]; then
+            echo "Cannot resolve commit for tag: ${{ steps.release_meta.outputs.tag }}"
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$TAG_COMMIT" origin/main; then
+            echo "Release is allowed only for tags whose commit is in main"
+            echo "tag: ${{ steps.release_meta.outputs.tag }}"
+            echo "commit: $TAG_COMMIT"
+            exit 1
+          fi
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -43,6 +117,23 @@ jobs:
       - name: Run tests
         run: flutter test
 
+      - name: Validate Android signing secrets
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || (echo "Missing secret: ANDROID_KEYSTORE_BASE64" && exit 1)
+          test -n "$ANDROID_KEYSTORE_PASSWORD" || (echo "Missing secret: ANDROID_KEYSTORE_PASSWORD" && exit 1)
+          test -n "$ANDROID_KEY_ALIAS" || (echo "Missing secret: ANDROID_KEY_ALIAS" && exit 1)
+          test -n "$ANDROID_KEY_PASSWORD" || (echo "Missing secret: ANDROID_KEY_PASSWORD" && exit 1)
+
+      - name: Prepare Android keystore and key.properties
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+
       - name: Build Android App Bundle
         run: flutter build appbundle --release
 
@@ -57,20 +148,34 @@ jobs:
           cd build/web
           zip -r ../../genauth-web-release.zip .
 
+      - name: Generate SHA256 checksums
+        shell: bash
+        run: |
+          sha256sum \
+            build/app/outputs/bundle/release/app-release.aab \
+            build/app/outputs/flutter-apk/app-release.apk \
+            genauth-web-release.zip \
+            > SHA256SUMS.txt
+
       - name: Upload release artifacts (workflow)
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
+          name: release-artifacts-${{ steps.release_meta.outputs.track }}
           path: |
             build/app/outputs/bundle/release/app-release.aab
             build/app/outputs/flutter-apk/app-release.apk
             genauth-web-release.zip
+            SHA256SUMS.txt
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          name: ${{ steps.release_meta.outputs.release_name }}
+          prerelease: ${{ steps.release_meta.outputs.prerelease }}
           generate_release_notes: true
           files: |
             build/app/outputs/bundle/release/app-release.aab
             build/app/outputs/flutter-apk/app-release.apk
             genauth-web-release.zip
+            SHA256SUMS.txt
