@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:genauth/screens/panic_corrupted_screen.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
-enum PinMode { setup, verify }
+enum PinMode { setup, verify, panicSetup }
 
 class PinScreen extends StatefulWidget {
   final PinMode mode;
@@ -18,7 +19,6 @@ class _PinScreenState extends State<PinScreen> {
   static const _pinLength = 6;
 
   String _pin = '';
-  // During setup, the first entry is stored here for confirmation.
   String? _setupFirst;
   bool _isConfirming = false;
   String? _errorMessage;
@@ -26,6 +26,11 @@ class _PinScreenState extends State<PinScreen> {
 
   String get _title {
     if (widget.mode == PinMode.verify) return context.l10n.pinEnterTitle;
+    if (widget.mode == PinMode.panicSetup) {
+      return _isConfirming
+          ? context.l10n.panicPinConfirmTitle
+          : context.l10n.panicPinSetupTitle;
+    }
     return _isConfirming
         ? context.l10n.pinConfirmTitle
         : context.l10n.pinSetupTitle;
@@ -33,6 +38,11 @@ class _PinScreenState extends State<PinScreen> {
 
   String get _subtitle {
     if (widget.mode == PinMode.verify) return '';
+    if (widget.mode == PinMode.panicSetup) {
+      return _isConfirming
+          ? context.l10n.panicPinConfirmDesc
+          : context.l10n.panicPinSetupDesc;
+    }
     return _isConfirming
         ? context.l10n.pinConfirmDesc
         : context.l10n.pinSetupDesc;
@@ -62,7 +72,20 @@ class _PinScreenState extends State<PinScreen> {
 
   Future<void> _verify() async {
     setState(() => _loading = true);
-    final ok = await StorageService().verifyPin(_pin);
+    final storage = StorageService();
+    final isPanic = await storage.verifyPanicPin(_pin);
+    if (isPanic) {
+      await storage.triggerPanicDestruct();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const PanicCorruptedScreen()),
+        (_) => false,
+      );
+      return;
+    }
+
+    final ok = await storage.verifyPin(_pin);
     if (!mounted) return;
     if (ok) {
       Navigator.pop(context, true);
@@ -95,11 +118,19 @@ class _PinScreenState extends State<PinScreen> {
       return;
     }
     setState(() => _loading = true);
-    await StorageService().savePin(_pin);
+    if (widget.mode == PinMode.panicSetup) {
+      await StorageService().savePanicPin(_pin);
+    } else {
+      await StorageService().savePin(_pin);
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(context.l10n.pinSaved),
+        content: Text(
+          widget.mode == PinMode.panicSetup
+              ? context.l10n.panicPinSaved
+              : context.l10n.pinSaved,
+        ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(12),
@@ -113,9 +144,9 @@ class _PinScreenState extends State<PinScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: widget.mode == PinMode.setup
-          ? AppBar(title: Text(context.l10n.pinSetupTitle))
-          : null,
+      appBar: widget.mode == PinMode.verify
+          ? null
+          : AppBar(title: Text(_title)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

@@ -10,6 +10,7 @@ import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
+import 'package:genauth/screens/panic_corrupted_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
 
@@ -133,8 +134,13 @@ class _AppEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: StorageService.instance.isOnboardingCompleted(),
+    return FutureBuilder<(bool panic, bool onboardingDone)>(
+      future: () async {
+        final panic = await StorageService.instance.isPanicTriggered();
+        final onboardingDone = await StorageService.instance
+            .isOnboardingCompleted();
+        return (panic, onboardingDone);
+      }(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
@@ -142,7 +148,12 @@ class _AppEntryScreen extends StatelessWidget {
           );
         }
 
-        if (snapshot.data == true) {
+        final entry = snapshot.data!;
+        if (entry.$1) {
+          return const PanicCorruptedScreen();
+        }
+
+        if (entry.$2) {
           return const LockScreen();
         }
 

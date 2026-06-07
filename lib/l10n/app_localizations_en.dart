@@ -142,6 +142,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingDesc3 => 'Your app is protected with device authentication before you enter.';
 
   @override
+  String get onboardingGuideTitle1 => 'How GenAuth Works';
+
+  @override
+  String get onboardingGuideDesc1 => 'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.';
+
+  @override
+  String get onboardingGuideTitle2 => 'Manage Accounts Easily';
+
+  @override
+  String get onboardingGuideDesc2 => 'Use search, tag filters, and drag to organize account order based on your needs.';
+
+  @override
+  String get onboardingGuideTitle3 => 'Security and Backup';
+
+  @override
+  String get onboardingGuideDesc3 => 'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.';
+
+  @override
+  String get onboardingDone => 'Done';
+
+  @override
   String get backupAndRestore => 'Backup & Restore';
 
   @override
@@ -215,6 +236,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupEncrypting => 'Encrypting...';
+
+  @override
+  String get backupShareSubject => 'GenAuth Backup';
+
+  @override
+  String backupSavedPath(Object fileName) {
+    return 'Backup saved: Files -> On My iPhone -> GenAuth -> $fileName';
+  }
 
   @override
   String get backupNoAccounts => 'No accounts to export.';
@@ -309,6 +338,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removePinOption => 'Remove PIN';
+
+  @override
+  String get setPanicPinOption => 'Set Panic PIN';
+
+  @override
+  String get removePanicPinOption => 'Remove Panic PIN';
+
+  @override
+  String get panicPinOptionSubtitle => 'Emergency self-destruct PIN';
+
+  @override
+  String get panicPinRemoved => 'Panic PIN removed';
+
+  @override
+  String get panicPinSetupTitle => 'Set Panic PIN';
+
+  @override
+  String get panicPinConfirmTitle => 'Confirm Panic PIN';
+
+  @override
+  String get panicPinSetupDesc => 'This emergency PIN will wipe all OTP data when used';
+
+  @override
+  String get panicPinConfirmDesc => 'Enter the same Panic PIN again to confirm';
+
+  @override
+  String get panicPinSaved => 'Panic PIN set successfully';
+
+  @override
+  String get panicCorruptedTitle => 'Database Error';
+
+  @override
+  String get panicCorruptedDesc => 'The app cannot load local data due to a storage integrity failure.';
+
+  @override
+  String get panicCorruptedHelp => 'Please restore from an available backup or reinstall the application.';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get close => 'Close';
 
   @override
   String get tags => 'Tags';

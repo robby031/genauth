@@ -316,7 +316,7 @@ class _SmartFloatingBubble extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'bubble-main',
             onPressed: onToggle,
-            tooltip: expanded ? 'Close' : 'Quick Actions',
+            tooltip: expanded ? context.l10n.close : context.l10n.quickActions,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               transitionBuilder: (child, animation) =>

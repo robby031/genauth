@@ -189,7 +189,7 @@ class _ExportCardState extends State<_ExportCard> {
       try {
         await Share.shareXFiles([
           XFile(file.path, mimeType: 'application/octet-stream'),
-        ], subject: 'GenAuth Backup');
+        ], subject: context.l10n.backupShareSubject);
       } catch (_) {
         // share sheet unavailable — user can still grab the file from Files.app
       }
@@ -215,7 +215,7 @@ class _ExportCardState extends State<_ExportCard> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Backup saved: Files → On My iPhone → GenAuth → $name',
+                    context.l10n.backupSavedPath(name),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
