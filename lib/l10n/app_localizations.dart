@@ -356,37 +356,37 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideTitle1.
   ///
   /// In en, this message translates to:
-  /// **'How GenAuth Works'**
+  /// **'Add and Generate OTP'**
   String get onboardingGuideTitle1;
 
   /// No description provided for @onboardingGuideDesc1.
   ///
   /// In en, this message translates to:
-  /// **'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.'**
+  /// **'Add accounts by scanning QR or manual entry. GenAuth then generates OTP codes automatically on the home screen.'**
   String get onboardingGuideDesc1;
 
   /// No description provided for @onboardingGuideTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Manage Accounts Easily'**
+  /// **'Find and Organize Accounts'**
   String get onboardingGuideTitle2;
 
   /// No description provided for @onboardingGuideDesc2.
   ///
   /// In en, this message translates to:
-  /// **'Use search, tag filters, and drag to organize account order based on your needs.'**
+  /// **'Use search and tags to find accounts quickly, then reorder them to match your workflow.'**
   String get onboardingGuideDesc2;
 
   /// No description provided for @onboardingGuideTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Security and Backup'**
+  /// **'Protect and Recover Data'**
   String get onboardingGuideTitle3;
 
   /// No description provided for @onboardingGuideDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.'**
+  /// **'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.'**
   String get onboardingGuideDesc3;
 
   /// No description provided for @onboardingDone.

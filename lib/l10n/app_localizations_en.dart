@@ -142,22 +142,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingDesc3 => 'Your app is protected with device authentication before you enter.';
 
   @override
-  String get onboardingGuideTitle1 => 'How GenAuth Works';
+  String get onboardingGuideTitle1 => 'Add and Generate OTP';
 
   @override
-  String get onboardingGuideDesc1 => 'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.';
+  String get onboardingGuideDesc1 => 'Add accounts by scanning QR or manual entry. GenAuth then generates OTP codes automatically on the home screen.';
 
   @override
-  String get onboardingGuideTitle2 => 'Manage Accounts Easily';
+  String get onboardingGuideTitle2 => 'Find and Organize Accounts';
 
   @override
-  String get onboardingGuideDesc2 => 'Use search, tag filters, and drag to organize account order based on your needs.';
+  String get onboardingGuideDesc2 => 'Use search and tags to find accounts quickly, then reorder them to match your workflow.';
 
   @override
-  String get onboardingGuideTitle3 => 'Security and Backup';
+  String get onboardingGuideTitle3 => 'Protect and Recover Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.';
+  String get onboardingGuideDesc3 => 'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.';
 
   @override
   String get onboardingDone => 'Done';

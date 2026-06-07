@@ -142,22 +142,22 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingDesc3 => 'Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.';
 
   @override
-  String get onboardingGuideTitle1 => 'Cara kerja GenAuth';
+  String get onboardingGuideTitle1 => 'Tambah Akun dan Buat OTP';
 
   @override
-  String get onboardingGuideDesc1 => 'Tambah akun via Scan QR atau Manual Entry, lalu kode OTP akan dibuat otomatis di halaman utama.';
+  String get onboardingGuideDesc1 => 'Tambahkan akun lewat scan QR atau input manual. Setelah itu GenAuth otomatis membuat kode OTP di halaman utama.';
 
   @override
-  String get onboardingGuideTitle2 => 'Kelola akun dengan mudah';
+  String get onboardingGuideTitle2 => 'Cari dan Rapikan Akun';
 
   @override
-  String get onboardingGuideDesc2 => 'Gunakan pencarian, filter tag, dan drag untuk merapikan urutan akun sesuai kebutuhan kamu.';
+  String get onboardingGuideDesc2 => 'Gunakan pencarian dan tag untuk menemukan akun lebih cepat, lalu atur urutannya sesuai alur kerja kamu.';
 
   @override
-  String get onboardingGuideTitle3 => 'Keamanan dan cadangan data';
+  String get onboardingGuideTitle3 => 'Lindungi dan Pulihkan Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Aktifkan PIN untuk perlindungan tambahan, dan gunakan Backup & Restore agar data akun tetap aman.';
+  String get onboardingGuideDesc3 => 'Gunakan lock, PIN, atau Panic PIN untuk perlindungan, dan siapkan cadangan lewat Backup & Restore.';
 
   @override
   String get onboardingDone => 'Selesai';
