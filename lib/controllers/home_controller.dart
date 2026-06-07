@@ -18,18 +18,48 @@ class HomeController extends ChangeNotifier {
 
   bool _isSearching = false;
   String _searchQuery = '';
+  final Set<String> _selectedTags = {};
 
   bool get isSearching => _isSearching;
+
+  Set<String> get allTags {
+    final tags = <String>{};
+    for (final a in _accounts) {
+      tags.addAll(a.tags);
+    }
+    return tags;
+  }
+
+  Set<String> get selectedTags => Set.unmodifiable(_selectedTags);
+
+  void toggleTag(String tag) {
+    if (_selectedTags.contains(tag)) {
+      _selectedTags.remove(tag);
+    } else {
+      _selectedTags.add(tag);
+    }
+    notifyListeners();
+  }
+
   List<OtpAccount> get filteredAccounts {
-    if (_searchQuery.isEmpty) return _accounts;
-    final query = _searchQuery.toLowerCase();
-    return _accounts
-        .where(
-          (a) =>
-              a.label.toLowerCase().contains(query) ||
-              a.issuer.toLowerCase().contains(query),
-        )
-        .toList();
+    var list = _accounts;
+
+    if (_selectedTags.isNotEmpty) {
+      list = list.where((a) => a.tags.any(_selectedTags.contains)).toList();
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      list = list
+          .where(
+            (a) =>
+                a.label.toLowerCase().contains(q) ||
+                a.issuer.toLowerCase().contains(q),
+          )
+          .toList();
+    }
+
+    return list;
   }
 
   String codeFor(String id) => _codes[id] ?? '------';
@@ -81,8 +111,15 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // onReorderItem passes the already-adjusted newIndex (after removal),
-  // so no manual index correction is needed here.
+  Future<void> updateAccountTags(String id, List<String> tags) async {
+    final idx = _accounts.indexWhere((a) => a.id == id);
+    if (idx < 0) return;
+    _accounts[idx] = _accounts[idx].copyWith(tags: tags);
+    _selectedTags.removeWhere((t) => allTags.contains(t) == false);
+    await _storage.saveAccounts(_accounts);
+    notifyListeners();
+  }
+
   Future<void> reorderAccounts(int oldIndex, int newIndex) async {
     final account = _accounts.removeAt(oldIndex);
     _accounts.insert(newIndex, account);

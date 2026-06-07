@@ -659,6 +659,36 @@ abstract class AppLocalizations {
   /// **'Remove PIN'**
   String get removePinOption;
 
+  /// No description provided for @tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// No description provided for @addTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addTag;
+
+  /// No description provided for @editTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Tags'**
+  String get editTags;
+
+  /// No description provided for @tagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag name...'**
+  String get tagHint;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
   /// No description provided for @githubLinkOpenFailed.
   ///
   /// In en, this message translates to:

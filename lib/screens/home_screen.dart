@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../controllers/home_controller.dart';
 import '../services/storage_service.dart';
 import '../widgets/otp_tile.dart';
+import '../widgets/tag_filter_bar.dart';
 import 'add_account_screen.dart';
 import 'lock_screen.dart';
 import 'drawer_screen.dart';
@@ -85,72 +86,87 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, child) {
         final scheme = Theme.of(context).colorScheme;
         final filtered = _controller.filteredAccounts;
-        final body = filtered.isEmpty
-            ? ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _controller.isSearching
-                                ? Icons.search_off
-                                : Icons.lock_outline,
-                            size: 64,
-                            color: scheme.outlineVariant,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _controller.isSearching
-                                ? context.l10n.noResults
-                                : context.l10n.noAccountsYet,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          if (!_controller.isSearching)
-                            Text(context.l10n.tapToAddFirstAccount),
-                        ],
-                      ),
+        final tagBar = TagFilterBar(
+          allTags: _controller.allTags,
+          selectedTags: _controller.selectedTags,
+          onToggle: _controller.toggleTag,
+        );
+
+        final emptyState = ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _controller.isSearching
+                          ? Icons.search_off
+                          : Icons.lock_outline,
+                      size: 64,
+                      color: scheme.outlineVariant,
                     ),
-                  ),
-                ],
-              )
-            : ReorderableListView.builder(
-                padding: EdgeInsets.zero,
-                physics: const AlwaysScrollableScrollPhysics(),
-                onReorderItem: _controller.isSearching
-                    ? (oldIdx, newIdx) {}
-                    : _controller.reorderAccounts,
-                proxyDecorator: (child, _, animation) => Material(
-                  elevation: 4,
-                  shadowColor: Colors.black26,
-                  borderRadius: BorderRadius.circular(8),
-                  child: child,
+                    const SizedBox(height: 16),
+                    Text(
+                      _controller.isSearching
+                          ? context.l10n.noResults
+                          : context.l10n.noAccountsYet,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    if (!_controller.isSearching)
+                      Text(context.l10n.tapToAddFirstAccount),
+                  ],
                 ),
-                itemCount: filtered.length,
-                itemBuilder: (_, i) {
-                  final account = filtered[i];
-                  return Column(
-                    key: ValueKey(account.id),
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      OtpTile(
-                        account: account,
-                        code: _controller.codeFor(account.id),
-                        onDelete: () => _controller.deleteAccount(account.id),
-                        onHotpIncrement: account.isHotp
-                            ? () => _controller.incrementHotp(account)
-                            : null,
-                        showDragHandle: !_controller.isSearching,
-                      ),
-                      const Divider(height: 1),
-                    ],
-                  );
-                },
-              );
+              ),
+            ),
+          ],
+        );
+
+        final accountList = ReorderableListView.builder(
+          padding: EdgeInsets.zero,
+          physics: const AlwaysScrollableScrollPhysics(),
+          onReorderItem: _controller.isSearching
+              ? (oldIdx, newIdx) {}
+              : _controller.reorderAccounts,
+          proxyDecorator: (child, _, animation) => Material(
+            elevation: 4,
+            shadowColor: Colors.black26,
+            borderRadius: BorderRadius.circular(8),
+            child: child,
+          ),
+          itemCount: filtered.length,
+          itemBuilder: (_, i) {
+            final account = filtered[i];
+            return Column(
+              key: ValueKey(account.id),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OtpTile(
+                  account: account,
+                  code: _controller.codeFor(account.id),
+                  onDelete: () => _controller.deleteAccount(account.id),
+                  onHotpIncrement: account.isHotp
+                      ? () => _controller.incrementHotp(account)
+                      : null,
+                  showDragHandle: !_controller.isSearching,
+                  onEditTags: (tags) =>
+                      _controller.updateAccountTags(account.id, tags),
+                ),
+                const Divider(height: 1),
+              ],
+            );
+          },
+        );
+
+        final body = Column(
+          children: [
+            tagBar,
+            Expanded(child: filtered.isEmpty ? emptyState : accountList),
+          ],
+        );
 
         return Scaffold(
           appBar: AppBar(

@@ -11,6 +11,7 @@ class OtpAccount {
   final int period;
   final int counter;
   final bool isHotp;
+  final List<String> tags;
 
   const OtpAccount({
     required this.id,
@@ -22,6 +23,7 @@ class OtpAccount {
     this.period = 30,
     this.counter = 0,
     this.isHotp = false,
+    this.tags = const [],
   });
 
   int get algorithmInt {
@@ -35,7 +37,7 @@ class OtpAccount {
     }
   }
 
-  OtpAccount copyWith({int? counter}) => OtpAccount(
+  OtpAccount copyWith({int? counter, List<String>? tags}) => OtpAccount(
     id: id,
     label: label,
     issuer: issuer,
@@ -45,6 +47,7 @@ class OtpAccount {
     period: period,
     counter: counter ?? this.counter,
     isHotp: isHotp,
+    tags: tags ?? this.tags,
   );
 
   Map<String, dynamic> toJson() => {
@@ -57,6 +60,7 @@ class OtpAccount {
     'period': period,
     'counter': counter,
     'isHotp': isHotp,
+    if (tags.isNotEmpty) 'tags': tags,
   };
 
   factory OtpAccount.fromJson(Map<String, dynamic> json) => OtpAccount(
@@ -69,6 +73,7 @@ class OtpAccount {
     period: json['period'] as int? ?? 30,
     counter: json['counter'] as int? ?? 0,
     isHotp: json['isHotp'] as bool? ?? false,
+    tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? const [],
   );
 
   // Parse otpauth://totp/label?secret=X&issuer=Y&algorithm=Z&digits=6&period=30
