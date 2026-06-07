@@ -63,7 +63,7 @@ class _OtpTileState extends State<OtpTile> {
           content: Text(context.l10n.codeCopied),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 3),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
@@ -189,7 +189,7 @@ class _OtpTileState extends State<OtpTile> {
                   ? '${widget.account.issuer} · ${widget.account.label}'
                   : widget.account.label,
               maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, overflow: TextOverflow.ellipsis),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -203,9 +203,9 @@ class _OtpTileState extends State<OtpTile> {
                 else
                   _TotpProgress(period: widget.account.period),
                 if (widget.showDragHandle) ...[
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 8),
                   Icon(
-                    Icons.drag_handle,
+                    Icons.drag_indicator,
                     color: scheme.onSurface.withValues(alpha: 0.3),
                     size: 20,
                   ),
@@ -251,6 +251,7 @@ class _TagChipsRow extends StatelessWidget {
                   fontSize: 11,
                   color: scheme.onPrimaryContainer,
                   fontWeight: FontWeight.w500,
+                  fontFamily: 'Roboto Mono',
                 ),
               ),
             ),
@@ -298,8 +299,8 @@ class _TotpProgressState extends State<_TotpProgress> {
   Widget build(BuildContext context) {
     final urgent = _remaining <= 5;
     return SizedBox(
-      width: 32,
-      height: 32,
+      width: 24,
+      height: 24,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -314,7 +315,7 @@ class _TotpProgressState extends State<_TotpProgress> {
           Text(
             '$_remaining',
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 9,
               fontWeight: FontWeight.w600,
               color: urgent ? Colors.red : null,
             ),
