@@ -170,6 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           appBar: AppBar(
+            titleSpacing: 0,
+
             title: _controller.isSearching
                 ? TextField(
                     controller: _searchController,
@@ -177,10 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: InputDecoration(
                       hintText: context.l10n.searchHint,
                       border: InputBorder.none,
+                      isDense: true,
                     ),
                     onChanged: _controller.setSearchQuery,
                   )
-                : Text(context.l10n.appTitle),
+                : Text(
+                    context.l10n.appTitle,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
             centerTitle: false,
             actions: [
               _controller.isSearching

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genauth/l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
@@ -22,6 +23,16 @@ class GenAuthApp extends StatelessWidget {
     return ValueListenableBuilder<Locale>(
       valueListenable: LocaleService.localeNotifier,
       builder: (context, locale, child) {
+        final lightColorScheme = ColorScheme.fromSeed(
+          seedColor: _brandSeedColor,
+          dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+        );
+        final darkColorScheme = ColorScheme.fromSeed(
+          seedColor: _brandSeedColor,
+          brightness: Brightness.dark,
+          dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+        );
+
         return MaterialApp(
           title: 'GenAuth',
           debugShowCheckedModeBanner: false,
@@ -29,19 +40,26 @@ class GenAuthApp extends StatelessWidget {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: _brandSeedColor,
-              dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-            ),
+            colorScheme: lightColorScheme,
             useMaterial3: true,
+            textTheme: GoogleFonts.robotoMonoTextTheme(),
+            appBarTheme: AppBarTheme(
+              backgroundColor: lightColorScheme.surface,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
+            ),
           ),
           darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: _brandSeedColor,
-              brightness: Brightness.dark,
-              dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-            ),
+            colorScheme: darkColorScheme,
             useMaterial3: true,
+            textTheme: GoogleFonts.robotoMonoTextTheme(
+              ThemeData(brightness: Brightness.dark).textTheme,
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: darkColorScheme.surface,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
+            ),
           ),
           home: const _AppEntryScreen(),
         );

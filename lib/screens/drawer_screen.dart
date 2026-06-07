@@ -137,7 +137,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   Navigator.pop(context);
                 },
               ),
-              const SizedBox(height: 8),
               _menuTile(
                 context: context,
                 icon: Icons.translate,
@@ -235,7 +234,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 title: context.l10n.lockapp,
                 onTap: widget.onLock,
               ),
-              const SizedBox(height: 8),
               _menuTile(
                 context: context,
                 icon: Icons.pin_outlined,
@@ -244,7 +242,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     : context.l10n.setPinOption,
                 onTap: _hasPin ? _removePin : _openPinSetup,
               ),
-              const SizedBox(height: 8),
               _menuTile(
                 context: context,
                 icon: Icons.backup_outlined,
@@ -257,14 +254,12 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 8),
               _menuTile(
                 context: context,
                 icon: Icons.info_outline,
                 title: context.l10n.about,
                 onTap: widget.onAbout,
               ),
-              const SizedBox(height: 8),
               ValueListenableBuilder<Locale>(
                 valueListenable: LocaleService.localeNotifier,
                 builder: (context, currentLocale, child) {
