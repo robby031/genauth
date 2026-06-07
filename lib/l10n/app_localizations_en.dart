@@ -142,22 +142,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingDesc3 => 'Your app is protected with device authentication before you enter.';
 
   @override
-  String get onboardingGuideTitle1 => 'How GenAuth Works';
+  String get onboardingGuideTitle1 => 'Add and Generate OTP';
 
   @override
-  String get onboardingGuideDesc1 => 'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.';
+  String get onboardingGuideDesc1 => 'Add accounts by scanning QR or manual entry. GenAuth then generates OTP codes automatically on the home screen.';
 
   @override
-  String get onboardingGuideTitle2 => 'Manage Accounts Easily';
+  String get onboardingGuideTitle2 => 'Find and Organize Accounts';
 
   @override
-  String get onboardingGuideDesc2 => 'Use search, tag filters, and drag to organize account order based on your needs.';
+  String get onboardingGuideDesc2 => 'Use search and tags to find accounts quickly, then reorder them to match your workflow.';
 
   @override
-  String get onboardingGuideTitle3 => 'Security and Backup';
+  String get onboardingGuideTitle3 => 'Protect and Recover Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.';
+  String get onboardingGuideDesc3 => 'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.';
 
   @override
   String get onboardingDone => 'Done';
@@ -380,6 +380,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get auditLogTitle => 'Audit Log';
+
+  @override
+  String get auditLogMenu => 'Audit Activity';
+
+  @override
+  String get auditLogEmpty => 'No activity has been recorded yet.';
+
+  @override
+  String get auditLogClearAll => 'Clear all logs';
+
+  @override
+  String get auditLogClearConfirmTitle => 'Clear audit logs?';
+
+  @override
+  String get auditLogClearConfirmDesc => 'This will permanently remove all local audit records.';
+
+  @override
+  String get auditLogStatus => 'Status';
+
+  @override
+  String get auditLogDetail => 'Detail';
+
+  @override
+  String get auditLogMetadata => 'Metadata';
+
+  @override
+  String get auditLogCleared => 'Audit logs cleared';
+
+  @override
+  String get privacyPolicyMenu => 'Privacy Policy';
+
+  @override
+  String get privacyPolicyTitle => 'Privacy Policy';
+
+  @override
+  String get privacyPolicyNotConfigured => 'Privacy policy URL is not configured yet. Set it in lib/utils/app_links.dart.';
+
+  @override
+  String get privacyPolicyInvalidUrl => 'Privacy policy URL is invalid. Please use a valid http/https URL.';
+
+  @override
+  String get privacyPolicyLoadFailed => 'Failed to load privacy policy page. Please try again later.';
+
+  @override
+  String get privacyPolicyOpenExternalHint => 'For this platform, privacy policy opens in the system browser view.';
+
+  @override
+  String get privacyPolicyOpenExternal => 'Open Privacy Policy';
+
+  @override
+  String get termsConditionsMenu => 'Terms & Conditions';
+
+  @override
+  String get termsConditionsNotConfigured => 'Terms & Conditions URL is not configured yet. Set it in lib/utils/app_links.dart.';
+
+  @override
+  String get termsConditionsInvalidUrl => 'Terms & Conditions URL is invalid. Please use a valid http/https URL.';
+
+  @override
+  String get termsConditionsLoadFailed => 'Failed to load Terms & Conditions page. Please try again later.';
+
+  @override
+  String get drawerSectionSecurity => 'Security';
+
+  @override
+  String get drawerSectionData => 'Data and Privacy';
+
+  @override
+  String get drawerSectionApp => 'Application';
 
   @override
   String get tags => 'Tags';

@@ -356,37 +356,37 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideTitle1.
   ///
   /// In en, this message translates to:
-  /// **'How GenAuth Works'**
+  /// **'Add and Generate OTP'**
   String get onboardingGuideTitle1;
 
   /// No description provided for @onboardingGuideDesc1.
   ///
   /// In en, this message translates to:
-  /// **'Add accounts via Scan QR or Manual Entry, then OTP codes are generated automatically on the home screen.'**
+  /// **'Add accounts by scanning QR or manual entry. GenAuth then generates OTP codes automatically on the home screen.'**
   String get onboardingGuideDesc1;
 
   /// No description provided for @onboardingGuideTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Manage Accounts Easily'**
+  /// **'Find and Organize Accounts'**
   String get onboardingGuideTitle2;
 
   /// No description provided for @onboardingGuideDesc2.
   ///
   /// In en, this message translates to:
-  /// **'Use search, tag filters, and drag to organize account order based on your needs.'**
+  /// **'Use search and tags to find accounts quickly, then reorder them to match your workflow.'**
   String get onboardingGuideDesc2;
 
   /// No description provided for @onboardingGuideTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Security and Backup'**
+  /// **'Protect and Recover Data'**
   String get onboardingGuideTitle3;
 
   /// No description provided for @onboardingGuideDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Enable PIN for extra protection, and use Backup & Restore to keep your account data safe.'**
+  /// **'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.'**
   String get onboardingGuideDesc3;
 
   /// No description provided for @onboardingDone.
@@ -796,6 +796,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @auditLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Log'**
+  String get auditLogTitle;
+
+  /// No description provided for @auditLogMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Activity'**
+  String get auditLogMenu;
+
+  /// No description provided for @auditLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity has been recorded yet.'**
+  String get auditLogEmpty;
+
+  /// No description provided for @auditLogClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all logs'**
+  String get auditLogClearAll;
+
+  /// No description provided for @auditLogClearConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear audit logs?'**
+  String get auditLogClearConfirmTitle;
+
+  /// No description provided for @auditLogClearConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove all local audit records.'**
+  String get auditLogClearConfirmDesc;
+
+  /// No description provided for @auditLogStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get auditLogStatus;
+
+  /// No description provided for @auditLogDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get auditLogDetail;
+
+  /// No description provided for @auditLogMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata'**
+  String get auditLogMetadata;
+
+  /// No description provided for @auditLogCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit logs cleared'**
+  String get auditLogCleared;
+
+  /// No description provided for @privacyPolicyMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyMenu;
+
+  /// No description provided for @privacyPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyTitle;
+
+  /// No description provided for @privacyPolicyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy URL is not configured yet. Set it in lib/utils/app_links.dart.'**
+  String get privacyPolicyNotConfigured;
+
+  /// No description provided for @privacyPolicyInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy URL is invalid. Please use a valid http/https URL.'**
+  String get privacyPolicyInvalidUrl;
+
+  /// No description provided for @privacyPolicyLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load privacy policy page. Please try again later.'**
+  String get privacyPolicyLoadFailed;
+
+  /// No description provided for @privacyPolicyOpenExternalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For this platform, privacy policy opens in the system browser view.'**
+  String get privacyPolicyOpenExternalHint;
+
+  /// No description provided for @privacyPolicyOpenExternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Privacy Policy'**
+  String get privacyPolicyOpenExternal;
+
+  /// No description provided for @termsConditionsMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get termsConditionsMenu;
+
+  /// No description provided for @termsConditionsNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions URL is not configured yet. Set it in lib/utils/app_links.dart.'**
+  String get termsConditionsNotConfigured;
+
+  /// No description provided for @termsConditionsInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions URL is invalid. Please use a valid http/https URL.'**
+  String get termsConditionsInvalidUrl;
+
+  /// No description provided for @termsConditionsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load Terms & Conditions page. Please try again later.'**
+  String get termsConditionsLoadFailed;
+
+  /// No description provided for @drawerSectionSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get drawerSectionSecurity;
+
+  /// No description provided for @drawerSectionData.
+  ///
+  /// In en, this message translates to:
+  /// **'Data and Privacy'**
+  String get drawerSectionData;
+
+  /// No description provided for @drawerSectionApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get drawerSectionApp;
 
   /// No description provided for @tags.
   ///

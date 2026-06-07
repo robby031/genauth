@@ -142,22 +142,22 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingDesc3 => 'Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.';
 
   @override
-  String get onboardingGuideTitle1 => 'Cara kerja GenAuth';
+  String get onboardingGuideTitle1 => 'Tambah Akun dan Buat OTP';
 
   @override
-  String get onboardingGuideDesc1 => 'Tambah akun via Scan QR atau Manual Entry, lalu kode OTP akan dibuat otomatis di halaman utama.';
+  String get onboardingGuideDesc1 => 'Tambahkan akun lewat scan QR atau input manual. Setelah itu GenAuth otomatis membuat kode OTP di halaman utama.';
 
   @override
-  String get onboardingGuideTitle2 => 'Kelola akun dengan mudah';
+  String get onboardingGuideTitle2 => 'Cari dan Rapikan Akun';
 
   @override
-  String get onboardingGuideDesc2 => 'Gunakan pencarian, filter tag, dan drag untuk merapikan urutan akun sesuai kebutuhan kamu.';
+  String get onboardingGuideDesc2 => 'Gunakan pencarian dan tag untuk menemukan akun lebih cepat, lalu atur urutannya sesuai alur kerja kamu.';
 
   @override
-  String get onboardingGuideTitle3 => 'Keamanan dan cadangan data';
+  String get onboardingGuideTitle3 => 'Lindungi dan Pulihkan Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Aktifkan PIN untuk perlindungan tambahan, dan gunakan Backup & Restore agar data akun tetap aman.';
+  String get onboardingGuideDesc3 => 'Gunakan lock, PIN, atau Panic PIN untuk perlindungan, dan siapkan cadangan lewat Backup & Restore.';
 
   @override
   String get onboardingDone => 'Selesai';
@@ -380,6 +380,78 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get close => 'Tutup';
+
+  @override
+  String get auditLogTitle => 'Log Audit';
+
+  @override
+  String get auditLogMenu => 'Aktivitas Audit';
+
+  @override
+  String get auditLogEmpty => 'Belum ada aktivitas yang tercatat.';
+
+  @override
+  String get auditLogClearAll => 'Hapus semua log';
+
+  @override
+  String get auditLogClearConfirmTitle => 'Hapus log audit?';
+
+  @override
+  String get auditLogClearConfirmDesc => 'Tindakan ini akan menghapus permanen semua catatan audit lokal.';
+
+  @override
+  String get auditLogStatus => 'Status';
+
+  @override
+  String get auditLogDetail => 'Detail';
+
+  @override
+  String get auditLogMetadata => 'Metadata';
+
+  @override
+  String get auditLogCleared => 'Log audit dihapus';
+
+  @override
+  String get privacyPolicyMenu => 'Kebijakan Privasi';
+
+  @override
+  String get privacyPolicyTitle => 'Kebijakan Privasi';
+
+  @override
+  String get privacyPolicyNotConfigured => 'URL kebijakan privasi belum dikonfigurasi. Atur di lib/utils/app_links.dart.';
+
+  @override
+  String get privacyPolicyInvalidUrl => 'URL kebijakan privasi tidak valid. Gunakan URL http/https yang benar.';
+
+  @override
+  String get privacyPolicyLoadFailed => 'Halaman kebijakan privasi gagal dimuat. Silakan coba lagi nanti.';
+
+  @override
+  String get privacyPolicyOpenExternalHint => 'Di platform ini, kebijakan privasi dibuka di tampilan browser sistem.';
+
+  @override
+  String get privacyPolicyOpenExternal => 'Buka Kebijakan Privasi';
+
+  @override
+  String get termsConditionsMenu => 'Syarat & Ketentuan';
+
+  @override
+  String get termsConditionsNotConfigured => 'URL Syarat & Ketentuan belum dikonfigurasi. Atur di lib/utils/app_links.dart.';
+
+  @override
+  String get termsConditionsInvalidUrl => 'URL Syarat & Ketentuan tidak valid. Gunakan URL http/https yang benar.';
+
+  @override
+  String get termsConditionsLoadFailed => 'Halaman Syarat & Ketentuan gagal dimuat. Silakan coba lagi nanti.';
+
+  @override
+  String get drawerSectionSecurity => 'Keamanan';
+
+  @override
+  String get drawerSectionData => 'Data dan Privasi';
+
+  @override
+  String get drawerSectionApp => 'Aplikasi';
 
   @override
   String get tags => 'Tag';

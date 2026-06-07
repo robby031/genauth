@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:genauth/screens/panic_corrupted_screen.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -73,8 +74,13 @@ class _PinScreenState extends State<PinScreen> {
   Future<void> _verify() async {
     setState(() => _loading = true);
     final storage = StorageService();
+    await AuditLogService.instance.log('auth_pin_attempt');
     final isPanic = await storage.verifyPanicPin(_pin);
     if (isPanic) {
+      await AuditLogService.instance.log(
+        'auth_pin_panic_trigger',
+        status: 'critical',
+      );
       await storage.triggerPanicDestruct();
       if (!mounted) return;
       Navigator.pushAndRemoveUntil(
@@ -86,6 +92,10 @@ class _PinScreenState extends State<PinScreen> {
     }
 
     final ok = await storage.verifyPin(_pin);
+    await AuditLogService.instance.log(
+      'auth_pin_result',
+      status: ok ? 'success' : 'failed',
+    );
     if (!mounted) return;
     if (ok) {
       Navigator.pop(context, true);

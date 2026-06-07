@@ -53,17 +53,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             _OnboardingData(
               title: context.l10n.onboardingGuideTitle1,
               description: context.l10n.onboardingGuideDesc1,
-              icon: Icons.qr_code_scanner,
+              icon: Icons.qr_code_2_outlined,
             ),
             _OnboardingData(
               title: context.l10n.onboardingGuideTitle2,
               description: context.l10n.onboardingGuideDesc2,
-              icon: Icons.dashboard_customize_outlined,
+              icon: Icons.manage_search_outlined,
             ),
             _OnboardingData(
               title: context.l10n.onboardingGuideTitle3,
               description: context.l10n.onboardingGuideDesc3,
-              icon: Icons.lock_person_outlined,
+              icon: Icons.shield_outlined,
             ),
           ]
         : [

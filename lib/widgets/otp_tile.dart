@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/clipboard_security_service.dart';
 import 'package:genauth/services/otp_service.dart';
 import 'package:genauth/widgets/service_icon.dart';
@@ -54,6 +55,16 @@ class _OtpTileState extends State<OtpTile> {
       code: widget.code,
       period: widget.account.period,
       isHotp: widget.account.isHotp,
+    );
+    await AuditLogService.instance.log(
+      'otp_code_copied',
+      metadata: {
+        'accountId': widget.account.id,
+        'issuer': widget.account.issuer,
+        'label': widget.account.label,
+        'isHotp': widget.account.isHotp,
+        'period': widget.account.period,
+      },
     );
     setState(() => _revealed = true);
     _hideTimer?.cancel();

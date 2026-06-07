@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/google_auth_migration_service.dart';
 
 class StorageService {
@@ -41,6 +42,16 @@ class StorageService {
     final list = await loadAccounts();
     list.add(account);
     await saveAccounts(list);
+    await AuditLogService.instance.log(
+      'account_added',
+      metadata: {
+        'accountId': account.id,
+        'issuer': account.issuer,
+        'label': account.label,
+        'isHotp': account.isHotp,
+        'period': account.period,
+      },
+    );
   }
 
   Future<int> addAccountsUnique(List<OtpAccount> accounts) async {
@@ -62,6 +73,11 @@ class StorageService {
       await saveAccounts(list);
     }
 
+    await AuditLogService.instance.log(
+      'accounts_imported',
+      metadata: {'requested': accounts.length, 'imported': importedCount},
+    );
+
     return importedCount;
   }
 
@@ -78,6 +94,10 @@ class StorageService {
     final list = await loadAccounts();
     list.removeWhere((a) => a.id == id);
     await saveAccounts(list);
+    await AuditLogService.instance.log(
+      'account_deleted',
+      metadata: {'accountId': id},
+    );
   }
 
   Future<bool> hasPin() async =>
@@ -88,6 +108,7 @@ class StorageService {
     final hash = await _hashPin(pin, salt);
     await _storage.write(key: _pinHashKey, value: base64Encode(hash));
     await _storage.write(key: _pinSaltKey, value: base64Encode(salt));
+    await AuditLogService.instance.log('pin_set');
   }
 
   Future<bool> verifyPin(String pin) async {
@@ -101,6 +122,7 @@ class StorageService {
   Future<void> clearPin() async {
     await _storage.delete(key: _pinHashKey);
     await _storage.delete(key: _pinSaltKey);
+    await AuditLogService.instance.log('pin_removed');
   }
 
   Future<bool> hasPanicPin() async =>
@@ -111,6 +133,7 @@ class StorageService {
     final hash = await _hashPin(pin, salt);
     await _storage.write(key: _panicPinHashKey, value: base64Encode(hash));
     await _storage.write(key: _panicPinSaltKey, value: base64Encode(salt));
+    await AuditLogService.instance.log('panic_pin_set');
   }
 
   Future<bool> verifyPanicPin(String pin) async {
@@ -124,6 +147,7 @@ class StorageService {
   Future<void> clearPanicPin() async {
     await _storage.delete(key: _panicPinHashKey);
     await _storage.delete(key: _panicPinSaltKey);
+    await AuditLogService.instance.log('panic_pin_removed');
   }
 
   Future<bool> isPanicTriggered() async {
@@ -132,6 +156,11 @@ class StorageService {
   }
 
   Future<void> triggerPanicDestruct() async {
+    await AuditLogService.instance.log(
+      'panic_destruct_triggered',
+      status: 'critical',
+      detail: 'All local OTP data was wiped by panic PIN trigger.',
+    );
     await _storage.delete(key: _key);
     await clearPin();
     await clearPanicPin();

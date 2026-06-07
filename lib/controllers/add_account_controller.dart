@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/google_auth_migration_service.dart';
 import 'package:genauth/services/otp_service.dart';
 import 'package:genauth/services/storage_service.dart';
@@ -15,7 +16,12 @@ class AddAccountController extends ChangeNotifier {
 
   Future<int> saveFromQrCode(String code) async {
     final accounts = await _migration.decodeAccounts(code);
-    return _storage.addAccountsUnique(accounts);
+    final imported = await _storage.addAccountsUnique(accounts);
+    await AuditLogService.instance.log(
+      'account_import_qr',
+      metadata: {'decoded': accounts.length, 'imported': imported},
+    );
+    return imported;
   }
 
   Future<void> saveManualAccount({
@@ -45,6 +51,16 @@ class AddAccountController extends ChangeNotifier {
       );
 
       await _storage.addAccount(account);
+      await AuditLogService.instance.log(
+        'account_add_manual',
+        metadata: {
+          'accountId': account.id,
+          'issuer': account.issuer,
+          'label': account.label,
+          'isHotp': account.isHotp,
+          'period': account.period,
+        },
+      );
     } finally {
       _saving = false;
       notifyListeners();

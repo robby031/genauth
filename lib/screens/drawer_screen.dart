@@ -3,8 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/app_links.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/backup_screen.dart';
+import 'package:genauth/screens/audit_log_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/services/storage_service.dart';
 
@@ -24,10 +26,6 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
-  static final Uri _repoUrl = Uri.parse(
-    'https://github.com/robby031/genotp-go',
-  );
-
   bool _hasPin = false;
   bool _hasPanicPin = false;
 
@@ -101,7 +99,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
   }
 
   Future<void> _openGithubRepo(BuildContext context) async {
-    final ok = await launchUrl(_repoUrl, mode: LaunchMode.externalApplication);
+    final ok = await launchUrl(
+      Uri.parse(AppLinks.repoUrl),
+      mode: LaunchMode.externalApplication,
+    );
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context)
         ..hideCurrentMaterialBanner()
@@ -116,6 +117,90 @@ class _DrawerScreenState extends State<DrawerScreen> {
             ),
           ),
         );
+    }
+  }
+
+  Future<void> _openPrivacyPolicyDirect() async {
+    Navigator.pop(context);
+
+    final raw = AppLinks.privacyPolicyUrl.trim();
+    if (raw.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.privacyPolicyNotConfigured),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final uri = Uri.tryParse(raw);
+    if (uri == null ||
+        !(uri.hasScheme && (uri.scheme == 'https' || uri.scheme == 'http'))) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.privacyPolicyInvalidUrl),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.privacyPolicyLoadFailed),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openTermsConditionsDirect() async {
+    Navigator.pop(context);
+
+    final raw = AppLinks.termsConditionsUrl.trim();
+    if (raw.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsNotConfigured),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final uri = Uri.tryParse(raw);
+    if (uri == null ||
+        !(uri.hasScheme && (uri.scheme == 'https' || uri.scheme == 'http'))) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsInvalidUrl),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
+    }
+
+    final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.termsConditionsLoadFailed),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+        ),
+      );
     }
   }
 
@@ -147,6 +232,24 @@ class _DrawerScreenState extends State<DrawerScreen> {
               ),
         trailing: trailing,
         onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _sectionHeader(BuildContext context, String title) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 8, 4, 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: scheme.onSurfaceVariant,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+          ),
+        ),
       ),
     );
   }
@@ -202,9 +305,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
     return Drawer(
       width: 292,
       child: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: double.infinity,
@@ -268,6 +372,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+              _sectionHeader(context, context.l10n.drawerSectionSecurity),
               _menuTile(
                 context: context,
                 icon: Icons.lock_outline,
@@ -291,6 +396,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 subtitle: context.l10n.panicPinOptionSubtitle,
                 onTap: _hasPanicPin ? _removePanicPin : _openPanicPinSetup,
               ),
+              const SizedBox(height: 6),
+              _sectionHeader(context, context.l10n.drawerSectionData),
               _menuTile(
                 context: context,
                 icon: Icons.backup_outlined,
@@ -303,6 +410,32 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   );
                 },
               ),
+              _menuTile(
+                context: context,
+                icon: Icons.history_edu_outlined,
+                title: context.l10n.auditLogMenu,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuditLogScreen()),
+                  );
+                },
+              ),
+              _menuTile(
+                context: context,
+                icon: Icons.privacy_tip_outlined,
+                title: context.l10n.privacyPolicyMenu,
+                onTap: _openPrivacyPolicyDirect,
+              ),
+              _menuTile(
+                context: context,
+                icon: Icons.gavel_outlined,
+                title: context.l10n.termsConditionsMenu,
+                onTap: _openTermsConditionsDirect,
+              ),
+              const SizedBox(height: 6),
+              _sectionHeader(context, context.l10n.drawerSectionApp),
               _menuTile(
                 context: context,
                 icon: Icons.info_outline,
@@ -336,7 +469,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   );
                 },
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
