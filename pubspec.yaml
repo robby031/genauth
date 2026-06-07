@@ -25,6 +25,7 @@ dependencies:
   share_plus: ^10.1.4
   file_picker: ^8.1.2
   path_provider: ^2.1.5
+  cached_network_image: ^3.4.1
   otpauth_migration: ^0.0.7
   fixnum: ^1.1.1
 

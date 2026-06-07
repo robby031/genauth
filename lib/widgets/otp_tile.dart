@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/otp_account.dart';
 import '../services/otp_service.dart';
+import '../widgets/service_icon.dart';
+import '../widgets/tag_editor_sheet.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../utils/l10n_extensions.dart';
 
@@ -12,6 +14,7 @@ class OtpTile extends StatefulWidget {
   final VoidCallback onDelete;
   final VoidCallback? onHotpIncrement;
   final bool showDragHandle;
+  final void Function(List<String> tags)? onEditTags;
 
   const OtpTile({
     super.key,
@@ -20,6 +23,7 @@ class OtpTile extends StatefulWidget {
     required this.onDelete,
     this.onHotpIncrement,
     this.showDragHandle = false,
+    this.onEditTags,
   });
 
   @override
@@ -36,7 +40,6 @@ class _OtpTileState extends State<OtpTile> {
     super.dispose();
   }
 
-  // When the account changes (e.g. HOTP counter updated), reset reveal.
   @override
   void didUpdateWidget(OtpTile oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -66,6 +69,23 @@ class _OtpTileState extends State<OtpTile> {
       );
   }
 
+  Future<void> _openTagEditor(BuildContext context) async {
+    final name = widget.account.issuer.isNotEmpty
+        ? widget.account.issuer
+        : widget.account.label;
+    final updated = await showModalBottomSheet<List<String>>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) =>
+          TagEditorSheet(accountName: name, initialTags: widget.account.tags),
+    );
+    if (updated != null) widget.onEditTags?.call(updated);
+  }
+
   String get _maskedCode {
     final len = widget.code.replaceAll(' ', '').length;
     if (len == 6) return '••• •••';
@@ -80,17 +100,24 @@ class _OtpTileState extends State<OtpTile> {
     return c;
   }
 
-  String get _avatarLabel {
-    final src =
-        widget.account.issuer.isNotEmpty ? widget.account.issuer : widget.account.label;
-    return src.isNotEmpty ? src[0].toUpperCase() : '?';
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Slidable(
       key: ValueKey(widget.account.id),
+      startActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.20,
+        children: [
+          SlidableAction(
+            onPressed: _openTagEditor,
+            backgroundColor: scheme.primary,
+            foregroundColor: scheme.onPrimary,
+            icon: Icons.label_outline,
+            label: context.l10n.tags,
+          ),
+        ],
+      ),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         extentRatio: 0.18,
@@ -131,78 +158,117 @@ class _OtpTileState extends State<OtpTile> {
           ),
         ],
       ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _avatarColor(widget.account.issuer + widget.account.label),
-          child: Text(
-            _avatarLabel,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: ServiceIcon(
+              issuer: widget.account.issuer,
+              label: widget.account.label,
             ),
-          ),
-        ),
-        title: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: Align(
-            key: ValueKey(_revealed),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              _revealed ? _displayCode : _maskedCode,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 2,
-                color: _revealed ? null : scheme.onSurface.withValues(alpha: 0.35),
+            title: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Align(
+                key: ValueKey(_revealed),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _revealed ? _displayCode : _maskedCode,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 2,
+                    color: _revealed
+                        ? null
+                        : scheme.onSurface.withValues(alpha: 0.35),
+                  ),
+                ),
               ),
             ),
+            subtitle: Text(
+              widget.account.issuer.isNotEmpty
+                  ? '${widget.account.issuer} · ${widget.account.label}'
+                  : widget.account.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.account.isHotp)
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: context.l10n.nextCode,
+                    onPressed: widget.onHotpIncrement,
+                  )
+                else
+                  _TotpProgress(period: widget.account.period),
+                if (widget.showDragHandle) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.drag_handle,
+                    color: scheme.onSurface.withValues(alpha: 0.3),
+                    size: 20,
+                  ),
+                ],
+              ],
+            ),
+            onTap: _onTap,
           ),
-        ),
-        subtitle: Text(
-          widget.account.issuer.isNotEmpty
-              ? '${widget.account.issuer} · ${widget.account.label}'
-              : widget.account.label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.account.isHotp)
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                tooltip: context.l10n.nextCode,
-                onPressed: widget.onHotpIncrement,
-              )
-            else
-              _TotpProgress(period: widget.account.period),
-            if (widget.showDragHandle) ...[
-              const SizedBox(width: 4),
-              Icon(
-                Icons.drag_handle,
-                color: scheme.onSurface.withValues(alpha: 0.3),
-                size: 20,
-              ),
-            ],
-          ],
-        ),
-        onTap: _onTap,
+          if (widget.account.tags.isNotEmpty)
+            _TagChipsRow(tags: widget.account.tags, scheme: scheme),
+        ],
       ),
     );
   }
+}
 
-  Color _avatarColor(String seed) {
-    const colors = [
-      Color(0xFF5C6BC0),
-      Color(0xFF26A69A),
-      Color(0xFFEF5350),
-      Color(0xFFAB47BC),
-      Color(0xFF42A5F5),
-      Color(0xFFFF7043),
-      Color(0xFF66BB6A),
-      Color(0xFFEC407A),
-    ];
-    return colors[seed.codeUnits.fold(0, (a, b) => a + b) % colors.length];
+class _TagChipsRow extends StatelessWidget {
+  final List<String> tags;
+  final ColorScheme scheme;
+
+  const _TagChipsRow({required this.tags, required this.scheme});
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = tags.take(3).toList();
+    final overflow = tags.length - visible.length;
+    return Padding(
+      padding: const EdgeInsets.only(left: 72, right: 16, bottom: 8),
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          for (final tag in visible)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                tag,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: scheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          if (overflow > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '+$overflow',
+                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
@@ -241,8 +307,9 @@ class _TotpProgressState extends State<_TotpProgress> {
             value: OtpService.progress(widget.period),
             strokeWidth: 3,
             color: urgent ? Colors.red : Theme.of(context).colorScheme.primary,
-            backgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest,
           ),
           Text(
             '$_remaining',

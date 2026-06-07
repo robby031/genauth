@@ -311,6 +311,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get removePinOption => 'Hapus PIN';
 
   @override
+  String get tags => 'Tag';
+
+  @override
+  String get addTag => 'Tambah';
+
+  @override
+  String get editTags => 'Edit Tag';
+
+  @override
+  String get tagHint => 'Nama tag...';
+
+  @override
+  String get done => 'Selesai';
+
+  @override
   String get githubLinkOpenFailed => 'Tidak dapat membuka tautan GitHub.';
 
   @override

@@ -311,6 +311,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removePinOption => 'Remove PIN';
 
   @override
+  String get tags => 'Tags';
+
+  @override
+  String get addTag => 'Add';
+
+  @override
+  String get editTags => 'Edit Tags';
+
+  @override
+  String get tagHint => 'Tag name...';
+
+  @override
+  String get done => 'Done';
+
+  @override
   String get githubLinkOpenFailed => 'Unable to open GitHub link.';
 
   @override
