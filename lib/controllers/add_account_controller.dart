@@ -14,7 +14,7 @@ class AddAccountController extends ChangeNotifier {
   bool get saving => _saving;
 
   Future<int> saveFromQrCode(String code) async {
-    final accounts = _migration.decodeAccounts(code);
+    final accounts = await _migration.decodeAccounts(code);
     return _storage.addAccountsUnique(accounts);
   }
 

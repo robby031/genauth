@@ -170,7 +170,7 @@ packages:
     source: hosted
     version: "8.3.7"
   fixnum:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: fixnum
       sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
@@ -305,10 +305,10 @@ packages:
     dependency: "direct main"
     description:
       name: genotp_flutter
-      sha256: "32d8333a8ea9c583677eb6a5dc33443fa25b7ec0a149c5338d65543b1fb52935"
+      sha256: "2459046bc06bc966dce37b29ba0734bd110d0639f7ef7abf1a9ed158ab877073"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.2"
+    version: "0.0.3"
   hooks:
     dependency: transitive
     description:
@@ -509,14 +509,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  otpauth_migration:
-    dependency: "direct main"
-    description:
-      name: otpauth_migration
-      sha256: "5c0ac119b8d957b27bf12a2982c923a4457e69ae5a0a11e833d1b51faae016d9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.7"
   package_config:
     dependency: transitive
     description:
@@ -621,14 +613,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
-  protobuf:
-    dependency: transitive
-    description:
-      name: protobuf
-      sha256: "01dd9bd0fa02548bf2ceee13545d4a0ec6046459d847b6b061d8a27237108a08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   pub_semver:
     dependency: transitive
     description:

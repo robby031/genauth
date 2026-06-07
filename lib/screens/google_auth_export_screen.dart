@@ -13,51 +13,60 @@ class GoogleAuthExportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final batches = GoogleAuthMigrationService().encodeAccounts(accounts);
-
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.googleAuthExportTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                context.l10n.googleAuthExportIntro(accounts.length),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                context.l10n.googleAuthExportHint,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: PageView.builder(
-                        itemCount: batches.length,
-                        controller: PageController(viewportFraction: 1),
-                        itemBuilder: (context, index) {
-                          final batch = batches[index];
-                          return _BatchCard(batch: batch);
-                        },
-                      ),
+          child: FutureBuilder<List<GoogleAuthMigrationBatch>>(
+            future: GoogleAuthMigrationService().encodeAccounts(accounts),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final batches = snapshot.data!;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    context.l10n.googleAuthExportIntro(accounts.length),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.googleAuthExportHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      flex: 4,
-                      child: _BatchAccountsTable(batches: batches),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 6,
+                          child: PageView.builder(
+                            itemCount: batches.length,
+                            controller: PageController(viewportFraction: 1),
+                            itemBuilder: (context, index) {
+                              final batch = batches[index];
+                              return _BatchCard(batch: batch);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          flex: 4,
+                          child: _BatchAccountsTable(batches: batches),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
