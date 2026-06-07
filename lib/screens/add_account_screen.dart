@@ -5,9 +5,12 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:genauth/controllers/add_account_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/widgets/cam_scan_overlay.dart';
 
 class AddAccountScreen extends StatefulWidget {
-  const AddAccountScreen({super.key});
+  const AddAccountScreen({super.key, this.importMode = false});
+
+  final bool importMode;
 
   @override
   State<AddAccountScreen> createState() => _AddAccountScreenState();
@@ -15,19 +18,21 @@ class AddAccountScreen extends StatefulWidget {
 
 class _AddAccountScreenState extends State<AddAccountScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
+  TabController? _tabs;
   late final AddAccountController _controller;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
+    if (!widget.importMode) {
+      _tabs = TabController(length: 2, vsync: this);
+    }
     _controller = AddAccountController(storage: StorageService.instance);
   }
 
   @override
   void dispose() {
-    _tabs.dispose();
+    _tabs?.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -36,36 +41,44 @@ class _AddAccountScreenState extends State<AddAccountScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.addAccount),
-        bottom: TabBar(
-          controller: _tabs,
-          tabs: [
-            Tab(text: context.l10n.scanQr),
-            Tab(text: context.l10n.manualEntry),
-          ],
+        title: Text(
+          widget.importMode
+              ? context.l10n.googleAuthImportAction
+              : context.l10n.addAccount,
         ),
+        bottom: widget.importMode
+            ? null
+            : TabBar(
+                controller: _tabs,
+                tabs: [
+                  Tab(text: context.l10n.scanQr),
+                  Tab(text: context.l10n.manualEntry),
+                ],
+              ),
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: [
-          _ScanTab(controller: _controller),
-          _ManualTab(controller: _controller),
-        ],
-      ),
+      body: widget.importMode
+          ? _ScanQrTab(controller: _controller)
+          : TabBarView(
+              controller: _tabs,
+              children: [
+                _ScanQrTab(controller: _controller),
+                _ManualTab(controller: _controller),
+              ],
+            ),
     );
   }
 }
 
-class _ScanTab extends StatefulWidget {
-  const _ScanTab({required this.controller});
+class _ScanQrTab extends StatefulWidget {
+  const _ScanQrTab({required this.controller});
 
   final AddAccountController controller;
 
   @override
-  State<_ScanTab> createState() => _ScanTabState();
+  State<_ScanQrTab> createState() => _ScanQrTabState();
 }
 
-class _ScanTabState extends State<_ScanTab> with TickerProviderStateMixin {
+class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   bool _done = false;
   late final AnimationController _scanLineController;
   late final AnimationController _framePulseController;
@@ -178,7 +191,7 @@ class _ScanTabState extends State<_ScanTab> with TickerProviderStateMixin {
           fit: StackFit.expand,
           children: [
             MobileScanner(onDetect: _onDetect),
-            _ScanOverlay(
+            CamScanOverlay(
               scanAnimation: _scanLineController,
               framePulseAnimation: _framePulseController,
               scanBoxSize: scanBoxSize,
@@ -186,242 +199,6 @@ class _ScanTabState extends State<_ScanTab> with TickerProviderStateMixin {
           ],
         );
       },
-    );
-  }
-}
-
-class _ScanOverlay extends StatelessWidget {
-  const _ScanOverlay({
-    required this.scanAnimation,
-    required this.framePulseAnimation,
-    required this.scanBoxSize,
-  });
-
-  final Animation<double> scanAnimation;
-  final Animation<double> framePulseAnimation;
-  final double scanBoxSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final height = constraints.maxHeight;
-        final left = (width - scanBoxSize) / 2;
-        final top = (height - scanBoxSize) / 2;
-        const overlayColor = Color.fromRGBO(0, 0, 0, 0.58);
-        final accentColor = Theme.of(context).colorScheme.primary;
-
-        return IgnorePointer(
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                right: 0,
-                height: top,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                left: 0,
-                top: top,
-                width: left,
-                height: scanBoxSize,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                right: 0,
-                top: top,
-                width: left,
-                height: scanBoxSize,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: top + scanBoxSize,
-                bottom: 0,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                left: left,
-                top: top,
-                width: scanBoxSize,
-                height: scanBoxSize,
-                child: AnimatedBuilder(
-                  animation: framePulseAnimation,
-                  builder: (context, child) {
-                    final borderColor = Color.lerp(
-                      accentColor.withValues(alpha: 0.65),
-                      accentColor,
-                      0.35 + (0.45 * framePulseAnimation.value),
-                    );
-
-                    return DecoratedBox(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: borderColor!, width: 2),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Positioned(
-                left: left,
-                top: top,
-                width: scanBoxSize,
-                height: scanBoxSize,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        accentColor.withValues(alpha: 0.05),
-                        Colors.transparent,
-                        accentColor.withValues(alpha: 0.03),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: left,
-                top: top,
-                width: scanBoxSize,
-                height: scanBoxSize,
-                child: _CornerAccent(
-                  color: accentColor.withValues(alpha: 0.95),
-                ),
-              ),
-              AnimatedBuilder(
-                animation: scanAnimation,
-                builder: (context, child) {
-                  final lineY =
-                      top + 8 + (scanBoxSize - 16) * scanAnimation.value;
-                  return Positioned(
-                    left: left + 10,
-                    right: left + 10,
-                    top: lineY,
-                    child: Container(
-                      height: 4,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            accentColor,
-                            Colors.transparent,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: accentColor.withValues(alpha: 0.7),
-                            blurRadius: 16,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              Positioned(
-                left: left,
-                right: left,
-                top: top + scanBoxSize + 16,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white24),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.qr_code_scanner,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            context.l10n.scanQr,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CornerAccent extends StatelessWidget {
-  const _CornerAccent({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Stack(
-        children: [
-          _corner(alignment: Alignment.topLeft, left: true, top: true),
-          _corner(alignment: Alignment.topRight, right: true, top: true),
-          _corner(alignment: Alignment.bottomLeft, left: true, bottom: true),
-          _corner(alignment: Alignment.bottomRight, right: true, bottom: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _corner({
-    required Alignment alignment,
-    bool left = false,
-    bool right = false,
-    bool top = false,
-    bool bottom = false,
-  }) {
-    return Align(
-      alignment: alignment,
-      child: SizedBox(
-        width: 28,
-        height: 28,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              left: left ? BorderSide(color: color, width: 3) : BorderSide.none,
-              right: right
-                  ? BorderSide(color: color, width: 3)
-                  : BorderSide.none,
-              top: top ? BorderSide(color: color, width: 3) : BorderSide.none,
-              bottom: bottom
-                  ? BorderSide(color: color, width: 3)
-                  : BorderSide.none,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -509,7 +286,11 @@ class _ManualTabState extends State<_ManualTab> {
                 TextFormField(
                   controller: _labelCtrl,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: l10n.accountLabel),
+                  decoration: InputDecoration(
+                    labelText: l10n.accountLabel,
+                    labelStyle: TextStyle(fontSize: 12),
+                    isDense: true,
+                  ),
                   validator: (v) =>
                       v == null || v.trim().isEmpty ? l10n.requiredField : null,
                 ),
@@ -517,7 +298,11 @@ class _ManualTabState extends State<_ManualTab> {
                 TextFormField(
                   controller: _issuerCtrl,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: l10n.issuerLabel),
+                  decoration: InputDecoration(
+                    labelText: l10n.issuerLabel,
+                    labelStyle: TextStyle(fontSize: 12),
+                    isDense: true,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -525,6 +310,8 @@ class _ManualTabState extends State<_ManualTab> {
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: l10n.secretKeyLabel,
+                    labelStyle: TextStyle(fontSize: 12),
+                    isDense: true,
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.autorenew),
                       tooltip: l10n.generateNewSecret,
@@ -540,7 +327,11 @@ class _ManualTabState extends State<_ManualTab> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _algorithm,
-                        decoration: InputDecoration(labelText: l10n.algorithm),
+                        decoration: InputDecoration(
+                          labelText: l10n.algorithm,
+                          labelStyle: TextStyle(fontSize: 12),
+                          isDense: true,
+                        ),
                         items: ['SHA1', 'SHA256', 'SHA512']
                             .map(
                               (a) => DropdownMenuItem(value: a, child: Text(a)),
@@ -553,7 +344,11 @@ class _ManualTabState extends State<_ManualTab> {
                     Expanded(
                       child: DropdownButtonFormField<int>(
                         initialValue: _digits,
-                        decoration: InputDecoration(labelText: l10n.digits),
+                        decoration: InputDecoration(
+                          labelText: l10n.digits,
+                          labelStyle: TextStyle(fontSize: 12),
+                          isDense: true,
+                        ),
                         items: [6, 7, 8]
                             .map(
                               (d) =>
@@ -567,8 +362,14 @@ class _ManualTabState extends State<_ManualTab> {
                 ),
                 const SizedBox(height: 8),
                 SwitchListTile(
-                  title: Text(l10n.hotpCounterBased),
-                  subtitle: Text(l10n.defaultTotpTimeBased),
+                  title: Text(
+                    l10n.hotpCounterBased,
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  subtitle: Text(
+                    l10n.defaultTotpTimeBased,
+                    style: TextStyle(fontSize: 12),
+                  ),
                   value: _isHotp,
                   onChanged: (v) => setState(() => _isHotp = v),
                   contentPadding: EdgeInsets.zero,
@@ -577,7 +378,11 @@ class _ManualTabState extends State<_ManualTab> {
                   const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
                     initialValue: _period,
-                    decoration: InputDecoration(labelText: l10n.periodSeconds),
+                    decoration: InputDecoration(
+                      labelText: l10n.periodSeconds,
+                      labelStyle: TextStyle(fontSize: 12),
+                      isDense: true,
+                    ),
                     items: [15, 30, 60, 90, 120]
                         .map(
                           (p) =>

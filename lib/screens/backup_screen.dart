@@ -48,7 +48,9 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
   Future<void> _openImport() async {
     await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => const AddAccountScreen()),
+      MaterialPageRoute(
+        builder: (_) => const AddAccountScreen(importMode: true),
+      ),
     );
   }
 
@@ -175,9 +177,6 @@ class _ExportCardState extends State<_ExportCard> {
 
       final bytes = await BackupService.export(accounts, _pwCtrl.text);
 
-      // UIFileSharingEnabled in Info.plist exposes Documents/ in Files.app
-      // (Files → On My iPhone → GenAuth), so the file is always reachable
-      // even when the share sheet fails on the iOS Simulator.
       final dir = await getApplicationDocumentsDirectory();
       final now = DateTime.now().toLocal();
       final name =
@@ -288,6 +287,8 @@ class _ExportCardState extends State<_ExportCard> {
                 obscureText: _obscure1,
                 decoration: InputDecoration(
                   labelText: l10n.backupPassword,
+                  labelStyle: TextStyle(fontSize: 12),
+                  isDense: true,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscure1 ? Icons.visibility : Icons.visibility_off,
@@ -304,6 +305,8 @@ class _ExportCardState extends State<_ExportCard> {
                 obscureText: _obscure2,
                 decoration: InputDecoration(
                   labelText: l10n.backupPasswordConfirm,
+                  labelStyle: TextStyle(fontSize: 12),
+                  isDense: true,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscure2 ? Icons.visibility : Icons.visibility_off,
@@ -530,6 +533,8 @@ class _ImportCardState extends State<_ImportCard> {
               obscureText: _obscure,
               decoration: InputDecoration(
                 labelText: l10n.backupPassword,
+                labelStyle: TextStyle(fontSize: 12),
+                isDense: true,
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscure ? Icons.visibility : Icons.visibility_off,

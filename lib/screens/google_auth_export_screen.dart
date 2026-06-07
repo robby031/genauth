@@ -113,7 +113,7 @@ class _BatchCard extends StatelessWidget {
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 340),
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -191,9 +191,10 @@ class _BatchAccountsTable extends StatelessWidget {
               color: scheme.surfaceContainerHigh,
               child: Text(
                 context.l10n.googleAuthBatchAccounts(rows.length),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const Divider(height: 1),
@@ -205,29 +206,43 @@ class _BatchAccountsTable extends StatelessWidget {
                     headingRowColor: WidgetStatePropertyAll(
                       scheme.surfaceContainerHigh,
                     ),
+                    headingRowHeight: 34,
+                    horizontalMargin: 6,
                     columns: [
                       DataColumn(
                         label: Text(
                           context.l10n.googleAuthTableQr,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       DataColumn(
                         label: Text(
                           context.l10n.googleAuthTableIssuer,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       DataColumn(
                         label: Text(
                           context.l10n.googleAuthTableAccount,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       DataColumn(
                         label: Text(
                           context.l10n.googleAuthTableType,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
