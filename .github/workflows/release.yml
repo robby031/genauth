@@ -153,8 +153,7 @@ jobs:
           keytool -list \
             -keystore android/upload-keystore.jks \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-            -alias "$ANDROID_KEY_ALIAS" \
-            >/dev/null
+            -alias "$ANDROID_KEY_ALIAS"
 
       - name: Build Android App Bundle
         run: flutter build appbundle --release
