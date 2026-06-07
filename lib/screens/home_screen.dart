@@ -6,6 +6,7 @@ import 'package:genauth/widgets/tag_filter_bar.dart';
 import 'package:genauth/screens/add_account_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/drawer_screen.dart';
+import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -76,6 +77,16 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 48,
       ),
       children: [Text(context.l10n.aboutDescription)],
+    );
+  }
+
+  void _openOnboardingFromDrawer() {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const OnboardingScreen(fromDrawer: true),
+      ),
     );
   }
 
@@ -200,7 +211,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
             ],
           ),
-          drawer: DrawerScreen(onLock: _lockApp, onAbout: _showAbout),
+          drawer: DrawerScreen(
+            onLock: _lockApp,
+            onAbout: _showAbout,
+            onOpenOnboarding: _openOnboardingFromDrawer,
+          ),
           body: RefreshIndicator(
             onRefresh: _controller.loadAndRefresh,
             child: body,
