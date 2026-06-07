@@ -1,0 +1,33 @@
+name: genauth
+description: "GenAuth - TOTP/2FA Authenticator"
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  genotp_flutter:
+    path: ../genotp-flutter
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.2.0
+  local_auth: ^3.0.1
+  flutter_secure_storage: ^10.3.1
+  intl: ^0.20.2
+  axtoolbar: ^0.1.0
+  flutter_slidable: ^4.0.3
+  flutter_localization: ^0.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
