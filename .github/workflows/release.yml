@@ -30,6 +30,7 @@ jobs:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      ANDROID_KEYSTORE_TYPE: ${{ secrets.ANDROID_KEYSTORE_TYPE }}
 
     steps:
       - name: Checkout
@@ -140,17 +141,42 @@ jobs:
 
           test -s android/upload-keystore.jks || (echo "Decoded keystore is empty" && exit 1)
 
+          KEYSTORE_TYPE="${ANDROID_KEYSTORE_TYPE:-}"
+
+          if [[ -z "$KEYSTORE_TYPE" ]]; then
+            if keytool -list \
+              -storetype PKCS12 \
+              -keystore android/upload-keystore.jks \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+              -alias "$ANDROID_KEY_ALIAS" \
+              >/dev/null 2>&1; then
+              KEYSTORE_TYPE="PKCS12"
+            elif keytool -list \
+              -storetype JKS \
+              -keystore android/upload-keystore.jks \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+              -alias "$ANDROID_KEY_ALIAS" \
+              >/dev/null 2>&1; then
+              KEYSTORE_TYPE="JKS"
+            else
+              echo "Unable to detect keystore type for provided Android signing secret"
+              exit 1
+            fi
+          fi
+
           cat > android/key.properties <<EOF
           storeFile=upload-keystore.jks
           storePassword=$ANDROID_KEYSTORE_PASSWORD
           keyAlias=$ANDROID_KEY_ALIAS
           keyPassword=$ANDROID_KEY_PASSWORD
+          storeType=$KEYSTORE_TYPE
           EOF
 
       - name: Validate Android keystore contents
         shell: bash
         run: |
           keytool -list \
+            -storetype "$(grep '^storeType=' android/key.properties | cut -d= -f2-)" \
             -keystore android/upload-keystore.jks \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
             -alias "$ANDROID_KEY_ALIAS"
