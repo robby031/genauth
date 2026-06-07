@@ -47,8 +47,14 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
+      - name: Run tests (if present)
+        shell: bash
+        run: |
+          if find test -type f -name '*_test.dart' 2>/dev/null | grep -q .; then
+            flutter test
+          else
+            echo "No *_test.dart files found in test/. Skipping tests."
+          fi
 
       - name: Build Android APK (debug check)
         run: flutter build apk --debug
