@@ -19,4 +19,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get about => 'Tentang';
+
+  @override
+  String get language => 'Bahasa';
+
+  @override
+  String get lockapp => 'Kunci App';
 }

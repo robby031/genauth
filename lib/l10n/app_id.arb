@@ -2,5 +2,7 @@
   "appTitle": "GenAuth",
   "deleteAccount": "Hapus Akun",
   "searchHint": "Cari Akun...",
-  "about": "Tentang"
+  "about": "Tentang",
+  "language": "Bahasa",
+  "lockapp": "Kunci App"
 }

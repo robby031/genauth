@@ -2,5 +2,7 @@
   "appTitle": "GenAuth",
   "deleteAccount": "Delete Account",
   "searchHint": "Search Account...",
-  "about": "about"
+  "about": "About",
+  "language": "Language",
+  "lockapp": "Lock App"
 }

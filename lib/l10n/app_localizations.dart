@@ -116,8 +116,20 @@ abstract class AppLocalizations {
   /// No description provided for @about.
   ///
   /// In en, this message translates to:
-  /// **'about'**
+  /// **'About'**
   String get about;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @lockapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock App'**
+  String get lockapp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

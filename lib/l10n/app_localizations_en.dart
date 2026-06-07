@@ -18,5 +18,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchHint => 'Search Account...';
 
   @override
-  String get about => 'about';
+  String get about => 'About';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get lockapp => 'Lock App';
 }

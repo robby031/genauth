@@ -40,7 +40,7 @@ class DrawerScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.lock_outline),
-            title: const Text('Lock app'),
+            title: Text(context.l10n.lockapp),
             onTap: onLock,
           ),
           const Divider(),
@@ -53,21 +53,19 @@ class DrawerScreen extends StatelessWidget {
           ValueListenableBuilder<Locale>(
             valueListenable: LocaleService.localeNotifier,
             builder: (context, currentLocale, child) {
-              // Deteksi bahasa yang lagi aktif buat dipajang di subtitle
               final currentLangName = currentLocale.languageCode == 'id'
                   ? 'Bahasa Indonesia'
                   : 'English';
 
               return ListTile(
                 leading: const Icon(Icons.language),
-                title: const Text('Language / Bahasa'),
+                title: Text(context.l10n.language),
                 subtitle: Text(
                   currentLangName,
                   style: TextStyle(color: scheme.primary),
                 ),
                 trailing: const Icon(Icons.arrow_drop_down),
                 onTap: () {
-                  // Munculin Bottom Sheet atau Dialog biar keren pas milih bahasa
                   showModalBottomSheet(
                     context: context,
                     builder: (context) => SafeArea(
@@ -75,23 +73,23 @@ class DrawerScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
-                            title: const Text('English (Premium)'),
+                            title: const Text('English'),
                             trailing: currentLocale.languageCode == 'en'
                                 ? Icon(Icons.check, color: scheme.primary)
                                 : null,
                             onTap: () {
                               LocaleService.changeLocale('en');
-                              Navigator.pop(context); // Tutup bottom sheet
+                              Navigator.pop(context);
                             },
                           ),
                           ListTile(
-                            title: const Text('Indonesia (Ganteng)'),
+                            title: const Text('Bahasa Indonesia'),
                             trailing: currentLocale.languageCode == 'id'
                                 ? Icon(Icons.check, color: scheme.primary)
                                 : null,
                             onTap: () {
                               LocaleService.changeLocale('id');
-                              Navigator.pop(context); // Tutup bottom sheet
+                              Navigator.pop(context);
                             },
                           ),
                         ],
