@@ -8,6 +8,7 @@ import 'add_account_screen.dart';
 import 'lock_screen.dart';
 import 'drawer_screen.dart';
 import '../repositories/otp_repository.dart';
+import '../utils/l10n_extensions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -139,12 +140,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     Navigator.pop(context);
     showAboutDialog(
       context: context,
-      applicationName: 'GenAuth',
+      applicationName: context.l10n.appTitle,
       applicationVersion: '1.0.0',
       applicationIcon: const Icon(Icons.lock, size: 48),
-      children: const [
-        Text('A secure TOTP/2FA authenticator powered by genotp-go.'),
-      ],
+      children: [Text(context.l10n.aboutDescription)],
     );
   }
 
@@ -159,13 +158,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search accounts...',
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchHint,
                   border: InputBorder.none,
                 ),
                 onChanged: (v) => setState(() => _searchQuery = v),
               )
-            : const Text('GenAuth'),
+            : Text(context.l10n.appTitle),
         centerTitle: false,
         actions: [
           _isSearching
@@ -192,12 +191,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _isSearching ? 'No results' : 'No accounts yet',
+                    _isSearching
+                        ? context.l10n.noResults
+                        : context.l10n.noAccountsYet,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  if (!_isSearching)
-                    const Text('Tap + to add your first account'),
+                  if (!_isSearching) Text(context.l10n.tapToAddFirstAccount),
                 ],
               ),
             )

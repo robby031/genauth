@@ -4,5 +4,43 @@
   "searchHint": "Search Account...",
   "about": "About",
   "language": "Language",
-  "lockapp": "Lock App"
+  "lockapp": "Lock App",
+  "authenticator": "Authenticator",
+  "unlock": "Unlock",
+  "authFailed": "Authentication failed. Please try again.",
+  "english": "English",
+  "indonesian": "Bahasa Indonesia",
+  "aboutDescription": "A secure TOTP/2FA authenticator powered by genotp-go.",
+  "noResults": "No results",
+  "noAccountsYet": "No accounts yet",
+  "tapToAddFirstAccount": "Tap + to add your first account",
+  "addAccount": "Add account",
+  "scanQr": "Scan QR",
+  "manualEntry": "Manual entry",
+  "invalidQr": "Invalid QR: {error}",
+  "@invalidQr": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "accountLabel": "Account (e.g. user@example.com)",
+  "issuerLabel": "Issuer (e.g. Google)",
+  "requiredField": "Required",
+  "secretKeyLabel": "Secret key (Base32)",
+  "generateNewSecret": "Generate new secret",
+  "algorithm": "Algorithm",
+  "digits": "Digits",
+  "hotpCounterBased": "HOTP (counter-based)",
+  "defaultTotpTimeBased": "Default is TOTP (time-based)",
+  "periodSeconds": "Period (seconds)",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "removeAccount": "Remove {accountName}?",
+  "@removeAccount": {
+    "placeholders": {
+      "accountName": {}
+    }
+  },
+  "nextCode": "Next code",
+  "codeCopied": "Code copied"
 }

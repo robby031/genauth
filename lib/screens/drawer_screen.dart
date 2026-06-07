@@ -30,7 +30,7 @@ class DrawerScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Authenticator',
+                  context.l10n.authenticator,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
                   ),
@@ -54,8 +54,8 @@ class DrawerScreen extends StatelessWidget {
             valueListenable: LocaleService.localeNotifier,
             builder: (context, currentLocale, child) {
               final currentLangName = currentLocale.languageCode == 'id'
-                  ? 'Bahasa Indonesia'
-                  : 'English';
+                  ? context.l10n.indonesian
+                  : context.l10n.english;
 
               return ListTile(
                 leading: const Icon(Icons.language),
@@ -73,7 +73,7 @@ class DrawerScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
-                            title: const Text('English'),
+                            title: Text(context.l10n.english),
                             trailing: currentLocale.languageCode == 'en'
                                 ? Icon(Icons.check, color: scheme.primary)
                                 : null,
@@ -83,7 +83,7 @@ class DrawerScreen extends StatelessWidget {
                             },
                           ),
                           ListTile(
-                            title: const Text('Bahasa Indonesia'),
+                            title: Text(context.l10n.indonesian),
                             trailing: currentLocale.languageCode == 'id'
                                 ? Icon(Icons.check, color: scheme.primary)
                                 : null,

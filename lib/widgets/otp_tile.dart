@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/otp_account.dart';
 import '../services/otp_service.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../utils/l10n_extensions.dart';
 
 class OtpTile extends StatelessWidget {
   final OtpAccount account;
@@ -43,19 +44,23 @@ class OtpTile extends StatelessWidget {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: const Text('Delete account'),
+                  title: Text(context.l10n.deleteAccount),
                   content: Text(
-                    'Remove ${account.issuer.isNotEmpty ? account.issuer : account.label}?',
+                    context.l10n.removeAccount(
+                      account.issuer.isNotEmpty
+                          ? account.issuer
+                          : account.label,
+                    ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(context.l10n.cancel),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: TextButton.styleFrom(foregroundColor: Colors.red),
-                      child: const Text('Delete'),
+                      child: Text(context.l10n.delete),
                     ),
                   ],
                 ),
@@ -67,7 +72,7 @@ class OtpTile extends StatelessWidget {
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
-            label: 'Delete',
+            label: context.l10n.delete,
           ),
         ],
       ),
@@ -100,15 +105,15 @@ class OtpTile extends StatelessWidget {
         trailing: account.isHotp
             ? IconButton(
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Next code',
+                tooltip: context.l10n.nextCode,
                 onPressed: onHotpIncrement,
               )
             : _TotpProgress(period: account.period),
         onTap: () {
           Clipboard.setData(ClipboardData(text: code));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Code copied'),
+            SnackBar(
+              content: Text(context.l10n.codeCopied),
               duration: Duration(seconds: 1),
             ),
           );

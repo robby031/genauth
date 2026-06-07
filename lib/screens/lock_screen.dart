@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../utils/l10n_extensions.dart';
 import 'home_screen.dart';
 
 class LockScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
     } else {
       setState(() {
         _authenticating = false;
-        _error = 'Authentication failed. Please try again.';
+        _error = context.l10n.authFailed;
       });
     }
   }
@@ -62,21 +63,35 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
               children: [
                 Icon(Icons.lock, size: 72, color: scheme.primary),
                 const SizedBox(height: 24),
-                Text('GenAuth', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'GenAuth',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('Authenticator', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: scheme.outline)),
+                Text(
+                  context.l10n.authenticator,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(color: scheme.outline),
+                ),
                 const SizedBox(height: 40),
                 if (_authenticating)
                   const CircularProgressIndicator()
                 else ...[
                   if (_error != null) ...[
-                    Text(_error!, style: TextStyle(color: scheme.error), textAlign: TextAlign.center),
+                    Text(
+                      _error!,
+                      style: TextStyle(color: scheme.error),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 20),
                   ],
                   FilledButton.icon(
                     onPressed: _authenticate,
                     icon: const Icon(Icons.fingerprint),
-                    label: const Text('Unlock'),
+                    label: Text(context.l10n.unlock),
                   ),
                 ],
               ],

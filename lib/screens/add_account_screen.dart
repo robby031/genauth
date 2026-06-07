@@ -3,6 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../models/otp_account.dart';
 import '../services/storage_service.dart';
 import '../services/otp_service.dart';
+import '../utils/l10n_extensions.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({super.key});
@@ -31,12 +32,12 @@ class _AddAccountScreenState extends State<AddAccountScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add account'),
+        title: Text(context.l10n.addAccount),
         bottom: TabBar(
           controller: _tabs,
-          tabs: const [
-            Tab(text: 'Scan QR'),
-            Tab(text: 'Manual entry'),
+          tabs: [
+            Tab(text: context.l10n.scanQr),
+            Tab(text: context.l10n.manualEntry),
           ],
         ),
       ),
@@ -75,7 +76,7 @@ class _ScanTabState extends State<_ScanTab> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Invalid QR: $e')));
+        ).showSnackBar(SnackBar(content: Text(context.l10n.invalidQr('$e'))));
       }
     }
   }
@@ -149,18 +150,15 @@ class _ManualTabState extends State<_ManualTab> {
           children: [
             TextFormField(
               controller: _labelCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Account (e.g. user@example.com)',
-              ),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+              decoration: InputDecoration(labelText: context.l10n.accountLabel),
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? context.l10n.requiredField
+                  : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _issuerCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Issuer (e.g. Google)',
-              ),
+              decoration: InputDecoration(labelText: context.l10n.issuerLabel),
             ),
             const SizedBox(height: 12),
             Row(
@@ -168,16 +166,17 @@ class _ManualTabState extends State<_ManualTab> {
                 Expanded(
                   child: TextFormField(
                     controller: _secretCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Secret key (Base32)',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.secretKeyLabel,
                     ),
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? 'Required' : null,
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? context.l10n.requiredField
+                        : null,
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.autorenew),
-                  tooltip: 'Generate new secret',
+                  tooltip: context.l10n.generateNewSecret,
                   onPressed: _generateSecret,
                 ),
               ],
@@ -188,7 +187,9 @@ class _ManualTabState extends State<_ManualTab> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _algorithm,
-                    decoration: const InputDecoration(labelText: 'Algorithm'),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.algorithm,
+                    ),
                     items: ['SHA1', 'SHA256', 'SHA512']
                         .map((a) => DropdownMenuItem(value: a, child: Text(a)))
                         .toList(),
@@ -199,7 +200,7 @@ class _ManualTabState extends State<_ManualTab> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     initialValue: _digits,
-                    decoration: const InputDecoration(labelText: 'Digits'),
+                    decoration: InputDecoration(labelText: context.l10n.digits),
                     items: [6, 7, 8]
                         .map(
                           (d) => DropdownMenuItem(value: d, child: Text('$d')),
@@ -212,8 +213,8 @@ class _ManualTabState extends State<_ManualTab> {
             ),
             const SizedBox(height: 12),
             SwitchListTile(
-              title: const Text('HOTP (counter-based)'),
-              subtitle: const Text('Default is TOTP (time-based)'),
+              title: Text(context.l10n.hotpCounterBased),
+              subtitle: Text(context.l10n.defaultTotpTimeBased),
               value: _isHotp,
               onChanged: (v) => setState(() => _isHotp = v),
               contentPadding: EdgeInsets.zero,
@@ -222,8 +223,8 @@ class _ManualTabState extends State<_ManualTab> {
               const SizedBox(height: 4),
               DropdownButtonFormField<int>(
                 initialValue: _period,
-                decoration: const InputDecoration(
-                  labelText: 'Period (seconds)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.periodSeconds,
                 ),
                 items: [15, 30, 60, 90, 120]
                     .map(
@@ -242,7 +243,7 @@ class _ManualTabState extends State<_ManualTab> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Add account'),
+                  : Text(context.l10n.addAccount),
             ),
           ],
         ),

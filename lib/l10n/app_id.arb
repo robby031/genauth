@@ -4,5 +4,43 @@
   "searchHint": "Cari Akun...",
   "about": "Tentang",
   "language": "Bahasa",
-  "lockapp": "Kunci App"
+  "lockapp": "Kunci App",
+  "authenticator": "Autentikator",
+  "unlock": "Buka Kunci",
+  "authFailed": "Autentikasi gagal. Silakan coba lagi.",
+  "english": "Inggris",
+  "indonesian": "Bahasa Indonesia",
+  "aboutDescription": "Aplikasi autentikator TOTP/2FA aman yang didukung genotp-go.",
+  "noResults": "Tidak ada hasil",
+  "noAccountsYet": "Belum ada akun",
+  "tapToAddFirstAccount": "Ketuk + untuk menambahkan akun pertama",
+  "addAccount": "Tambah akun",
+  "scanQr": "Pindai QR",
+  "manualEntry": "Input manual",
+  "invalidQr": "QR tidak valid: {error}",
+  "@invalidQr": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "accountLabel": "Akun (contoh: user@example.com)",
+  "issuerLabel": "Penerbit (contoh: Google)",
+  "requiredField": "Wajib diisi",
+  "secretKeyLabel": "Kunci rahasia (Base32)",
+  "generateNewSecret": "Buat kunci baru",
+  "algorithm": "Algoritma",
+  "digits": "Digit",
+  "hotpCounterBased": "HOTP (berbasis counter)",
+  "defaultTotpTimeBased": "Default adalah TOTP (berbasis waktu)",
+  "periodSeconds": "Periode (detik)",
+  "cancel": "Batal",
+  "delete": "Hapus",
+  "removeAccount": "Hapus {accountName}?",
+  "@removeAccount": {
+    "placeholders": {
+      "accountName": {}
+    }
+  },
+  "nextCode": "Kode berikutnya",
+  "codeCopied": "Kode disalin"
 }

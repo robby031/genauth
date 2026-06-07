@@ -130,6 +130,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lock App'**
   String get lockapp;
+
+  /// No description provided for @authenticator.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticator'**
+  String get authenticator;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// No description provided for @authFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed. Please try again.'**
+  String get authFailed;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @indonesian.
+  ///
+  /// In en, this message translates to:
+  /// **'Bahasa Indonesia'**
+  String get indonesian;
+
+  /// No description provided for @aboutDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A secure TOTP/2FA authenticator powered by genotp-go.'**
+  String get aboutDescription;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get noResults;
+
+  /// No description provided for @noAccountsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts yet'**
+  String get noAccountsYet;
+
+  /// No description provided for @tapToAddFirstAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add your first account'**
+  String get tapToAddFirstAccount;
+
+  /// No description provided for @addAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add account'**
+  String get addAccount;
+
+  /// No description provided for @scanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get scanQr;
+
+  /// No description provided for @manualEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual entry'**
+  String get manualEntry;
+
+  /// No description provided for @invalidQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR: {error}'**
+  String invalidQr(Object error);
+
+  /// No description provided for @accountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account (e.g. user@example.com)'**
+  String get accountLabel;
+
+  /// No description provided for @issuerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer (e.g. Google)'**
+  String get issuerLabel;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get requiredField;
+
+  /// No description provided for @secretKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secret key (Base32)'**
+  String get secretKeyLabel;
+
+  /// No description provided for @generateNewSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate new secret'**
+  String get generateNewSecret;
+
+  /// No description provided for @algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Algorithm'**
+  String get algorithm;
+
+  /// No description provided for @digits.
+  ///
+  /// In en, this message translates to:
+  /// **'Digits'**
+  String get digits;
+
+  /// No description provided for @hotpCounterBased.
+  ///
+  /// In en, this message translates to:
+  /// **'HOTP (counter-based)'**
+  String get hotpCounterBased;
+
+  /// No description provided for @defaultTotpTimeBased.
+  ///
+  /// In en, this message translates to:
+  /// **'Default is TOTP (time-based)'**
+  String get defaultTotpTimeBased;
+
+  /// No description provided for @periodSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Period (seconds)'**
+  String get periodSeconds;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @removeAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {accountName}?'**
+  String removeAccount(Object accountName);
+
+  /// No description provided for @nextCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Next code'**
+  String get nextCode;
+
+  /// No description provided for @codeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied'**
+  String get codeCopied;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
