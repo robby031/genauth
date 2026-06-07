@@ -94,5 +94,14 @@
     "placeholders": {
       "error": {}
     }
+  },
+  "githubLinkOpenFailed": "Unable to open GitHub link.",
+  "openGithubRepository": "Open GitHub repository",
+  "allRightsReserved": "All rights reserved.",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {}
+    }
   }
 }

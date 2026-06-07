@@ -62,21 +62,58 @@ class _ExportCardState extends State<_ExportCard> {
 
       final bytes = await BackupService.export(accounts, _pwCtrl.text);
 
-      final dir = await getTemporaryDirectory();
+      // UIFileSharingEnabled in Info.plist exposes Documents/ in Files.app
+      // (Files → On My iPhone → GenAuth), so the file is always reachable
+      // even when the share sheet fails on the iOS Simulator.
+      final dir = await getApplicationDocumentsDirectory();
       final now = DateTime.now().toLocal();
       final name =
           'genauth-backup-${now.year}-${_p(now.month)}-${_p(now.day)}.genauth';
       final file = File('${dir.path}/$name');
       await file.writeAsBytes(bytes);
 
-      await Share.shareXFiles([
-        XFile(file.path, mimeType: 'application/octet-stream'),
-      ], subject: 'GenAuth Backup');
+      if (!mounted) return;
+
+      try {
+        await Share.shareXFiles([
+          XFile(file.path, mimeType: 'application/octet-stream'),
+        ], subject: 'GenAuth Backup');
+      } catch (_) {
+        // share sheet unavailable — user can still grab the file from Files.app
+      }
 
       if (!mounted) return;
       _formKey.currentState!.reset();
       _pwCtrl.clear();
       _confirmCtrl.clear();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentMaterialBanner()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: Colors.green.shade600,
+            duration: const Duration(seconds: 3),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Backup saved: Files → On My iPhone → GenAuth → $name',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
     } catch (e) {
       if (mounted) _showSnack(context.l10n.backupExportFailed(e.toString()));
     } finally {
@@ -86,7 +123,17 @@ class _ExportCardState extends State<_ExportCard> {
 
   void _showSnack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context)
+      ..hideCurrentMaterialBanner()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
   }
 
   String _p(int n) => n.toString().padLeft(2, '0');
@@ -244,12 +291,34 @@ class _ImportCardState extends State<_ImportCard> {
       }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.backupRestoredSuccess(imported.length)),
-          backgroundColor: Colors.green,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: Colors.green.shade600,
+            duration: const Duration(seconds: 3),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.backupRestoredSuccess(imported.length),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       setState(() {
         _pickedFileName = null;
         _pickedBytes = null;
@@ -291,7 +360,17 @@ class _ImportCardState extends State<_ImportCard> {
 
   void _showSnack(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context)
+      ..hideCurrentMaterialBanner()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
   }
 
   @override

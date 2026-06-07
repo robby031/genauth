@@ -111,12 +111,19 @@ class OtpTile extends StatelessWidget {
             : _TotpProgress(period: account.period),
         onTap: () {
           Clipboard.setData(ClipboardData(text: code));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.codeCopied),
-              duration: Duration(seconds: 1),
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..hideCurrentMaterialBanner()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(context.l10n.codeCopied),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.all(12),
+                duration: const Duration(seconds: 3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
         },
       ),
     );

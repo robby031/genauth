@@ -94,5 +94,14 @@
     "placeholders": {
       "error": {}
     }
+  },
+  "githubLinkOpenFailed": "Tidak dapat membuka tautan GitHub.",
+  "openGithubRepository": "Buka repositori GitHub",
+  "allRightsReserved": "Hak cipta dilindungi.",
+  "versionLabel": "Versi {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {}
+    }
   }
 }

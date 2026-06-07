@@ -217,4 +217,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String backupExportFailed(Object error) {
     return 'Export failed: $error';
   }
+
+  @override
+  String get githubLinkOpenFailed => 'Unable to open GitHub link.';
+
+  @override
+  String get openGithubRepository => 'Open GitHub repository';
+
+  @override
+  String get allRightsReserved => 'All rights reserved.';
+
+  @override
+  String versionLabel(Object version) {
+    return 'Version $version';
+  }
 }

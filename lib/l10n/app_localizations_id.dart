@@ -217,4 +217,18 @@ class AppLocalizationsId extends AppLocalizations {
   String backupExportFailed(Object error) {
     return 'Ekspor gagal: $error';
   }
+
+  @override
+  String get githubLinkOpenFailed => 'Tidak dapat membuka tautan GitHub.';
+
+  @override
+  String get openGithubRepository => 'Buka repositori GitHub';
+
+  @override
+  String get allRightsReserved => 'Hak cipta dilindungi.';
+
+  @override
+  String versionLabel(Object version) {
+    return 'Versi $version';
+  }
 }

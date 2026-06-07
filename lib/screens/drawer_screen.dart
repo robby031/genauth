@@ -18,9 +18,19 @@ class DrawerScreen extends StatelessWidget {
   Future<void> _openGithubRepo(BuildContext context) async {
     final ok = await launchUrl(_repoUrl, mode: LaunchMode.externalApplication);
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open GitHub link.')),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentMaterialBanner()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.githubLinkOpenFailed),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            duration: const Duration(seconds: 3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
     }
   }
 
@@ -227,7 +237,7 @@ class DrawerScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton.filledTonal(
-                    tooltip: 'Open GitHub repository',
+                    tooltip: context.l10n.openGithubRepository,
                     onPressed: () => _openGithubRepo(context),
                     icon: SvgPicture.asset(
                       AppAssets.githubSvg,
@@ -251,14 +261,14 @@ class DrawerScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '© 2026 GenAuth. All rights reserved.',
+                '© 2026 GenAuth. ${context.l10n.allRightsReserved}',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 10,
                   color: scheme.outlineVariant,
                 ),
               ),
               Text(
-                'Version 1.0.0',
+                context.l10n.versionLabel('1.0.0'),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 10,
                   color: scheme.outlineVariant,

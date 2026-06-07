@@ -490,6 +490,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export failed: {error}'**
   String backupExportFailed(Object error);
+
+  /// No description provided for @githubLinkOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open GitHub link.'**
+  String get githubLinkOpenFailed;
+
+  /// No description provided for @openGithubRepository.
+  ///
+  /// In en, this message translates to:
+  /// **'Open GitHub repository'**
+  String get openGithubRepository;
+
+  /// No description provided for @allRightsReserved.
+  ///
+  /// In en, this message translates to:
+  /// **'All rights reserved.'**
+  String get allRightsReserved;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String versionLabel(Object version);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
