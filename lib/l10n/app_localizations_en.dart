@@ -113,4 +113,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get codeCopied => 'Code copied';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get onboardingTitle1 => 'Welcome to GenAuth';
+
+  @override
+  String get onboardingDesc1 => 'Store your TOTP and HOTP codes safely in one place.';
+
+  @override
+  String get onboardingTitle2 => 'Add Accounts Quickly';
+
+  @override
+  String get onboardingDesc2 => 'Scan a QR code or add account details manually in seconds.';
+
+  @override
+  String get onboardingTitle3 => 'Protected Access';
+
+  @override
+  String get onboardingDesc3 => 'Your app is protected with device authentication before you enter.';
 }

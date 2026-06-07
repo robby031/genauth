@@ -423,118 +423,211 @@ class _ManualTabState extends State<_ManualTab> {
     setState(() => _secretCtrl.text = s);
   }
 
+  InputDecoration _inputDecoration(
+    BuildContext context, {
+    required String label,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: scheme.surfaceContainerLow.withValues(alpha: 0.75),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: scheme.outlineVariant),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: scheme.outlineVariant),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: scheme.primary, width: 1.6),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              controller: _labelCtrl,
-              decoration: InputDecoration(labelText: context.l10n.accountLabel),
-              validator: (v) => v == null || v.trim().isEmpty
-                  ? context.l10n.requiredField
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _issuerCtrl,
-              decoration: InputDecoration(labelText: context.l10n.issuerLabel),
-            ),
-            const SizedBox(height: 12),
-            Row(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _secretCtrl,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.secretKeyLabel,
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLowest.withValues(
+                      alpha: 0.65,
                     ),
-                    validator: (v) => v == null || v.trim().isEmpty
-                        ? context.l10n.requiredField
-                        : null,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _labelCtrl,
+                          textInputAction: TextInputAction.next,
+                          decoration: _inputDecoration(
+                            context,
+                            label: context.l10n.accountLabel,
+                            prefixIcon: const Icon(
+                              Icons.account_circle_outlined,
+                            ),
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? context.l10n.requiredField
+                              : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _issuerCtrl,
+                          textInputAction: TextInputAction.next,
+                          decoration: _inputDecoration(
+                            context,
+                            label: context.l10n.issuerLabel,
+                            prefixIcon: const Icon(Icons.business_outlined),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _secretCtrl,
+                          textInputAction: TextInputAction.done,
+                          decoration: _inputDecoration(
+                            context,
+                            label: context.l10n.secretKeyLabel,
+                            prefixIcon: const Icon(Icons.key_outlined),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.autorenew),
+                              tooltip: context.l10n.generateNewSecret,
+                              onPressed: _generateSecret,
+                            ),
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? context.l10n.requiredField
+                              : null,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.autorenew),
-                  tooltip: context.l10n.generateNewSecret,
-                  onPressed: _generateSecret,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _algorithm,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.algorithm,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _algorithm,
+                        decoration: _inputDecoration(
+                          context,
+                          label: context.l10n.algorithm,
+                          prefixIcon: const Icon(Icons.memory_outlined),
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        items: ['SHA1', 'SHA256', 'SHA512']
+                            .map(
+                              (a) => DropdownMenuItem(value: a, child: Text(a)),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => _algorithm = v!),
+                      ),
                     ),
-                    items: ['SHA1', 'SHA256', 'SHA512']
-                        .map((a) => DropdownMenuItem(value: a, child: Text(a)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _algorithm = v!),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _digits,
+                        decoration: _inputDecoration(
+                          context,
+                          label: context.l10n.digits,
+                          prefixIcon: const Icon(Icons.pin_outlined),
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        items: [6, 7, 8]
+                            .map(
+                              (d) =>
+                                  DropdownMenuItem(value: d, child: Text('$d')),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => _digits = v!),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLowest.withValues(
+                      alpha: 0.65,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: SwitchListTile(
+                    title: Text(context.l10n.hotpCounterBased),
+                    subtitle: Text(context.l10n.defaultTotpTimeBased),
+                    value: _isHotp,
+                    onChanged: (v) => setState(() => _isHotp = v),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<int>(
-                    initialValue: _digits,
-                    decoration: InputDecoration(labelText: context.l10n.digits),
-                    items: [6, 7, 8]
+                if (!_isHotp) ...[
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<int>(
+                    initialValue: _period,
+                    decoration: _inputDecoration(
+                      context,
+                      label: context.l10n.periodSeconds,
+                      prefixIcon: const Icon(Icons.timer_outlined),
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    items: [15, 30, 60, 90, 120]
                         .map(
-                          (d) => DropdownMenuItem(value: d, child: Text('$d')),
+                          (p) =>
+                              DropdownMenuItem(value: p, child: Text('${p}s')),
                         )
                         .toList(),
-                    onChanged: (v) => setState(() => _digits = v!),
+                    onChanged: (v) => setState(() => _period = v!),
                   ),
+                ],
+                const SizedBox(height: 28),
+                AnimatedBuilder(
+                  animation: widget.controller,
+                  builder: (context, child) {
+                    return FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: widget.controller.saving ? null : _save,
+                      child: widget.controller.saving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(context.l10n.addAccount),
+                    );
+                  },
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            SwitchListTile(
-              title: Text(context.l10n.hotpCounterBased),
-              subtitle: Text(context.l10n.defaultTotpTimeBased),
-              value: _isHotp,
-              onChanged: (v) => setState(() => _isHotp = v),
-              contentPadding: EdgeInsets.zero,
-            ),
-            if (!_isHotp) ...[
-              const SizedBox(height: 4),
-              DropdownButtonFormField<int>(
-                initialValue: _period,
-                decoration: InputDecoration(
-                  labelText: context.l10n.periodSeconds,
-                ),
-                items: [15, 30, 60, 90, 120]
-                    .map(
-                      (p) => DropdownMenuItem(value: p, child: Text('${p}s')),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => _period = v!),
-              ),
-            ],
-            const SizedBox(height: 28),
-            AnimatedBuilder(
-              animation: widget.controller,
-              builder: (context, child) {
-                return FilledButton(
-                  onPressed: widget.controller.saving ? null : _save,
-                  child: widget.controller.saving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(context.l10n.addAccount),
-                );
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

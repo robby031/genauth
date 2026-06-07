@@ -42,5 +42,14 @@
     }
   },
   "nextCode": "Next code",
-  "codeCopied": "Code copied"
+  "codeCopied": "Code copied",
+  "skip": "Skip",
+  "next": "Next",
+  "getStarted": "Get Started",
+  "onboardingTitle1": "Welcome to GenAuth",
+  "onboardingDesc1": "Store your TOTP and HOTP codes safely in one place.",
+  "onboardingTitle2": "Add Accounts Quickly",
+  "onboardingDesc2": "Scan a QR code or add account details manually in seconds.",
+  "onboardingTitle3": "Protected Access",
+  "onboardingDesc3": "Your app is protected with device authentication before you enter."
 }

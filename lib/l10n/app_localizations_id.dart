@@ -113,4 +113,31 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get codeCopied => 'Kode disalin';
+
+  @override
+  String get skip => 'Lewati';
+
+  @override
+  String get next => 'Lanjut';
+
+  @override
+  String get getStarted => 'Mulai';
+
+  @override
+  String get onboardingTitle1 => 'Selamat datang di GenAuth';
+
+  @override
+  String get onboardingDesc1 => 'Simpan kode TOTP dan HOTP dengan aman di satu tempat.';
+
+  @override
+  String get onboardingTitle2 => 'Tambah Akun Lebih Cepat';
+
+  @override
+  String get onboardingDesc2 => 'Pindai QR code atau isi detail akun secara manual dalam hitungan detik.';
+
+  @override
+  String get onboardingTitle3 => 'Akses Terlindungi';
+
+  @override
+  String get onboardingDesc3 => 'Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.';
 }

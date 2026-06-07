@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:genauth/services/locale_service.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/lock_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
@@ -41,8 +43,32 @@ class GenAuthApp extends StatelessWidget {
             ),
             useMaterial3: true,
           ),
-          home: const LockScreen(),
+          home: const _AppEntryScreen(),
         );
+      },
+    );
+  }
+}
+
+class _AppEntryScreen extends StatelessWidget {
+  const _AppEntryScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: StorageService.instance.isOnboardingCompleted(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.data == true) {
+          return const LockScreen();
+        }
+
+        return const OnboardingScreen();
       },
     );
   }

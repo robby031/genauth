@@ -42,5 +42,14 @@
     }
   },
   "nextCode": "Kode berikutnya",
-  "codeCopied": "Kode disalin"
+  "codeCopied": "Kode disalin",
+  "skip": "Lewati",
+  "next": "Lanjut",
+  "getStarted": "Mulai",
+  "onboardingTitle1": "Selamat datang di GenAuth",
+  "onboardingDesc1": "Simpan kode TOTP dan HOTP dengan aman di satu tempat.",
+  "onboardingTitle2": "Tambah Akun Lebih Cepat",
+  "onboardingDesc2": "Pindai QR code atau isi detail akun secara manual dalam hitungan detik.",
+  "onboardingTitle3": "Akses Terlindungi",
+  "onboardingDesc3": "Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk."
 }

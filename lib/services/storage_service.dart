@@ -8,6 +8,7 @@ class StorageService {
   factory StorageService() => instance;
 
   static const _key = 'genauth_accounts';
+  static const _onboardingKey = 'genauth_onboarding_done';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -43,5 +44,14 @@ class StorageService {
     final list = await loadAccounts();
     list.removeWhere((a) => a.id == id);
     await saveAccounts(list);
+  }
+
+  Future<bool> isOnboardingCompleted() async {
+    final raw = await _storage.read(key: _onboardingKey);
+    return raw == 'true';
+  }
+
+  Future<void> setOnboardingCompleted(bool done) async {
+    await _storage.write(key: _onboardingKey, value: done.toString());
   }
 }
