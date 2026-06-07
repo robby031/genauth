@@ -48,6 +48,7 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
 
   Future<void> _openImport() async {
     await AuditLogService.instance.log('google_auth_import_opened');
+    if (!mounted) return;
     await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -68,6 +69,7 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
           status: 'failed',
           detail: 'no_accounts',
         );
+        if (!mounted) return;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -215,6 +217,7 @@ class _ExportCardState extends State<_ExportCard> {
         'backup_export_success',
         metadata: {'fileName': name, 'accountCount': accounts.length},
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentMaterialBanner()
         ..showSnackBar(
@@ -249,7 +252,8 @@ class _ExportCardState extends State<_ExportCard> {
         status: 'failed',
         detail: e.toString(),
       );
-      if (mounted) _showSnack(context.l10n.backupExportFailed(e.toString()));
+      if (!mounted) return;
+      _showSnack(context.l10n.backupExportFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
