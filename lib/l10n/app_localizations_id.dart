@@ -412,6 +412,36 @@ class AppLocalizationsId extends AppLocalizations {
   String get auditLogCleared => 'Log audit dihapus';
 
   @override
+  String get privacyPolicyMenu => 'Kebijakan Privasi';
+
+  @override
+  String get privacyPolicyTitle => 'Kebijakan Privasi';
+
+  @override
+  String get privacyPolicyNotConfigured => 'URL kebijakan privasi belum dikonfigurasi. Atur di lib/utils/app_links.dart.';
+
+  @override
+  String get privacyPolicyInvalidUrl => 'URL kebijakan privasi tidak valid. Gunakan URL http/https yang benar.';
+
+  @override
+  String get privacyPolicyLoadFailed => 'Halaman kebijakan privasi gagal dimuat. Silakan coba lagi nanti.';
+
+  @override
+  String get privacyPolicyOpenExternalHint => 'Di platform ini, kebijakan privasi dibuka di tampilan browser sistem.';
+
+  @override
+  String get privacyPolicyOpenExternal => 'Buka Kebijakan Privasi';
+
+  @override
+  String get drawerSectionSecurity => 'Keamanan';
+
+  @override
+  String get drawerSectionData => 'Data dan Privasi';
+
+  @override
+  String get drawerSectionApp => 'Aplikasi';
+
+  @override
   String get tags => 'Tag';
 
   @override

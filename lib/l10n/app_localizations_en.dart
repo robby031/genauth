@@ -412,6 +412,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get auditLogCleared => 'Audit logs cleared';
 
   @override
+  String get privacyPolicyMenu => 'Privacy Policy';
+
+  @override
+  String get privacyPolicyTitle => 'Privacy Policy';
+
+  @override
+  String get privacyPolicyNotConfigured => 'Privacy policy URL is not configured yet. Set it in lib/utils/app_links.dart.';
+
+  @override
+  String get privacyPolicyInvalidUrl => 'Privacy policy URL is invalid. Please use a valid http/https URL.';
+
+  @override
+  String get privacyPolicyLoadFailed => 'Failed to load privacy policy page. Please try again later.';
+
+  @override
+  String get privacyPolicyOpenExternalHint => 'For this platform, privacy policy opens in the system browser view.';
+
+  @override
+  String get privacyPolicyOpenExternal => 'Open Privacy Policy';
+
+  @override
+  String get drawerSectionSecurity => 'Security';
+
+  @override
+  String get drawerSectionData => 'Data and Privacy';
+
+  @override
+  String get drawerSectionApp => 'Application';
+
+  @override
   String get tags => 'Tags';
 
   @override

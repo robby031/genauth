@@ -857,6 +857,66 @@ abstract class AppLocalizations {
   /// **'Audit logs cleared'**
   String get auditLogCleared;
 
+  /// No description provided for @privacyPolicyMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyMenu;
+
+  /// No description provided for @privacyPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyTitle;
+
+  /// No description provided for @privacyPolicyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy URL is not configured yet. Set it in lib/utils/app_links.dart.'**
+  String get privacyPolicyNotConfigured;
+
+  /// No description provided for @privacyPolicyInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy URL is invalid. Please use a valid http/https URL.'**
+  String get privacyPolicyInvalidUrl;
+
+  /// No description provided for @privacyPolicyLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load privacy policy page. Please try again later.'**
+  String get privacyPolicyLoadFailed;
+
+  /// No description provided for @privacyPolicyOpenExternalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For this platform, privacy policy opens in the system browser view.'**
+  String get privacyPolicyOpenExternalHint;
+
+  /// No description provided for @privacyPolicyOpenExternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Privacy Policy'**
+  String get privacyPolicyOpenExternal;
+
+  /// No description provided for @drawerSectionSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get drawerSectionSecurity;
+
+  /// No description provided for @drawerSectionData.
+  ///
+  /// In en, this message translates to:
+  /// **'Data and Privacy'**
+  String get drawerSectionData;
+
+  /// No description provided for @drawerSectionApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get drawerSectionApp;
+
   /// No description provided for @tags.
   ///
   /// In en, this message translates to:
