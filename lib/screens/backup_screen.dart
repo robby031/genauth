@@ -7,6 +7,8 @@ import 'package:share_plus/share_plus.dart';
 import '../services/backup_service.dart';
 import '../services/storage_service.dart';
 import '../utils/l10n_extensions.dart';
+import 'add_account_screen.dart';
+import 'google_auth_export_screen.dart';
 
 class BackupScreen extends StatelessWidget {
   const BackupScreen({super.key});
@@ -19,7 +21,118 @@ class BackupScreen extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [_ExportCard(), SizedBox(height: 20), _ImportCard()],
+          children: [
+            _GoogleAuthMigrationCard(),
+            SizedBox(height: 20),
+            _ExportCard(),
+            SizedBox(height: 20),
+            _ImportCard(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleAuthMigrationCard extends StatefulWidget {
+  const _GoogleAuthMigrationCard();
+
+  @override
+  State<_GoogleAuthMigrationCard> createState() =>
+      _GoogleAuthMigrationCardState();
+}
+
+class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
+  bool _loading = false;
+
+  Future<void> _openImport() async {
+    await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const AddAccountScreen()),
+    );
+  }
+
+  Future<void> _openExport() async {
+    setState(() => _loading = true);
+    try {
+      final accounts = await StorageService().loadAccounts();
+      if (!mounted) return;
+      if (accounts.isEmpty) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.googleAuthNoAccounts),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        return;
+      }
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GoogleAuthExportScreen(accounts: accounts),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.qr_code_2_outlined, color: scheme.primary),
+                const SizedBox(width: 10),
+                Text(
+                  l10n.googleAuthSectionTitle,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l10n.googleAuthSectionDesc,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: scheme.outline),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: _loading ? null : _openImport,
+              icon: const Icon(Icons.download_rounded),
+              label: Text(l10n.googleAuthImportAction),
+            ),
+            const SizedBox(height: 10),
+            FilledButton.icon(
+              onPressed: _loading ? null : _openExport,
+              icon: _loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.qr_code_rounded),
+              label: Text(l10n.googleAuthExportAction),
+            ),
+          ],
         ),
       ),
     );

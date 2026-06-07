@@ -95,14 +95,38 @@ class _ScanTabState extends State<_ScanTab> with TickerProviderStateMixin {
   Future<void> _onDetect(BarcodeCapture capture) async {
     if (_done) return;
     final code = capture.barcodes.firstOrNull?.rawValue;
-    if (code == null || !code.startsWith('otpauth://')) return;
+    if (code == null) return;
+    final isSupported =
+        code.startsWith('otpauth://') ||
+        code.startsWith('otpauth-migration://');
+    if (!isSupported) return;
 
     _done = true;
     _scanLineController.stop();
     _framePulseController.stop();
     try {
-      await widget.controller.saveFromQrCode(code);
-      if (mounted) Navigator.pop(context, true);
+      final importedCount = await widget.controller.saveFromQrCode(code);
+      if (!mounted) return;
+
+      final message = importedCount > 0
+          ? context.l10n.accountsImported(importedCount)
+          : context.l10n.accountsAlreadyImported;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: const Duration(seconds: 3),
+            content: Text(message),
+          ),
+        );
+
+      Navigator.pop(context, importedCount > 0);
     } catch (e) {
       _done = false;
       _scanLineController.repeat();

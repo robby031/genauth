@@ -145,6 +145,54 @@ class AppLocalizationsId extends AppLocalizations {
   String get backupAndRestore => 'Cadangkan & Pulihkan';
 
   @override
+  String get googleAuthSectionTitle => 'Google Authenticator';
+
+  @override
+  String get googleAuthSectionDesc => 'Impor QR ekspor multi-akun dari Google Authenticator dan buat QR ekspor kompatibel dari GenAuth.';
+
+  @override
+  String get googleAuthImportAction => 'Impor dari QR';
+
+  @override
+  String get googleAuthExportAction => 'Ekspor sebagai QR';
+
+  @override
+  String get googleAuthNoAccounts => 'Belum ada akun untuk diekspor ke Google Authenticator.';
+
+  @override
+  String get googleAuthExportTitle => 'Ekspor ke Google Authenticator';
+
+  @override
+  String get googleAuthExportHint => 'Buka Google Authenticator di perangkat lain, pilih impor akun, lalu pindai setiap QR secara berurutan.';
+
+  @override
+  String googleAuthExportIntro(int count) {
+    return 'Ekspor ini berisi $count akun. Jika diperlukan, GenAuth akan membaginya menjadi beberapa QR yang bisa dibaca Google Authenticator.';
+  }
+
+  @override
+  String googleAuthBatchLabel(int current, int total) {
+    return 'QR $current dari $total';
+  }
+
+  @override
+  String googleAuthBatchAccounts(int count) {
+    return '$count akun di QR ini';
+  }
+
+  @override
+  String get googleAuthTableQr => 'QR';
+
+  @override
+  String get googleAuthTableIssuer => 'Penerbit';
+
+  @override
+  String get googleAuthTableAccount => 'Akun';
+
+  @override
+  String get googleAuthTableType => 'Tipe';
+
+  @override
   String get backupExportTitle => 'Ekspor Cadangan';
 
   @override
@@ -217,6 +265,14 @@ class AppLocalizationsId extends AppLocalizations {
   String backupExportFailed(Object error) {
     return 'Ekspor gagal: $error';
   }
+
+  @override
+  String accountsImported(int count) {
+    return '$count akun berhasil diimpor.';
+  }
+
+  @override
+  String get accountsAlreadyImported => 'Semua akun dari QR ini sudah ada di GenAuth.';
 
   @override
   String get pinEnterTitle => 'Masukkan PIN';

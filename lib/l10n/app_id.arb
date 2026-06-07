@@ -53,6 +53,36 @@
   "onboardingTitle3": "Akses Terlindungi",
   "onboardingDesc3": "Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.",
   "backupAndRestore": "Cadangkan & Pulihkan",
+  "googleAuthSectionTitle": "Google Authenticator",
+  "googleAuthSectionDesc": "Impor QR ekspor multi-akun dari Google Authenticator dan buat QR ekspor kompatibel dari GenAuth.",
+  "googleAuthImportAction": "Impor dari QR",
+  "googleAuthExportAction": "Ekspor sebagai QR",
+  "googleAuthNoAccounts": "Belum ada akun untuk diekspor ke Google Authenticator.",
+  "googleAuthExportTitle": "Ekspor ke Google Authenticator",
+  "googleAuthExportHint": "Buka Google Authenticator di perangkat lain, pilih impor akun, lalu pindai setiap QR secara berurutan.",
+  "googleAuthExportIntro": "Ekspor ini berisi {count} akun. Jika diperlukan, GenAuth akan membaginya menjadi beberapa QR yang bisa dibaca Google Authenticator.",
+  "@googleAuthExportIntro": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "googleAuthBatchLabel": "QR {current} dari {total}",
+  "@googleAuthBatchLabel": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "googleAuthBatchAccounts": "{count} akun di QR ini",
+  "@googleAuthBatchAccounts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "googleAuthTableQr": "QR",
+  "googleAuthTableIssuer": "Penerbit",
+  "googleAuthTableAccount": "Akun",
+  "googleAuthTableType": "Tipe",
   "backupExportTitle": "Ekspor Cadangan",
   "backupExportDesc": "Akun dienkripsi dengan kata sandi sebelum diekspor. Simpan file ke iCloud Drive, Google Drive, atau penyimpanan lain yang kamu gunakan.",
   "backupPassword": "Kata sandi cadangan",
@@ -95,6 +125,13 @@
       "error": {}
     }
   },
+  "accountsImported": "{count} akun berhasil diimpor.",
+  "@accountsImported": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "accountsAlreadyImported": "Semua akun dari QR ini sudah ada di GenAuth.",
   "pinEnterTitle": "Masukkan PIN",
   "pinSetupTitle": "Atur PIN",
   "pinConfirmTitle": "Konfirmasi PIN",

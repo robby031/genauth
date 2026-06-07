@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/otp_account.dart';
+import 'google_auth_migration_service.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._internal();
@@ -37,6 +38,28 @@ class StorageService {
     final list = await loadAccounts();
     list.add(account);
     await saveAccounts(list);
+  }
+
+  Future<int> addAccountsUnique(List<OtpAccount> accounts) async {
+    if (accounts.isEmpty) return 0;
+
+    final list = await loadAccounts();
+    final existing = list.map(GoogleAuthMigrationService.fingerprint).toSet();
+    var importedCount = 0;
+
+    for (final account in accounts) {
+      final fingerprint = GoogleAuthMigrationService.fingerprint(account);
+      if (existing.add(fingerprint)) {
+        list.add(account);
+        importedCount++;
+      }
+    }
+
+    if (importedCount > 0) {
+      await saveAccounts(list);
+    }
+
+    return importedCount;
   }
 
   Future<void> updateAccount(OtpAccount account) async {
@@ -77,7 +100,6 @@ class StorageService {
     await _storage.delete(key: _pinSaltKey);
   }
 
-  // SHA-256(pin bytes || salt) — PIN is stored in Keychain, so this is sufficient.
   static Future<List<int>> _hashPin(String pin, List<int> salt) async {
     final hash = await Sha256().hash([...utf8.encode(pin), ...salt]);
     return hash.bytes;

@@ -36,40 +36,40 @@ class OtpAccount {
   }
 
   OtpAccount copyWith({int? counter}) => OtpAccount(
-        id: id,
-        label: label,
-        issuer: issuer,
-        secretB32: secretB32,
-        algorithm: algorithm,
-        digits: digits,
-        period: period,
-        counter: counter ?? this.counter,
-        isHotp: isHotp,
-      );
+    id: id,
+    label: label,
+    issuer: issuer,
+    secretB32: secretB32,
+    algorithm: algorithm,
+    digits: digits,
+    period: period,
+    counter: counter ?? this.counter,
+    isHotp: isHotp,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'label': label,
-        'issuer': issuer,
-        'secretB32': secretB32,
-        'algorithm': algorithm,
-        'digits': digits,
-        'period': period,
-        'counter': counter,
-        'isHotp': isHotp,
-      };
+    'id': id,
+    'label': label,
+    'issuer': issuer,
+    'secretB32': secretB32,
+    'algorithm': algorithm,
+    'digits': digits,
+    'period': period,
+    'counter': counter,
+    'isHotp': isHotp,
+  };
 
   factory OtpAccount.fromJson(Map<String, dynamic> json) => OtpAccount(
-        id: json['id'] as String,
-        label: json['label'] as String,
-        issuer: json['issuer'] as String? ?? '',
-        secretB32: json['secretB32'] as String,
-        algorithm: json['algorithm'] as String? ?? 'SHA1',
-        digits: json['digits'] as int? ?? 6,
-        period: json['period'] as int? ?? 30,
-        counter: json['counter'] as int? ?? 0,
-        isHotp: json['isHotp'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    label: json['label'] as String,
+    issuer: json['issuer'] as String? ?? '',
+    secretB32: json['secretB32'] as String,
+    algorithm: json['algorithm'] as String? ?? 'SHA1',
+    digits: json['digits'] as int? ?? 6,
+    period: json['period'] as int? ?? 30,
+    counter: json['counter'] as int? ?? 0,
+    isHotp: json['isHotp'] as bool? ?? false,
+  );
 
   // Parse otpauth://totp/label?secret=X&issuer=Y&algorithm=Z&digits=6&period=30
   factory OtpAccount.fromUri(String uriStr) {
@@ -111,15 +111,42 @@ class OtpAccount {
 
   static String newId() {
     final r = Random.secure();
-    return List.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+    return List.generate(
+      16,
+      (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    ).join();
   }
 
   static List<OtpAccount> listFromJson(String jsonStr) {
     final list = jsonDecode(jsonStr) as List<dynamic>;
-    return list.map((e) => OtpAccount.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => OtpAccount.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   static String listToJson(List<OtpAccount> accounts) {
     return jsonEncode(accounts.map((a) => a.toJson()).toList());
+  }
+
+  String toUri() {
+    final type = isHotp ? 'hotp' : 'totp';
+    final labelValue = issuer.isNotEmpty ? '$issuer:$label' : label;
+    final queryParameters = <String, String>{
+      'secret': secretB32,
+      if (issuer.isNotEmpty) 'issuer': issuer,
+      'algorithm': algorithm,
+      'digits': digits.toString(),
+      if (isHotp)
+        'counter': counter.toString()
+      else
+        'period': period.toString(),
+    };
+
+    return Uri(
+      scheme: 'otpauth',
+      host: type,
+      pathSegments: [labelValue],
+      queryParameters: queryParameters,
+    ).toString();
   }
 }

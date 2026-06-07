@@ -145,6 +145,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupAndRestore => 'Backup & Restore';
 
   @override
+  String get googleAuthSectionTitle => 'Google Authenticator';
+
+  @override
+  String get googleAuthSectionDesc => 'Import multi-account QR exports from Google Authenticator and generate compatible export QR codes from GenAuth.';
+
+  @override
+  String get googleAuthImportAction => 'Import from QR';
+
+  @override
+  String get googleAuthExportAction => 'Export as QR';
+
+  @override
+  String get googleAuthNoAccounts => 'No accounts available for Google Authenticator export.';
+
+  @override
+  String get googleAuthExportTitle => 'Export to Google Authenticator';
+
+  @override
+  String get googleAuthExportHint => 'Open Google Authenticator on the other device, choose Import accounts, then scan each QR in order.';
+
+  @override
+  String googleAuthExportIntro(int count) {
+    return 'This export includes $count account(s). If needed, GenAuth will split them into several QR codes that Google Authenticator can read.';
+  }
+
+  @override
+  String googleAuthBatchLabel(int current, int total) {
+    return 'QR $current of $total';
+  }
+
+  @override
+  String googleAuthBatchAccounts(int count) {
+    return '$count account(s) in this QR';
+  }
+
+  @override
+  String get googleAuthTableQr => 'QR';
+
+  @override
+  String get googleAuthTableIssuer => 'Issuer';
+
+  @override
+  String get googleAuthTableAccount => 'Account';
+
+  @override
+  String get googleAuthTableType => 'Type';
+
+  @override
   String get backupExportTitle => 'Export Backup';
 
   @override
@@ -217,6 +265,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String backupExportFailed(Object error) {
     return 'Export failed: $error';
   }
+
+  @override
+  String accountsImported(int count) {
+    return 'Imported $count account(s).';
+  }
+
+  @override
+  String get accountsAlreadyImported => 'All scanned accounts are already in GenAuth.';
 
   @override
   String get pinEnterTitle => 'Enter PIN';

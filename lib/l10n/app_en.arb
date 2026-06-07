@@ -53,6 +53,36 @@
   "onboardingTitle3": "Protected Access",
   "onboardingDesc3": "Your app is protected with device authentication before you enter.",
   "backupAndRestore": "Backup & Restore",
+  "googleAuthSectionTitle": "Google Authenticator",
+  "googleAuthSectionDesc": "Import multi-account QR exports from Google Authenticator and generate compatible export QR codes from GenAuth.",
+  "googleAuthImportAction": "Import from QR",
+  "googleAuthExportAction": "Export as QR",
+  "googleAuthNoAccounts": "No accounts available for Google Authenticator export.",
+  "googleAuthExportTitle": "Export to Google Authenticator",
+  "googleAuthExportHint": "Open Google Authenticator on the other device, choose Import accounts, then scan each QR in order.",
+  "googleAuthExportIntro": "This export includes {count} account(s). If needed, GenAuth will split them into several QR codes that Google Authenticator can read.",
+  "@googleAuthExportIntro": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "googleAuthBatchLabel": "QR {current} of {total}",
+  "@googleAuthBatchLabel": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "googleAuthBatchAccounts": "{count} account(s) in this QR",
+  "@googleAuthBatchAccounts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "googleAuthTableQr": "QR",
+  "googleAuthTableIssuer": "Issuer",
+  "googleAuthTableAccount": "Account",
+  "googleAuthTableType": "Type",
   "backupExportTitle": "Export Backup",
   "backupExportDesc": "Accounts are encrypted with your password before export. Save the file to iCloud Drive, Google Drive, or any storage you use.",
   "backupPassword": "Backup password",
@@ -95,6 +125,13 @@
       "error": {}
     }
   },
+  "accountsImported": "Imported {count} account(s).",
+  "@accountsImported": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "accountsAlreadyImported": "All scanned accounts are already in GenAuth.",
   "pinEnterTitle": "Enter PIN",
   "pinSetupTitle": "Set PIN",
   "pinConfirmTitle": "Confirm PIN",

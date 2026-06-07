@@ -359,6 +359,90 @@ abstract class AppLocalizations {
   /// **'Backup & Restore'**
   String get backupAndRestore;
 
+  /// No description provided for @googleAuthSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Authenticator'**
+  String get googleAuthSectionTitle;
+
+  /// No description provided for @googleAuthSectionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Import multi-account QR exports from Google Authenticator and generate compatible export QR codes from GenAuth.'**
+  String get googleAuthSectionDesc;
+
+  /// No description provided for @googleAuthImportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from QR'**
+  String get googleAuthImportAction;
+
+  /// No description provided for @googleAuthExportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as QR'**
+  String get googleAuthExportAction;
+
+  /// No description provided for @googleAuthNoAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts available for Google Authenticator export.'**
+  String get googleAuthNoAccounts;
+
+  /// No description provided for @googleAuthExportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export to Google Authenticator'**
+  String get googleAuthExportTitle;
+
+  /// No description provided for @googleAuthExportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Google Authenticator on the other device, choose Import accounts, then scan each QR in order.'**
+  String get googleAuthExportHint;
+
+  /// No description provided for @googleAuthExportIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This export includes {count} account(s). If needed, GenAuth will split them into several QR codes that Google Authenticator can read.'**
+  String googleAuthExportIntro(int count);
+
+  /// No description provided for @googleAuthBatchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'QR {current} of {total}'**
+  String googleAuthBatchLabel(int current, int total);
+
+  /// No description provided for @googleAuthBatchAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} account(s) in this QR'**
+  String googleAuthBatchAccounts(int count);
+
+  /// No description provided for @googleAuthTableQr.
+  ///
+  /// In en, this message translates to:
+  /// **'QR'**
+  String get googleAuthTableQr;
+
+  /// No description provided for @googleAuthTableIssuer.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer'**
+  String get googleAuthTableIssuer;
+
+  /// No description provided for @googleAuthTableAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get googleAuthTableAccount;
+
+  /// No description provided for @googleAuthTableType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get googleAuthTableType;
+
   /// No description provided for @backupExportTitle.
   ///
   /// In en, this message translates to:
@@ -490,6 +574,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export failed: {error}'**
   String backupExportFailed(Object error);
+
+  /// No description provided for @accountsImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count} account(s).'**
+  String accountsImported(int count);
+
+  /// No description provided for @accountsAlreadyImported.
+  ///
+  /// In en, this message translates to:
+  /// **'All scanned accounts are already in GenAuth.'**
+  String get accountsAlreadyImported;
 
   /// No description provided for @pinEnterTitle.
   ///
