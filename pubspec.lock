@@ -256,10 +256,11 @@ packages:
   genotp_flutter:
     dependency: "direct main"
     description:
-      path: "../genotp-flutter"
-      relative: true
-    source: path
-    version: "0.0.1"
+      name: genotp_flutter
+      sha256: "32d8333a8ea9c583677eb6a5dc33443fa25b7ec0a149c5338d65543b1fb52935"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   hooks:
     dependency: transitive
     description:
