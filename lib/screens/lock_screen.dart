@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controllers/lock_controller.dart';
+import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 import 'home_screen.dart';
 
@@ -53,7 +54,11 @@ class _LockScreenState extends State<LockScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.lock, size: 72, color: scheme.primary),
+                    Image.asset(
+                      AppAssets.logoNoBackground,
+                      width: 84,
+                      height: 84,
+                    ),
                     const SizedBox(height: 24),
                     Text(
                       'GenAuth',

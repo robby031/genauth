@@ -6,6 +6,7 @@ import 'add_account_screen.dart';
 import 'lock_screen.dart';
 import 'drawer_screen.dart';
 import '../repositories/otp_repository.dart';
+import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -68,7 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       applicationName: context.l10n.appTitle,
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.lock, size: 48),
+      applicationIcon: Image.asset(
+        AppAssets.logoNoBackground,
+        width: 48,
+        height: 48,
+      ),
       children: [Text(context.l10n.aboutDescription)],
     );
   }

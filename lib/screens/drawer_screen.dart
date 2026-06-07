@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/locale_service.dart';
+import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 
 class DrawerScreen extends StatelessWidget {
@@ -20,7 +21,7 @@ class DrawerScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Icon(Icons.lock, size: 40, color: scheme.onPrimaryContainer),
+                Image.asset(AppAssets.logoNoBackground, width: 44, height: 44),
                 const SizedBox(height: 8),
                 Text(
                   'GenAuth',
