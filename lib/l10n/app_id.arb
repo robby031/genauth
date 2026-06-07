@@ -51,5 +51,48 @@
   "onboardingTitle2": "Tambah Akun Lebih Cepat",
   "onboardingDesc2": "Pindai QR code atau isi detail akun secara manual dalam hitungan detik.",
   "onboardingTitle3": "Akses Terlindungi",
-  "onboardingDesc3": "Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk."
+  "onboardingDesc3": "Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.",
+  "backupAndRestore": "Cadangkan & Pulihkan",
+  "backupExportTitle": "Ekspor Cadangan",
+  "backupExportDesc": "Akun dienkripsi dengan kata sandi sebelum diekspor. Simpan file ke iCloud Drive, Google Drive, atau penyimpanan lain yang kamu gunakan.",
+  "backupPassword": "Kata sandi cadangan",
+  "backupPasswordConfirm": "Konfirmasi kata sandi",
+  "backupPasswordMin": "Minimal 8 karakter",
+  "backupPasswordMismatch": "Kata sandi tidak cocok",
+  "backupExportShare": "Ekspor & Bagikan",
+  "backupEncrypting": "Mengenkripsi...",
+  "backupNoAccounts": "Tidak ada akun untuk diekspor.",
+  "backupRestoreTitle": "Pulihkan Cadangan",
+  "backupRestoreDesc": "Pilih file cadangan .genauth dan masukkan kata sandi yang digunakan saat mengekspor.",
+  "backupChooseFile": "Pilih file cadangan",
+  "backupDecrypting": "Mendekripsi...",
+  "backupRestore": "Pulihkan",
+  "backupRestoreDialogTitle": "Pulihkan cadangan",
+  "backupRestoreDialogContent": "Ditemukan {count} akun di cadangan.\n\nGanti: menghapus semua akun saat ini dan menggunakan cadangan.\nGabung: menambahkan akun dari cadangan yang belum ada.",
+  "@backupRestoreDialogContent": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "backupMerge": "Gabung",
+  "backupReplace": "Ganti",
+  "backupRestoredSuccess": "{count} akun berhasil dipulihkan.",
+  "@backupRestoredSuccess": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "backupInvalidFile": "File cadangan tidak valid: {error}",
+  "@backupInvalidFile": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "backupWrongPassword": "Kata sandi salah atau file rusak.",
+  "backupExportFailed": "Ekspor gagal: {error}",
+  "@backupExportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
 }

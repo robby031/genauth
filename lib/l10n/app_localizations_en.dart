@@ -140,4 +140,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingDesc3 => 'Your app is protected with device authentication before you enter.';
+
+  @override
+  String get backupAndRestore => 'Backup & Restore';
+
+  @override
+  String get backupExportTitle => 'Export Backup';
+
+  @override
+  String get backupExportDesc => 'Accounts are encrypted with your password before export. Save the file to iCloud Drive, Google Drive, or any storage you use.';
+
+  @override
+  String get backupPassword => 'Backup password';
+
+  @override
+  String get backupPasswordConfirm => 'Confirm password';
+
+  @override
+  String get backupPasswordMin => 'Minimum 8 characters';
+
+  @override
+  String get backupPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get backupExportShare => 'Export & Share';
+
+  @override
+  String get backupEncrypting => 'Encrypting...';
+
+  @override
+  String get backupNoAccounts => 'No accounts to export.';
+
+  @override
+  String get backupRestoreTitle => 'Restore Backup';
+
+  @override
+  String get backupRestoreDesc => 'Choose a .genauth backup file and enter the password used when exporting.';
+
+  @override
+  String get backupChooseFile => 'Choose backup file';
+
+  @override
+  String get backupDecrypting => 'Decrypting...';
+
+  @override
+  String get backupRestore => 'Restore';
+
+  @override
+  String get backupRestoreDialogTitle => 'Restore backup';
+
+  @override
+  String backupRestoreDialogContent(int count) {
+    return 'Found $count account(s) in backup.\n\nReplace: removes all current accounts and uses backup.\nMerge: adds accounts from backup that don\'t exist yet.';
+  }
+
+  @override
+  String get backupMerge => 'Merge';
+
+  @override
+  String get backupReplace => 'Replace';
+
+  @override
+  String backupRestoredSuccess(int count) {
+    return 'Restored $count account(s).';
+  }
+
+  @override
+  String backupInvalidFile(Object error) {
+    return 'Invalid backup file: $error';
+  }
+
+  @override
+  String get backupWrongPassword => 'Wrong password or corrupted file.';
+
+  @override
+  String backupExportFailed(Object error) {
+    return 'Export failed: $error';
+  }
 }

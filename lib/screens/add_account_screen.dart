@@ -423,118 +423,75 @@ class _ManualTabState extends State<_ManualTab> {
     setState(() => _secretCtrl.text = s);
   }
 
-  InputDecoration _inputDecoration(
-    BuildContext context, {
-    required String label,
-    Widget? prefixIcon,
-    Widget? suffixIcon,
-  }) {
-    final scheme = Theme.of(context).colorScheme;
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: scheme.surfaceContainerLow.withValues(alpha: 0.75),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: scheme.outlineVariant),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: scheme.outlineVariant),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: scheme.primary, width: 1.6),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Form(
-            key: _formKey,
+      child: Form(
+        key: _formKey,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerLowest.withValues(
-                      alpha: 0.65,
+                Row(
+                  children: [
+                    Icon(Icons.edit_note, color: scheme.primary),
+                    const SizedBox(width: 10),
+                    Text(
+                      l10n.manualEntry,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: scheme.outlineVariant),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _labelCtrl,
-                          textInputAction: TextInputAction.next,
-                          decoration: _inputDecoration(
-                            context,
-                            label: context.l10n.accountLabel,
-                            prefixIcon: const Icon(
-                              Icons.account_circle_outlined,
-                            ),
-                          ),
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? context.l10n.requiredField
-                              : null,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _issuerCtrl,
-                          textInputAction: TextInputAction.next,
-                          decoration: _inputDecoration(
-                            context,
-                            label: context.l10n.issuerLabel,
-                            prefixIcon: const Icon(Icons.business_outlined),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _secretCtrl,
-                          textInputAction: TextInputAction.done,
-                          decoration: _inputDecoration(
-                            context,
-                            label: context.l10n.secretKeyLabel,
-                            prefixIcon: const Icon(Icons.key_outlined),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.autorenew),
-                              tooltip: context.l10n.generateNewSecret,
-                              onPressed: _generateSecret,
-                            ),
-                          ),
-                          validator: (v) => v == null || v.trim().isEmpty
-                              ? context.l10n.requiredField
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.addAccount,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: scheme.outline),
                 ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  controller: _labelCtrl,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(labelText: l10n.accountLabel),
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? l10n.requiredField : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _issuerCtrl,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(labelText: l10n.issuerLabel),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _secretCtrl,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    labelText: l10n.secretKeyLabel,
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.autorenew),
+                      tooltip: l10n.generateNewSecret,
+                      onPressed: _generateSecret,
+                    ),
+                  ),
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? l10n.requiredField : null,
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _algorithm,
-                        decoration: _inputDecoration(
-                          context,
-                          label: context.l10n.algorithm,
-                          prefixIcon: const Icon(Icons.memory_outlined),
-                        ),
-                        borderRadius: BorderRadius.circular(16),
+                        decoration: InputDecoration(labelText: l10n.algorithm),
                         items: ['SHA1', 'SHA256', 'SHA512']
                             .map(
                               (a) => DropdownMenuItem(value: a, child: Text(a)),
@@ -547,12 +504,7 @@ class _ManualTabState extends State<_ManualTab> {
                     Expanded(
                       child: DropdownButtonFormField<int>(
                         initialValue: _digits,
-                        decoration: _inputDecoration(
-                          context,
-                          label: context.l10n.digits,
-                          prefixIcon: const Icon(Icons.pin_outlined),
-                        ),
-                        borderRadius: BorderRadius.circular(16),
+                        decoration: InputDecoration(labelText: l10n.digits),
                         items: [6, 7, 8]
                             .map(
                               (d) =>
@@ -564,36 +516,19 @@ class _ManualTabState extends State<_ManualTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerLowest.withValues(
-                      alpha: 0.65,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: scheme.outlineVariant),
-                  ),
-                  child: SwitchListTile(
-                    title: Text(context.l10n.hotpCounterBased),
-                    subtitle: Text(context.l10n.defaultTotpTimeBased),
-                    value: _isHotp,
-                    onChanged: (v) => setState(() => _isHotp = v),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                  ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: Text(l10n.hotpCounterBased),
+                  subtitle: Text(l10n.defaultTotpTimeBased),
+                  value: _isHotp,
+                  onChanged: (v) => setState(() => _isHotp = v),
+                  contentPadding: EdgeInsets.zero,
                 ),
                 if (!_isHotp) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   DropdownButtonFormField<int>(
                     initialValue: _period,
-                    decoration: _inputDecoration(
-                      context,
-                      label: context.l10n.periodSeconds,
-                      prefixIcon: const Icon(Icons.timer_outlined),
-                    ),
-                    borderRadius: BorderRadius.circular(16),
+                    decoration: InputDecoration(labelText: l10n.periodSeconds),
                     items: [15, 30, 60, 90, 120]
                         .map(
                           (p) =>
@@ -603,25 +538,20 @@ class _ManualTabState extends State<_ManualTab> {
                     onChanged: (v) => setState(() => _period = v!),
                   ),
                 ],
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
                 AnimatedBuilder(
                   animation: widget.controller,
                   builder: (context, child) {
-                    return FilledButton(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
+                    return FilledButton.icon(
                       onPressed: widget.controller.saving ? null : _save,
-                      child: widget.controller.saving
+                      icon: widget.controller.saving
                           ? const SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: 16,
+                              height: 16,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text(context.l10n.addAccount),
+                          : const Icon(Icons.add_task),
+                      label: Text(l10n.addAccount),
                     );
                   },
                 ),

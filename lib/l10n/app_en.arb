@@ -51,5 +51,48 @@
   "onboardingTitle2": "Add Accounts Quickly",
   "onboardingDesc2": "Scan a QR code or add account details manually in seconds.",
   "onboardingTitle3": "Protected Access",
-  "onboardingDesc3": "Your app is protected with device authentication before you enter."
+  "onboardingDesc3": "Your app is protected with device authentication before you enter.",
+  "backupAndRestore": "Backup & Restore",
+  "backupExportTitle": "Export Backup",
+  "backupExportDesc": "Accounts are encrypted with your password before export. Save the file to iCloud Drive, Google Drive, or any storage you use.",
+  "backupPassword": "Backup password",
+  "backupPasswordConfirm": "Confirm password",
+  "backupPasswordMin": "Minimum 8 characters",
+  "backupPasswordMismatch": "Passwords do not match",
+  "backupExportShare": "Export & Share",
+  "backupEncrypting": "Encrypting...",
+  "backupNoAccounts": "No accounts to export.",
+  "backupRestoreTitle": "Restore Backup",
+  "backupRestoreDesc": "Choose a .genauth backup file and enter the password used when exporting.",
+  "backupChooseFile": "Choose backup file",
+  "backupDecrypting": "Decrypting...",
+  "backupRestore": "Restore",
+  "backupRestoreDialogTitle": "Restore backup",
+  "backupRestoreDialogContent": "Found {count} account(s) in backup.\n\nReplace: removes all current accounts and uses backup.\nMerge: adds accounts from backup that don't exist yet.",
+  "@backupRestoreDialogContent": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "backupMerge": "Merge",
+  "backupReplace": "Replace",
+  "backupRestoredSuccess": "Restored {count} account(s).",
+  "@backupRestoredSuccess": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "backupInvalidFile": "Invalid backup file: {error}",
+  "@backupInvalidFile": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "backupWrongPassword": "Wrong password or corrupted file.",
+  "backupExportFailed": "Export failed: {error}",
+  "@backupExportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
 }

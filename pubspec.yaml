@@ -17,11 +17,14 @@ dependencies:
   local_auth: ^3.0.1
   flutter_secure_storage: ^10.3.1
   intl: ^0.20.2
-  axtoolbar: ^0.1.0
   flutter_slidable: ^4.0.3
   flutter_localization: ^0.4.0
   url_launcher: ^6.3.1
   flutter_svg: ^2.1.0
+  cryptography: ^2.7.0
+  share_plus: ^10.1.4
+  file_picker: ^8.1.2
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

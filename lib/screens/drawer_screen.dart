@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/locale_service.dart';
 import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
+import 'backup_screen.dart';
 
 class DrawerScreen extends StatelessWidget {
   static final Uri _repoUrl = Uri.parse(
@@ -178,6 +179,19 @@ class DrawerScreen extends StatelessWidget {
                 icon: Icons.lock_outline,
                 title: context.l10n.lockapp,
                 onTap: onLock,
+              ),
+              const SizedBox(height: 8),
+              _menuTile(
+                context: context,
+                icon: Icons.backup_outlined,
+                title: context.l10n.backupAndRestore,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BackupScreen()),
+                  );
+                },
               ),
               const SizedBox(height: 8),
               _menuTile(

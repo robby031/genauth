@@ -140,4 +140,81 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onboardingDesc3 => 'Aplikasi dilindungi autentikasi perangkat sebelum kamu masuk.';
+
+  @override
+  String get backupAndRestore => 'Cadangkan & Pulihkan';
+
+  @override
+  String get backupExportTitle => 'Ekspor Cadangan';
+
+  @override
+  String get backupExportDesc => 'Akun dienkripsi dengan kata sandi sebelum diekspor. Simpan file ke iCloud Drive, Google Drive, atau penyimpanan lain yang kamu gunakan.';
+
+  @override
+  String get backupPassword => 'Kata sandi cadangan';
+
+  @override
+  String get backupPasswordConfirm => 'Konfirmasi kata sandi';
+
+  @override
+  String get backupPasswordMin => 'Minimal 8 karakter';
+
+  @override
+  String get backupPasswordMismatch => 'Kata sandi tidak cocok';
+
+  @override
+  String get backupExportShare => 'Ekspor & Bagikan';
+
+  @override
+  String get backupEncrypting => 'Mengenkripsi...';
+
+  @override
+  String get backupNoAccounts => 'Tidak ada akun untuk diekspor.';
+
+  @override
+  String get backupRestoreTitle => 'Pulihkan Cadangan';
+
+  @override
+  String get backupRestoreDesc => 'Pilih file cadangan .genauth dan masukkan kata sandi yang digunakan saat mengekspor.';
+
+  @override
+  String get backupChooseFile => 'Pilih file cadangan';
+
+  @override
+  String get backupDecrypting => 'Mendekripsi...';
+
+  @override
+  String get backupRestore => 'Pulihkan';
+
+  @override
+  String get backupRestoreDialogTitle => 'Pulihkan cadangan';
+
+  @override
+  String backupRestoreDialogContent(int count) {
+    return 'Ditemukan $count akun di cadangan.\n\nGanti: menghapus semua akun saat ini dan menggunakan cadangan.\nGabung: menambahkan akun dari cadangan yang belum ada.';
+  }
+
+  @override
+  String get backupMerge => 'Gabung';
+
+  @override
+  String get backupReplace => 'Ganti';
+
+  @override
+  String backupRestoredSuccess(int count) {
+    return '$count akun berhasil dipulihkan.';
+  }
+
+  @override
+  String backupInvalidFile(Object error) {
+    return 'File cadangan tidak valid: $error';
+  }
+
+  @override
+  String get backupWrongPassword => 'Kata sandi salah atau file rusak.';
+
+  @override
+  String backupExportFailed(Object error) {
+    return 'Ekspor gagal: $error';
+  }
 }

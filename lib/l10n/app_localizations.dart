@@ -352,6 +352,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your app is protected with device authentication before you enter.'**
   String get onboardingDesc3;
+
+  /// No description provided for @backupAndRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupAndRestore;
+
+  /// No description provided for @backupExportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Backup'**
+  String get backupExportTitle;
+
+  /// No description provided for @backupExportDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts are encrypted with your password before export. Save the file to iCloud Drive, Google Drive, or any storage you use.'**
+  String get backupExportDesc;
+
+  /// No description provided for @backupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get backupPassword;
+
+  /// No description provided for @backupPasswordConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get backupPasswordConfirm;
+
+  /// No description provided for @backupPasswordMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 8 characters'**
+  String get backupPasswordMin;
+
+  /// No description provided for @backupPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get backupPasswordMismatch;
+
+  /// No description provided for @backupExportShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Export & Share'**
+  String get backupExportShare;
+
+  /// No description provided for @backupEncrypting.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting...'**
+  String get backupEncrypting;
+
+  /// No description provided for @backupNoAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts to export.'**
+  String get backupNoAccounts;
+
+  /// No description provided for @backupRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup'**
+  String get backupRestoreTitle;
+
+  /// No description provided for @backupRestoreDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a .genauth backup file and enter the password used when exporting.'**
+  String get backupRestoreDesc;
+
+  /// No description provided for @backupChooseFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose backup file'**
+  String get backupChooseFile;
+
+  /// No description provided for @backupDecrypting.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypting...'**
+  String get backupDecrypting;
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get backupRestore;
+
+  /// No description provided for @backupRestoreDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get backupRestoreDialogTitle;
+
+  /// No description provided for @backupRestoreDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {count} account(s) in backup.\n\nReplace: removes all current accounts and uses backup.\nMerge: adds accounts from backup that don\'t exist yet.'**
+  String backupRestoreDialogContent(int count);
+
+  /// No description provided for @backupMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get backupMerge;
+
+  /// No description provided for @backupReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get backupReplace;
+
+  /// No description provided for @backupRestoredSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {count} account(s).'**
+  String backupRestoredSuccess(int count);
+
+  /// No description provided for @backupInvalidFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid backup file: {error}'**
+  String backupInvalidFile(Object error);
+
+  /// No description provided for @backupWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong password or corrupted file.'**
+  String get backupWrongPassword;
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String backupExportFailed(Object error);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
