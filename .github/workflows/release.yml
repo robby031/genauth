@@ -134,14 +134,27 @@ jobs:
           test -n "$ANDROID_KEY_PASSWORD" || (echo "Missing secret: ANDROID_KEY_PASSWORD" && exit 1)
 
       - name: Prepare Android keystore and key.properties
+        shell: bash
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+
+          test -s android/upload-keystore.jks || (echo "Decoded keystore is empty" && exit 1)
+
           cat > android/key.properties <<EOF
           storeFile=upload-keystore.jks
           storePassword=$ANDROID_KEYSTORE_PASSWORD
           keyAlias=$ANDROID_KEY_ALIAS
           keyPassword=$ANDROID_KEY_PASSWORD
           EOF
+
+      - name: Validate Android keystore contents
+        shell: bash
+        run: |
+          keytool -list \
+            -keystore android/upload-keystore.jks \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" \
+            >/dev/null
 
       - name: Build Android App Bundle
         run: flutter build appbundle --release
