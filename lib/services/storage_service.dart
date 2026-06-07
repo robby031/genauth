@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/otp_account.dart';
 
@@ -9,6 +12,8 @@ class StorageService {
 
   static const _key = 'genauth_accounts';
   static const _onboardingKey = 'genauth_onboarding_done';
+  static const _pinHashKey = 'genauth_pin_hash';
+  static const _pinSaltKey = 'genauth_pin_salt';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -47,6 +52,35 @@ class StorageService {
     final list = await loadAccounts();
     list.removeWhere((a) => a.id == id);
     await saveAccounts(list);
+  }
+
+  Future<bool> hasPin() async =>
+      (await _storage.read(key: _pinHashKey)) != null;
+
+  Future<void> savePin(String pin) async {
+    final salt = List.generate(16, (_) => Random.secure().nextInt(256));
+    final hash = await _hashPin(pin, salt);
+    await _storage.write(key: _pinHashKey, value: base64Encode(hash));
+    await _storage.write(key: _pinSaltKey, value: base64Encode(salt));
+  }
+
+  Future<bool> verifyPin(String pin) async {
+    final storedHash = await _storage.read(key: _pinHashKey);
+    final storedSalt = await _storage.read(key: _pinSaltKey);
+    if (storedHash == null || storedSalt == null) return false;
+    final hash = await _hashPin(pin, base64Decode(storedSalt));
+    return base64Encode(hash) == storedHash;
+  }
+
+  Future<void> clearPin() async {
+    await _storage.delete(key: _pinHashKey);
+    await _storage.delete(key: _pinSaltKey);
+  }
+
+  // SHA-256(pin bytes || salt) — PIN is stored in Keychain, so this is sufficient.
+  static Future<List<int>> _hashPin(String pin, List<int> salt) async {
+    final hash = await Sha256().hash([...utf8.encode(pin), ...salt]);
+    return hash.bytes;
   }
 
   Future<bool> isOnboardingCompleted() async {

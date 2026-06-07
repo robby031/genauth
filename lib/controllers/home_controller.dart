@@ -81,6 +81,15 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // onReorderItem passes the already-adjusted newIndex (after removal),
+  // so no manual index correction is needed here.
+  Future<void> reorderAccounts(int oldIndex, int newIndex) async {
+    final account = _accounts.removeAt(oldIndex);
+    _accounts.insert(newIndex, account);
+    await _storage.saveAccounts(_accounts);
+    notifyListeners();
+  }
+
   Future<void> incrementHotp(OtpAccount account) async {
     final result = await _otpRepository.hotpIncrement(account);
     final updated = result['account'] as OtpAccount;

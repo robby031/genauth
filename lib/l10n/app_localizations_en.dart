@@ -219,6 +219,42 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get pinEnterTitle => 'Enter PIN';
+
+  @override
+  String get pinSetupTitle => 'Set PIN';
+
+  @override
+  String get pinConfirmTitle => 'Confirm PIN';
+
+  @override
+  String get pinSetupDesc => 'Set a 6-digit PIN as a backup unlock method';
+
+  @override
+  String get pinConfirmDesc => 'Enter the same PIN again to confirm';
+
+  @override
+  String get pinWrong => 'Wrong PIN. Try again.';
+
+  @override
+  String get pinMismatch => 'PINs do not match. Try again.';
+
+  @override
+  String get pinSaved => 'PIN set successfully';
+
+  @override
+  String get pinRemoved => 'PIN removed';
+
+  @override
+  String get usePin => 'Use PIN';
+
+  @override
+  String get setPinOption => 'Set PIN';
+
+  @override
+  String get removePinOption => 'Remove PIN';
+
+  @override
   String get githubLinkOpenFailed => 'Unable to open GitHub link.';
 
   @override

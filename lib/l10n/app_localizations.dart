@@ -491,6 +491,78 @@ abstract class AppLocalizations {
   /// **'Export failed: {error}'**
   String backupExportFailed(Object error);
 
+  /// No description provided for @pinEnterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get pinEnterTitle;
+
+  /// No description provided for @pinSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get pinSetupTitle;
+
+  /// No description provided for @pinConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get pinConfirmTitle;
+
+  /// No description provided for @pinSetupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a 6-digit PIN as a backup unlock method'**
+  String get pinSetupDesc;
+
+  /// No description provided for @pinConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the same PIN again to confirm'**
+  String get pinConfirmDesc;
+
+  /// No description provided for @pinWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN. Try again.'**
+  String get pinWrong;
+
+  /// No description provided for @pinMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'PINs do not match. Try again.'**
+  String get pinMismatch;
+
+  /// No description provided for @pinSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN set successfully'**
+  String get pinSaved;
+
+  /// No description provided for @pinRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN removed'**
+  String get pinRemoved;
+
+  /// No description provided for @usePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Use PIN'**
+  String get usePin;
+
+  /// No description provided for @setPinOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPinOption;
+
+  /// No description provided for @removePinOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
+  String get removePinOption;
+
   /// No description provided for @githubLinkOpenFailed.
   ///
   /// In en, this message translates to:

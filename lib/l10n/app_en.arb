@@ -95,6 +95,18 @@
       "error": {}
     }
   },
+  "pinEnterTitle": "Enter PIN",
+  "pinSetupTitle": "Set PIN",
+  "pinConfirmTitle": "Confirm PIN",
+  "pinSetupDesc": "Set a 6-digit PIN as a backup unlock method",
+  "pinConfirmDesc": "Enter the same PIN again to confirm",
+  "pinWrong": "Wrong PIN. Try again.",
+  "pinMismatch": "PINs do not match. Try again.",
+  "pinSaved": "PIN set successfully",
+  "pinRemoved": "PIN removed",
+  "usePin": "Use PIN",
+  "setPinOption": "Set PIN",
+  "removePinOption": "Remove PIN",
   "githubLinkOpenFailed": "Unable to open GitHub link.",
   "openGithubRepository": "Open GitHub repository",
   "allRightsReserved": "All rights reserved.",

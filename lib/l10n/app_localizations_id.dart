@@ -219,6 +219,42 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get pinEnterTitle => 'Masukkan PIN';
+
+  @override
+  String get pinSetupTitle => 'Atur PIN';
+
+  @override
+  String get pinConfirmTitle => 'Konfirmasi PIN';
+
+  @override
+  String get pinSetupDesc => 'Atur PIN 6 digit sebagai metode buka kunci cadangan';
+
+  @override
+  String get pinConfirmDesc => 'Masukkan PIN yang sama lagi untuk konfirmasi';
+
+  @override
+  String get pinWrong => 'PIN salah. Coba lagi.';
+
+  @override
+  String get pinMismatch => 'PIN tidak cocok. Coba lagi.';
+
+  @override
+  String get pinSaved => 'PIN berhasil diatur';
+
+  @override
+  String get pinRemoved => 'PIN dihapus';
+
+  @override
+  String get usePin => 'Gunakan PIN';
+
+  @override
+  String get setPinOption => 'Atur PIN';
+
+  @override
+  String get removePinOption => 'Hapus PIN';
+
+  @override
   String get githubLinkOpenFailed => 'Tidak dapat membuka tautan GitHub.';
 
   @override

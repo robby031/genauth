@@ -95,6 +95,18 @@
       "error": {}
     }
   },
+  "pinEnterTitle": "Masukkan PIN",
+  "pinSetupTitle": "Atur PIN",
+  "pinConfirmTitle": "Konfirmasi PIN",
+  "pinSetupDesc": "Atur PIN 6 digit sebagai metode buka kunci cadangan",
+  "pinConfirmDesc": "Masukkan PIN yang sama lagi untuk konfirmasi",
+  "pinWrong": "PIN salah. Coba lagi.",
+  "pinMismatch": "PIN tidak cocok. Coba lagi.",
+  "pinSaved": "PIN berhasil diatur",
+  "pinRemoved": "PIN dihapus",
+  "usePin": "Gunakan PIN",
+  "setPinOption": "Atur PIN",
+  "removePinOption": "Hapus PIN",
   "githubLinkOpenFailed": "Tidak dapat membuka tautan GitHub.",
   "openGithubRepository": "Buka repositori GitHub",
   "allRightsReserved": "Hak cipta dilindungi.",

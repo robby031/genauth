@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../controllers/lock_controller.dart';
+import '../services/storage_service.dart';
 import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 import 'home_screen.dart';
+import 'pin_screen.dart';
 
 class LockScreen extends StatefulWidget {
   const LockScreen({super.key});
@@ -38,6 +40,23 @@ class _LockScreenState extends State<LockScreen> {
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     }
+  }
+
+  Future<void> _openPin() async {
+    final storage = StorageService();
+    final hasPin = await storage.hasPin();
+    if (!mounted) return;
+
+    final mode = hasPin ? PinMode.verify : PinMode.setup;
+    final ok = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => PinScreen(mode: mode)),
+    );
+    if (!mounted || ok != true) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
@@ -89,6 +108,14 @@ class _LockScreenState extends State<LockScreen> {
                         icon: const Icon(Icons.fingerprint),
                         label: Text(context.l10n.unlock),
                       ),
+                      if (_controller.hasError) ...[
+                        const SizedBox(height: 12),
+                        TextButton.icon(
+                          onPressed: _openPin,
+                          icon: const Icon(Icons.pin_outlined),
+                          label: Text(context.l10n.usePin),
+                        ),
+                      ],
                     ],
                   ],
                 ),

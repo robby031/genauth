@@ -5,15 +5,60 @@ import '../services/locale_service.dart';
 import '../utils/app_assets.dart';
 import '../utils/l10n_extensions.dart';
 import 'backup_screen.dart';
+import 'pin_screen.dart';
+import '../services/storage_service.dart';
 
-class DrawerScreen extends StatelessWidget {
+class DrawerScreen extends StatefulWidget {
+  final VoidCallback onLock;
+  final VoidCallback onAbout;
+  const DrawerScreen({super.key, required this.onLock, required this.onAbout});
+
+  @override
+  State<DrawerScreen> createState() => _DrawerScreenState();
+}
+
+class _DrawerScreenState extends State<DrawerScreen> {
   static final Uri _repoUrl = Uri.parse(
     'https://github.com/robby031/genotp-go',
   );
 
-  final VoidCallback onLock;
-  final VoidCallback onAbout;
-  const DrawerScreen({super.key, required this.onLock, required this.onAbout});
+  bool _hasPin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshPinState();
+  }
+
+  Future<void> _refreshPinState() async {
+    final has = await StorageService().hasPin();
+    if (mounted) setState(() => _hasPin = has);
+  }
+
+  Future<void> _openPinSetup() async {
+    Navigator.pop(context);
+    final ok = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const PinScreen(mode: PinMode.setup)),
+    );
+    if (ok == true) _refreshPinState();
+  }
+
+  Future<void> _removePin() async {
+    Navigator.pop(context);
+    await StorageService().clearPin();
+    _refreshPinState();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.pinRemoved),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
+  }
 
   Future<void> _openGithubRepo(BuildContext context) async {
     final ok = await launchUrl(_repoUrl, mode: LaunchMode.externalApplication);
@@ -188,7 +233,16 @@ class DrawerScreen extends StatelessWidget {
                 context: context,
                 icon: Icons.lock_outline,
                 title: context.l10n.lockapp,
-                onTap: onLock,
+                onTap: widget.onLock,
+              ),
+              const SizedBox(height: 8),
+              _menuTile(
+                context: context,
+                icon: Icons.pin_outlined,
+                title: _hasPin
+                    ? context.l10n.removePinOption
+                    : context.l10n.setPinOption,
+                onTap: _hasPin ? _removePin : _openPinSetup,
               ),
               const SizedBox(height: 8),
               _menuTile(
@@ -208,7 +262,7 @@ class DrawerScreen extends StatelessWidget {
                 context: context,
                 icon: Icons.info_outline,
                 title: context.l10n.about,
-                onTap: onAbout,
+                onTap: widget.onAbout,
               ),
               const SizedBox(height: 8),
               ValueListenableBuilder<Locale>(

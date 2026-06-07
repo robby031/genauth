@@ -138,18 +138,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 )
-              : ListView.separated(
+              : ReorderableListView.builder(
+                  padding: EdgeInsets.zero,
+                  onReorderItem: _controller.isSearching
+                      ? (oldIdx, newIdx) {}
+                      : _controller.reorderAccounts,
+                  proxyDecorator: (child, _, animation) => Material(
+                    elevation: 4,
+                    shadowColor: Colors.black26,
+                    borderRadius: BorderRadius.circular(8),
+                    child: child,
+                  ),
                   itemCount: filtered.length,
-                  separatorBuilder: (context, i) => const Divider(height: 1),
                   itemBuilder: (_, i) {
                     final account = filtered[i];
-                    return OtpTile(
-                      account: account,
-                      code: _controller.codeFor(account.id),
-                      onDelete: () => _controller.deleteAccount(account.id),
-                      onHotpIncrement: account.isHotp
-                          ? () => _controller.incrementHotp(account)
-                          : null,
+                    return Column(
+                      key: ValueKey(account.id),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        OtpTile(
+                          account: account,
+                          code: _controller.codeFor(account.id),
+                          onDelete: () =>
+                              _controller.deleteAccount(account.id),
+                          onHotpIncrement: account.isHotp
+                              ? () => _controller.incrementHotp(account)
+                              : null,
+                          showDragHandle: !_controller.isSearching,
+                        ),
+                        const Divider(height: 1),
+                      ],
                     );
                   },
                 ),
