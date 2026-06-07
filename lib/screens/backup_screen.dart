@@ -4,11 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../services/backup_service.dart';
-import '../services/storage_service.dart';
-import '../utils/l10n_extensions.dart';
-import 'add_account_screen.dart';
-import 'google_auth_export_screen.dart';
+import 'package:genauth/services/backup_service.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/screens/add_account_screen.dart';
+import 'package:genauth/screens/google_auth_export_screen.dart';
 
 class BackupScreen extends StatelessWidget {
   const BackupScreen({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 class TagEditorSheet extends StatefulWidget {
   final String accountName;

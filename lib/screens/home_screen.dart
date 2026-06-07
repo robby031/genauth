@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../controllers/home_controller.dart';
-import '../services/storage_service.dart';
-import '../widgets/otp_tile.dart';
-import '../widgets/tag_filter_bar.dart';
-import 'add_account_screen.dart';
-import 'lock_screen.dart';
-import 'drawer_screen.dart';
-import '../repositories/otp_repository.dart';
-import '../utils/app_assets.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/controllers/home_controller.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/widgets/otp_tile.dart';
+import 'package:genauth/widgets/tag_filter_bar.dart';
+import 'package:genauth/screens/add_account_screen.dart';
+import 'package:genauth/screens/lock_screen.dart';
+import 'package:genauth/screens/drawer_screen.dart';
+import 'package:genauth/repositories/otp_repository.dart';
+import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

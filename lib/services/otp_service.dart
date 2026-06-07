@@ -1,5 +1,5 @@
 import 'package:genotp_flutter/genotp_flutter.dart';
-import '../models/otp_account.dart';
+import 'package:genauth/models/otp_account.dart';
 
 class OtpService {
   static Future<String> generateCode(OtpAccount account) async {

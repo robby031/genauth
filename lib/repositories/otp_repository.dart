@@ -1,7 +1,7 @@
 import 'dart:async';
-import '../models/otp_account.dart';
-import '../services/storage_service.dart';
-import '../services/otp_service.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/services/otp_service.dart';
 
 class OtpRepository {
   final StorageService _storage;

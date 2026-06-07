@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../services/auth_service.dart';
+import 'package:genauth/services/auth_service.dart';
 
 class LockController extends ChangeNotifier {
   bool _authenticating = false;

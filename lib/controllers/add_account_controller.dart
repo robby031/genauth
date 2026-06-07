@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import '../models/otp_account.dart';
-import '../services/google_auth_migration_service.dart';
-import '../services/otp_service.dart';
-import '../services/storage_service.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/google_auth_migration_service.dart';
+import 'package:genauth/services/otp_service.dart';
+import 'package:genauth/services/storage_service.dart';
 
 class AddAccountController extends ChangeNotifier {
   AddAccountController({required this._storage});

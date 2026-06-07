@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:genotp_flutter/genotp_flutter.dart';
 
-import '../models/otp_account.dart';
+import 'package:genauth/models/otp_account.dart';
 
 class GoogleAuthMigrationBatch {
   const GoogleAuthMigrationBatch({

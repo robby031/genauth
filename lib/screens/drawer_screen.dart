@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../services/locale_service.dart';
-import '../utils/app_assets.dart';
-import '../utils/l10n_extensions.dart';
-import 'backup_screen.dart';
-import 'pin_screen.dart';
-import '../services/storage_service.dart';
+import 'package:genauth/services/locale_service.dart';
+import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/screens/backup_screen.dart';
+import 'package:genauth/screens/pin_screen.dart';
+import 'package:genauth/services/storage_service.dart';
 
 class DrawerScreen extends StatefulWidget {
   final VoidCallback onLock;

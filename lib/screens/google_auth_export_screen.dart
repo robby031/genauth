@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../models/otp_account.dart';
-import '../services/google_auth_migration_service.dart';
-import '../utils/app_assets.dart';
-import '../utils/l10n_extensions.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/google_auth_migration_service.dart';
+import 'package:genauth/utils/app_assets.dart';
+import 'package:genauth/utils/l10n_extensions.dart';
 
 class GoogleAuthExportScreen extends StatelessWidget {
   const GoogleAuthExportScreen({super.key, required this.accounts});

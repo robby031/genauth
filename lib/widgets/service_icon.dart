@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import '../services/icon_service.dart';
+import 'package:genauth/services/icon_service.dart';
 
 class ServiceIcon extends StatelessWidget {
   final String issuer;

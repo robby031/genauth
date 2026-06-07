@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
-import '../models/otp_account.dart';
+import 'package:genauth/models/otp_account.dart';
 
 class BackupService {
   static const int _iterations = 100000;

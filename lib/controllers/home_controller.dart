@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import '../models/otp_account.dart';
-import '../repositories/otp_repository.dart';
-import '../services/otp_service.dart';
-import '../services/storage_service.dart';
+import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/repositories/otp_repository.dart';
+import 'package:genauth/services/otp_service.dart';
+import 'package:genauth/services/storage_service.dart';
 
 class HomeController extends ChangeNotifier {
   HomeController({required this._storage, required this._otpRepository});
