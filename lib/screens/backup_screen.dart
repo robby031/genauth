@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -386,16 +386,20 @@ class _ImportCardState extends State<_ImportCard> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      withData: true,
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'GenAuth Backup',
+          extensions: ['genauth', 'json', 'txt'],
+        ),
+      ],
     );
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.first;
-    if (file.bytes == null) return;
+
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
     setState(() {
       _pickedFileName = file.name;
-      _pickedBytes = file.bytes;
+      _pickedBytes = bytes;
     });
   }
 

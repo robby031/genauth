@@ -1,9 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/locale_service.dart';
@@ -17,9 +15,6 @@ const _brandSeedColor = Color(0xFF2F6BDE);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-  }
   runApp(const GenAuthApp());
 }
 
