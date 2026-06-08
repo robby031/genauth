@@ -106,10 +106,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _scannerController = MobileScannerController(
-      autoStart: false,
-      formats: const [BarcodeFormat.qrCode],
-    );
+    _scannerController = MobileScannerController(autoStart: false);
     _scanLineController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
