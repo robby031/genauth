@@ -99,12 +99,13 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   bool _isStartingScanner = false;
   late final AnimationController _scanLineController;
   late final AnimationController _framePulseController;
-  late final MobileScannerController _scannerController;
+  late MobileScannerController _scannerController;
+  int _scannerSession = 0;
 
   @override
   void initState() {
     super.initState();
-    _scannerController = MobileScannerController(autoStart: false);
+    _scannerController = _createScannerController();
     _scanLineController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -130,7 +131,7 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isActive == widget.isActive) return;
     if (widget.isActive) {
-      unawaited(_startScanner());
+      unawaited(_restartScanner(recreateController: true));
     } else {
       unawaited(_stopScanner());
       _scanLineController.stop();
@@ -144,6 +145,13 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
     _framePulseController.dispose();
     unawaited(_scannerController.dispose());
     super.dispose();
+  }
+
+  MobileScannerController _createScannerController() {
+    return MobileScannerController(
+      autoStart: false,
+      formats: const [BarcodeFormat.qrCode],
+    );
   }
 
   Future<void> _startScanner() async {
@@ -170,7 +178,6 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   }
 
   Future<void> _stopScanner() async {
-    if (!_scannerController.value.isRunning) return;
     try {
       await _scannerController.stop();
     } catch (_) {
@@ -178,10 +185,19 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _restartScanner() async {
+  Future<void> _restartScanner({bool recreateController = true}) async {
     if (!mounted || !widget.isActive) return;
     _done = false;
     await _stopScanner();
+    if (recreateController) {
+      final oldController = _scannerController;
+      final newController = _createScannerController();
+      setState(() {
+        _scannerController = newController;
+        _scannerSession++;
+      });
+      await oldController.dispose();
+    }
     await _startScanner();
   }
 
@@ -245,20 +261,24 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
             return Stack(
               fit: StackFit.expand,
               children: [
-                MobileScanner(
-                  controller: _scannerController,
-                  onDetect: _onDetect,
-                  errorBuilder: (context, error) {
-                    return _ScannerErrorView(
-                      title: context.l10n.scannerUnavailableTitle,
-                      message: error.errorDetails?.message?.isNotEmpty == true
-                          ? error.errorDetails!.message!
-                          : context.l10n.scannerUnavailableMessage,
-                      actionLabel: context.l10n.scannerRetry,
-                      onRetry: _restartScanner,
-                    );
-                  },
-                ),
+                if (widget.isActive)
+                  MobileScanner(
+                    key: ValueKey(_scannerSession),
+                    controller: _scannerController,
+                    onDetect: _onDetect,
+                    errorBuilder: (context, error) {
+                      return _ScannerErrorView(
+                        title: context.l10n.scannerUnavailableTitle,
+                        message: error.errorDetails?.message?.isNotEmpty == true
+                            ? error.errorDetails!.message!
+                            : context.l10n.scannerUnavailableMessage,
+                        actionLabel: context.l10n.scannerRetry,
+                        onRetry: _restartScanner,
+                      );
+                    },
+                  )
+                else
+                  const ColoredBox(color: Colors.black),
                 if (scannerState.error == null)
                   CamScanOverlay(
                     scanAnimation: _scanLineController,
