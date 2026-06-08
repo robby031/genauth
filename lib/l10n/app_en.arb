@@ -224,6 +224,7 @@
   "auditLogClearAll": "Clear all logs",
   "auditLogClearConfirmTitle": "Clear audit logs?",
   "auditLogClearConfirmDesc": "This will permanently remove all local audit records.",
+  "auditLogPinRequired": "Set a PIN first before clearing audit logs.",
   "auditLogStatus": "Status",
   "auditLogDetail": "Detail",
   "auditLogMetadata": "Metadata",

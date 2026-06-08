@@ -641,6 +641,7 @@ class _DriveBackupCard extends StatefulWidget {
 class _DriveBackupCardState extends State<_DriveBackupCard> {
   final _service = GoogleAccountService.instance;
   final _autoBackupService = AutoBackupService.instance;
+  final _storage = StorageService.instance;
   final _pwCtrl = TextEditingController();
   final _autoPwCtrl = TextEditingController();
   bool _obscure = true;
@@ -649,12 +650,28 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
   bool _autoEnabled = false;
   String _autoInterval = 'daily';
   bool _settingsLoaded = false;
+  bool _authChecked = false;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_service.initialize());
-    _loadAutoBackupSettings();
+    unawaited(_bootstrapDriveCard());
+  }
+
+  Future<void> _bootstrapDriveCard() async {
+    await Future.wait<void>([_loadAutoBackupSettings(), _prepareGoogleState()]);
+    if (!mounted) return;
+    setState(() {
+      _authChecked = true;
+    });
+  }
+
+  Future<void> _prepareGoogleState() async {
+    final hasStoredProfile = await _storage.hasGoogleProfile();
+    if (!hasStoredProfile) {
+      return;
+    }
+    await _service.initialize(restorePreviousSignIn: true);
   }
 
   @override
@@ -997,7 +1014,9 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
                   ).textTheme.bodySmall?.copyWith(color: scheme.outline),
                 ),
                 const SizedBox(height: 16),
-                if (!signedIn)
+                if (!_authChecked)
+                  const Center(child: CircularProgressIndicator())
+                else if (!signedIn)
                   FilledButton.icon(
                     onPressed: _busy ? null : _signIn,
                     icon: _busy

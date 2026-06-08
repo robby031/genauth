@@ -224,6 +224,7 @@
   "auditLogClearAll": "Hapus semua log",
   "auditLogClearConfirmTitle": "Hapus log audit?",
   "auditLogClearConfirmDesc": "Tindakan ini akan menghapus permanen semua catatan audit lokal.",
+  "auditLogPinRequired": "Atur PIN terlebih dahulu sebelum menghapus log audit.",
   "auditLogStatus": "Status",
   "auditLogDetail": "Detail",
   "auditLogMetadata": "Metadata",

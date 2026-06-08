@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:genauth/services/audit_log_service.dart';
+import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
@@ -30,6 +32,18 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
   }
 
   Future<void> _clearAll() async {
+    final hasPin = await StorageService.instance.hasPin();
+    if (!mounted) return;
+    if (!hasPin) {
+      SnackMessage.show(
+        context,
+        context.l10n.auditLogPinRequired,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
+      return;
+    }
+
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -49,6 +63,13 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
     );
 
     if (ok != true) return;
+    if (!mounted) return;
+    final pinVerified = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const PinScreen(mode: PinMode.verify)),
+    );
+    if (!mounted || pinVerified != true) return;
+
     await AuditLogService.instance.clearAll();
     await _reload();
     if (!mounted) return;

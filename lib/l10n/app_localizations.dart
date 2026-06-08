@@ -1073,6 +1073,12 @@ abstract class AppLocalizations {
   /// **'This will permanently remove all local audit records.'**
   String get auditLogClearConfirmDesc;
 
+  /// No description provided for @auditLogPinRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a PIN first before clearing audit logs.'**
+  String get auditLogPinRequired;
+
   /// No description provided for @auditLogStatus.
   ///
   /// In en, this message translates to:

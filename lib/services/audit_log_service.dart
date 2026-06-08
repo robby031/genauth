@@ -67,6 +67,16 @@ class AuditLogService {
 
   Future<void> clearAll() async {
     final db = await _database();
-    await db.delete('audit_logs');
+    final deletedAt = DateTime.now().millisecondsSinceEpoch;
+    await db.transaction((txn) async {
+      await txn.delete('audit_logs');
+      await txn.insert('audit_logs', {
+        'action': 'audit_logs_cleared',
+        'status': 'success',
+        'detail': 'All previous local audit records were removed.',
+        'metadata': jsonEncode({'deleted_at': deletedAt}),
+        'created_at': deletedAt,
+      });
+    });
   }
 }

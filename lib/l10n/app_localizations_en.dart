@@ -532,6 +532,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get auditLogClearConfirmDesc => 'This will permanently remove all local audit records.';
 
   @override
+  String get auditLogPinRequired => 'Set a PIN first before clearing audit logs.';
+
+  @override
   String get auditLogStatus => 'Status';
 
   @override

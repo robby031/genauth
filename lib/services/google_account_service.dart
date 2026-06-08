@@ -18,16 +18,28 @@ class GoogleAccountService {
   static const List<String> _driveScopes = [_driveScope];
 
   bool _initialized = false;
+  Future<void>? _initializing;
   GoogleSignInAccount? _currentUser;
   StreamSubscription<GoogleSignInAuthenticationEvent>? _eventSub;
 
   final ValueNotifier<GoogleSignInAccount?> userNotifier =
       ValueNotifier<GoogleSignInAccount?>(null);
 
-  Future<void> initialize() async {
-    if (_initialized) return;
-    _initialized = true;
+  Future<void> initialize({bool restorePreviousSignIn = true}) {
+    if (_initialized) {
+      return Future.value();
+    }
+    if (_initializing != null) {
+      return _initializing!;
+    }
 
+    _initializing = _initializeInternal(
+      restorePreviousSignIn: restorePreviousSignIn,
+    );
+    return _initializing!;
+  }
+
+  Future<void> _initializeInternal({required bool restorePreviousSignIn}) async {
     final signIn = GoogleSignIn.instance;
     await signIn.initialize(serverClientId: _serverClientId);
 
@@ -41,10 +53,14 @@ class GoogleAccountService {
       }
     });
 
-    await signIn.attemptLightweightAuthentication();
+    _initialized = true;
+
+    if (restorePreviousSignIn) {
+      await signIn.attemptLightweightAuthentication();
+    }
   }
 
-  Future<void> ensureInitialized() => initialize();
+  Future<void> ensureInitialized() => initialize(restorePreviousSignIn: true);
 
   void _setUser(GoogleSignInAccount? user) {
     _currentUser = user;
