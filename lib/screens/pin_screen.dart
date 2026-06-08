@@ -156,7 +156,11 @@ class _PinScreenState extends State<PinScreen> {
     return Scaffold(
       appBar: widget.mode == PinMode.verify
           ? null
-          : AppBar(title: Text(_title)),
+          : AppBar(
+              titleSpacing: 0,
+              centerTitle: false,
+              title: Text(_title, style: const TextStyle(fontSize: 16)),
+            ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

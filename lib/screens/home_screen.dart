@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:genauth/controllers/home_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/widgets/otp_tile.dart';
@@ -11,8 +12,10 @@ import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
+import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
+import 'google_signin_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -105,6 +108,41 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => const OnboardingScreen(fromDrawer: true),
       ),
     );
+  }
+
+  Future<void> _signOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.driveBackupSignOut),
+        content: Text(
+          context.l10n.driveBackupSignedInAs(
+            GoogleAccountService.instance.currentUser?.email ?? '',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(context.l10n.driveBackupSignOut),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await AuditLogService.instance.log('google_logout');
+      await GoogleAccountService.instance.signOut();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const GoogleSignInScreen()),
+        (_) => false,
+      );
+    }
   }
 
   void _toggleBubble() {
@@ -211,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: AppBar(
             titleSpacing: 0,
-
+            centerTitle: false,
             title: _controller.isSearching
                 ? TextField(
                     controller: _searchController,
@@ -225,19 +263,64 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 : Text(
                     context.l10n.appTitle,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-            centerTitle: false,
-            actions: [
-              _controller.isSearching
-                  ? IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: _stopSearch,
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: _startSearch,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+            actions: [
+              if (_controller.isSearching)
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: _stopSearch,
+                )
+              else ...[
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: _startSearch,
+                ),
+                ValueListenableBuilder(
+                  valueListenable: GoogleAccountService.instance.userNotifier,
+                  builder: (context, user, _) {
+                    if (user == null || user.photoUrl == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: GestureDetector(
+                        onTap: _signOut,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant,
+                              width: 1,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.transparent,
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: user.photoUrl!,
+                                placeholder: (context, url) =>
+                                    const Icon(Icons.account_circle, size: 32),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.account_circle, size: 32),
+                                fit: BoxFit.cover,
+                                width: 32,
+                                height: 32,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
           drawer: DrawerScreen(

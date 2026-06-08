@@ -98,7 +98,12 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.auditLogTitle),
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text(
+          context.l10n.auditLogTitle,
+          style: const TextStyle(fontSize: 16),
+        ),
         actions: [
           IconButton(
             tooltip: context.l10n.auditLogClearAll,

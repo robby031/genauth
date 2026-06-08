@@ -14,7 +14,14 @@ class GoogleAuthExportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.googleAuthExportTitle)),
+      appBar: AppBar(
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text(
+          context.l10n.googleAuthExportTitle,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),

@@ -20,7 +20,14 @@ class BackupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.backupAndRestore)),
+      appBar: AppBar(
+        titleSpacing: 0,
+        centerTitle: false,
+        title: Text(
+          context.l10n.backupAndRestore,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
       body: const SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -696,16 +703,6 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
     }
   }
 
-  Future<void> _signOut() async {
-    setState(() => _busy = true);
-    try {
-      await _service.signOut();
-      await AuditLogService.instance.log('drive_backup_signout');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
   Future<void> _upload() async {
     final l10n = context.l10n;
     if (_pwCtrl.text.length < 8) {
@@ -840,48 +837,11 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
   }
 
   Future<String?> _promptPassword() async {
-    final ctrl = TextEditingController();
-    var obscure = true;
-    final l10n = context.l10n;
-    final result = await showDialog<String>(
+    return showDialog<String>(
       context: context,
-      builder: (dialogCtx) {
-        return StatefulBuilder(
-          builder: (ctx, setLocal) {
-            return AlertDialog(
-              title: Text(l10n.backupRestore),
-              content: TextField(
-                controller: ctrl,
-                obscureText: obscure,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: l10n.backupPassword,
-                  isDense: true,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      obscure ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () => setLocal(() => obscure = !obscure),
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogCtx),
-                  child: Text(l10n.cancel),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(dialogCtx, ctrl.text),
-                  child: Text(l10n.backupRestore),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      barrierDismissible: false,
+      builder: (dialogCtx) => const _PasswordDialog(),
     );
-    ctrl.dispose();
-    return result;
   }
 
   Future<_RestoreAction?> _askMergeOrReplace(int count) {
@@ -960,7 +920,7 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
                     label: Text(l10n.driveBackupSignIn),
                   )
                 else ...[
-                  _SignedInTile(user: user, onSignOut: _busy ? null : _signOut),
+                  _SignedInTile(user: user),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _pwCtrl,
@@ -1010,10 +970,9 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
 }
 
 class _SignedInTile extends StatelessWidget {
-  const _SignedInTile({required this.user, required this.onSignOut});
+  const _SignedInTile({required this.user});
 
   final GoogleSignInAccount user;
-  final VoidCallback? onSignOut;
 
   @override
   Widget build(BuildContext context) {
@@ -1057,12 +1016,57 @@ class _SignedInTile extends StatelessWidget {
               ],
             ),
           ),
-          TextButton(
-            onPressed: onSignOut,
-            child: Text(l10n.driveBackupSignOut),
-          ),
         ],
       ),
+    );
+  }
+}
+
+class _PasswordDialog extends StatefulWidget {
+  const _PasswordDialog();
+
+  @override
+  State<_PasswordDialog> createState() => _PasswordDialogState();
+}
+
+class _PasswordDialogState extends State<_PasswordDialog> {
+  final _ctrl = TextEditingController();
+  bool _obscure = true;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.backupRestore),
+      content: TextField(
+        controller: _ctrl,
+        obscureText: _obscure,
+        autofocus: true,
+        decoration: InputDecoration(
+          labelText: l10n.backupPassword,
+          isDense: true,
+          suffixIcon: IconButton(
+            icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => _obscure = !_obscure),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _ctrl.text),
+          child: Text(l10n.backupRestore),
+        ),
+      ],
     );
   }
 }
