@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/screens/lock_screen.dart';
+import 'package:genauth/screens/google_signin_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, this.fromDrawer = false});
@@ -31,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LockScreen()),
+      MaterialPageRoute(builder: (_) => const GoogleSignInScreen()),
     );
   }
 

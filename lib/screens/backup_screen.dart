@@ -2,10 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/backup_service.dart';
+import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/add_account_screen.dart';
@@ -24,6 +27,8 @@ class BackupScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _GoogleAuthMigrationCard(),
+            SizedBox(height: 20),
+            _DriveBackupCard(),
             SizedBox(height: 20),
             _ExportCard(),
             SizedBox(height: 20),
@@ -614,3 +619,505 @@ class _ImportCardState extends State<_ImportCard> {
 }
 
 enum _RestoreAction { replace, merge }
+
+class _DriveBackupCard extends StatefulWidget {
+  const _DriveBackupCard();
+
+  @override
+  State<_DriveBackupCard> createState() => _DriveBackupCardState();
+}
+
+class _DriveBackupCardState extends State<_DriveBackupCard> {
+  final _service = GoogleAccountService.instance;
+  final _pwCtrl = TextEditingController();
+  bool _obscure = true;
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _pwCtrl.dispose();
+    super.dispose();
+  }
+
+  void _showSnack(String message, {Color? color}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          backgroundColor: color,
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+  }
+
+  Future<void> _signIn() async {
+    setState(() => _busy = true);
+    await AuditLogService.instance.log('drive_backup_signin_attempt');
+    try {
+      await _service.signIn();
+      await AuditLogService.instance.log('drive_backup_signin_success');
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        await AuditLogService.instance.log(
+          'drive_backup_signin_canceled',
+          status: 'failed',
+        );
+        return;
+      }
+      await AuditLogService.instance.log(
+        'drive_backup_signin_failed',
+        status: 'failed',
+        detail: e.code.name,
+      );
+      if (mounted) {
+        _showSnack(
+          context.l10n.driveBackupSignInFailed(e.description ?? e.code.name),
+        );
+      }
+    } catch (e) {
+      await AuditLogService.instance.log(
+        'drive_backup_signin_failed',
+        status: 'failed',
+        detail: e.toString(),
+      );
+      if (mounted) {
+        _showSnack(context.l10n.driveBackupSignInFailed(e.toString()));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _signOut() async {
+    setState(() => _busy = true);
+    try {
+      await _service.signOut();
+      await AuditLogService.instance.log('drive_backup_signout');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _upload() async {
+    final l10n = context.l10n;
+    if (_pwCtrl.text.length < 8) {
+      _showSnack(l10n.backupPasswordMin);
+      return;
+    }
+
+    setState(() => _busy = true);
+    await AuditLogService.instance.log('drive_backup_upload_attempt');
+    try {
+      final accounts = await StorageService().loadAccounts();
+      if (!mounted) return;
+      if (accounts.isEmpty) {
+        _showSnack(l10n.backupNoAccounts);
+        return;
+      }
+
+      final bytes = await BackupService.export(accounts, _pwCtrl.text);
+      final now = DateTime.now().toUtc();
+      final stamp =
+          '${now.year}${_p2(now.month)}${_p2(now.day)}-${_p2(now.hour)}${_p2(now.minute)}${_p2(now.second)}';
+      final fileName = 'genauth-backup-$stamp.genauth';
+
+      final uploaded = await _service.uploadBackup(
+        bytes: bytes,
+        fileName: fileName,
+      );
+
+      await AuditLogService.instance.log(
+        'drive_backup_upload_success',
+        metadata: {
+          'fileName': uploaded.name,
+          'fileId': uploaded.id,
+          'accountCount': accounts.length,
+        },
+      );
+
+      if (!mounted) return;
+      _pwCtrl.clear();
+      _showSnack(
+        l10n.driveBackupUploadSuccess(uploaded.name),
+        color: Colors.green.shade600,
+      );
+    } catch (e) {
+      await AuditLogService.instance.log(
+        'drive_backup_upload_failed',
+        status: 'failed',
+        detail: e.toString(),
+      );
+      if (mounted) {
+        _showSnack(context.l10n.driveBackupUploadFailed(e.toString()));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _restore() async {
+    final l10n = context.l10n;
+    setState(() => _busy = true);
+    try {
+      final files = await _service.listBackups();
+      if (!mounted) return;
+
+      if (files.isEmpty) {
+        _showSnack(l10n.driveBackupEmpty);
+        return;
+      }
+
+      final picked = await showModalBottomSheet<DriveBackupFile>(
+        context: context,
+        showDragHandle: true,
+        builder: (sheetCtx) => _DriveBackupPickerSheet(files: files),
+      );
+      if (!mounted || picked == null) return;
+
+      final password = await _promptPassword();
+      if (!mounted || password == null) return;
+
+      setState(() => _busy = true);
+      await AuditLogService.instance.log(
+        'drive_backup_restore_attempt',
+        metadata: {'fileId': picked.id, 'fileName': picked.name},
+      );
+
+      final bytes = await _service.downloadBackup(picked.id);
+      final imported = await BackupService.import(bytes, password);
+      if (!mounted) return;
+
+      final action = await _askMergeOrReplace(imported.length);
+      if (!mounted || action == null) return;
+
+      final storage = StorageService();
+      if (action == _RestoreAction.replace) {
+        await storage.saveAccounts(imported);
+      } else {
+        final existing = await storage.loadAccounts();
+        final existingIds = existing.map((a) => a.id).toSet();
+        final merged = [
+          ...existing,
+          ...imported.where((a) => !existingIds.contains(a.id)),
+        ];
+        await storage.saveAccounts(merged);
+      }
+
+      await AuditLogService.instance.log(
+        'drive_backup_restore_success',
+        metadata: {
+          'mode': action == _RestoreAction.replace ? 'replace' : 'merge',
+          'importedCount': imported.length,
+          'fileName': picked.name,
+        },
+      );
+
+      if (!mounted) return;
+      _showSnack(
+        l10n.backupRestoredSuccess(imported.length),
+        color: Colors.green.shade600,
+      );
+    } catch (e) {
+      await AuditLogService.instance.log(
+        'drive_backup_restore_failed',
+        status: 'failed',
+        detail: e.toString(),
+      );
+      if (mounted) {
+        _showSnack(context.l10n.driveBackupRestoreFailed(e.toString()));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<String?> _promptPassword() async {
+    final ctrl = TextEditingController();
+    var obscure = true;
+    final l10n = context.l10n;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setLocal) {
+            return AlertDialog(
+              title: Text(l10n.backupRestore),
+              content: TextField(
+                controller: ctrl,
+                obscureText: obscure,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: l10n.backupPassword,
+                  isDense: true,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscure ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () => setLocal(() => obscure = !obscure),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogCtx),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogCtx, ctrl.text),
+                  child: Text(l10n.backupRestore),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    ctrl.dispose();
+    return result;
+  }
+
+  Future<_RestoreAction?> _askMergeOrReplace(int count) {
+    final l10n = context.l10n;
+    return showDialog<_RestoreAction>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.backupRestoreDialogTitle),
+        content: Text(l10n.backupRestoreDialogContent(count)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, _RestoreAction.merge),
+            child: Text(l10n.backupMerge),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, _RestoreAction.replace),
+            child: Text(l10n.backupReplace),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _p2(int n) => n.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ValueListenableBuilder<GoogleSignInAccount?>(
+          valueListenable: _service.userNotifier,
+          builder: (context, user, _) {
+            final signedIn = user != null;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.cloud_outlined, color: scheme.primary),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.driveBackupTitle,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.driveBackupDesc,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: scheme.outline),
+                ),
+                const SizedBox(height: 16),
+                if (!signedIn)
+                  FilledButton.icon(
+                    onPressed: _busy ? null : _signIn,
+                    icon: _busy
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.login),
+                    label: Text(l10n.driveBackupSignIn),
+                  )
+                else ...[
+                  _SignedInTile(user: user, onSignOut: _busy ? null : _signOut),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _pwCtrl,
+                    obscureText: _obscure,
+                    decoration: InputDecoration(
+                      labelText: l10n.backupPassword,
+                      labelStyle: const TextStyle(fontSize: 12),
+                      isDense: true,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscure ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () => setState(() => _obscure = !_obscure),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _busy ? null : _upload,
+                    icon: _busy
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.cloud_upload_outlined),
+                    label: Text(
+                      _busy
+                          ? l10n.driveBackupUploading
+                          : l10n.driveBackupUpload,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: _busy ? null : _restore,
+                    icon: const Icon(Icons.cloud_download_outlined),
+                    label: Text(l10n.driveBackupRestore),
+                  ),
+                ],
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _SignedInTile extends StatelessWidget {
+  const _SignedInTile({required this.user, required this.onSignOut});
+
+  final GoogleSignInAccount user;
+  final VoidCallback? onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final photoUrl = user.photoUrl;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+            child: photoUrl == null
+                ? const Icon(Icons.person_outline, size: 18)
+                : null,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.displayName ?? user.email,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  l10n.driveBackupSignedInAs(user.email),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: scheme.outline),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: onSignOut,
+            child: Text(l10n.driveBackupSignOut),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DriveBackupPickerSheet extends StatelessWidget {
+  const _DriveBackupPickerSheet({required this.files});
+
+  final List<DriveBackupFile> files;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final dateFmt = DateFormat.yMMMd().add_jm();
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              child: Text(
+                l10n.driveBackupRestore,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 360),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: files.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, i) {
+                  final file = files[i];
+                  final modified = file.modifiedTime;
+                  final subtitle = modified == null
+                      ? null
+                      : dateFmt.format(modified.toLocal());
+                  return ListTile(
+                    leading: Icon(Icons.lock_outlined, color: scheme.primary),
+                    title: Text(
+                      file.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: subtitle != null ? Text(subtitle) : null,
+                    onTap: () => Navigator.pop(context, file),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

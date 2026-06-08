@@ -303,6 +303,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupWrongPassword => 'Wrong password or corrupted file.';
 
   @override
+  String get googleLoginTitle => 'Sign in to GenAuth';
+
+  @override
+  String get googleLoginSubtitle => 'Use your Google account to set up GenAuth on this device.';
+
+  @override
+  String get googleLoginBenefit1 => 'Tied to your Google identity — easy to recognize this device later.';
+
+  @override
+  String get googleLoginBenefit2 => 'Enables optional encrypted backup to your private Google Drive folder.';
+
+  @override
+  String get googleLoginBenefit3 => 'Daily unlock still uses biometrics or PIN — your secrets stay on this device.';
+
+  @override
+  String get googleLoginCta => 'Continue with Google';
+
+  @override
+  String get googleLoginInProgress => 'Signing in...';
+
+  @override
+  String get googleLoginDisclaimer => 'GenAuth only reads your basic profile (email, name, photo). It cannot access your other Google data.';
+
+  @override
+  String get driveBackupTitle => 'Google Drive Backup';
+
+  @override
+  String get driveBackupDesc => 'Sign in with Google to upload encrypted backups to a hidden app folder in your Drive.';
+
+  @override
+  String get driveBackupSignIn => 'Sign in with Google';
+
+  @override
+  String get driveBackupSignOut => 'Sign out';
+
+  @override
+  String driveBackupSignedInAs(Object email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get driveBackupUpload => 'Backup to Drive';
+
+  @override
+  String get driveBackupUploading => 'Uploading...';
+
+  @override
+  String get driveBackupRestore => 'Restore from Drive';
+
+  @override
+  String get driveBackupLoadingList => 'Loading backups...';
+
+  @override
+  String get driveBackupEmpty => 'No backups found on Drive yet.';
+
+  @override
+  String get driveBackupPickFile => 'Choose backup';
+
+  @override
+  String driveBackupUploadSuccess(Object fileName) {
+    return 'Uploaded $fileName to Drive.';
+  }
+
+  @override
+  String driveBackupSignInFailed(Object error) {
+    return 'Google sign-in failed: $error';
+  }
+
+  @override
+  String driveBackupUploadFailed(Object error) {
+    return 'Drive upload failed: $error';
+  }
+
+  @override
+  String driveBackupRestoreFailed(Object error) {
+    return 'Drive restore failed: $error';
+  }
+
+  @override
+  String get driveBackupConfirmDeleteTitle => 'Delete backup?';
+
+  @override
+  String driveBackupConfirmDelete(Object fileName) {
+    return 'Remove $fileName from your Drive? This cannot be undone.';
+  }
+
+  @override
+  String get driveBackupDelete => 'Delete';
+
+  @override
   String backupExportFailed(Object error) {
     return 'Export failed: $error';
   }

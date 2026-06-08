@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/app_lock_state.dart';
+import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/screens/google_signin_screen.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/panic_corrupted_screen.dart';
@@ -16,6 +18,7 @@ const _brandSeedColor = Color(0xFF2F6BDE);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  unawaited(GoogleAccountService.instance.initialize());
   runApp(const GenAuthApp());
 }
 
@@ -71,7 +74,8 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
   }
 
   Future<void> _armLockOnBackground() async {
-    final onboardingDone = await StorageService.instance.isOnboardingCompleted();
+    final onboardingDone = await StorageService.instance
+        .isOnboardingCompleted();
     final panicTriggered = await StorageService.instance.isPanicTriggered();
     if (!mounted) return;
     if (!onboardingDone || panicTriggered) {
@@ -84,7 +88,9 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
   }
 
   Future<void> _presentResumeLock() async {
-    if (!mounted || _resumeLockRouteActive || AppLockState.isLockScreenVisible.value) {
+    if (!mounted ||
+        _resumeLockRouteActive ||
+        AppLockState.isLockScreenVisible.value) {
       return;
     }
 
@@ -160,9 +166,7 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
           ),
           builder: (context, child) {
             final baseChild = child ?? const SizedBox.shrink();
-            final stackChildren = <Widget>[
-              baseChild,
-            ];
+            final stackChildren = <Widget>[baseChild];
 
             if (_shouldObscureForPrivacy) {
               stackChildren.add(
@@ -179,10 +183,7 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
               );
             }
 
-            return Stack(
-              fit: StackFit.expand,
-              children: stackChildren,
-            );
+            return Stack(fit: StackFit.expand, children: stackChildren);
           },
           home: const _AppEntryScreen(),
         );
@@ -196,12 +197,17 @@ class _AppEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<(bool panic, bool onboardingDone)>(
+    return FutureBuilder<_AppEntryState>(
       future: () async {
-        final panic = await StorageService.instance.isPanicTriggered();
-        final onboardingDone = await StorageService.instance
-            .isOnboardingCompleted();
-        return (panic, onboardingDone);
+        final storage = StorageService.instance;
+        final panic = await storage.isPanicTriggered();
+        final onboardingDone = await storage.isOnboardingCompleted();
+        final googleLinked = await storage.hasGoogleProfile();
+        return _AppEntryState(
+          panic: panic,
+          onboardingDone: onboardingDone,
+          googleLinked: googleLinked,
+        );
       }(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -211,16 +217,32 @@ class _AppEntryScreen extends StatelessWidget {
         }
 
         final entry = snapshot.data!;
-        if (entry.$1) {
+        if (entry.panic) {
           return const PanicCorruptedScreen();
         }
 
-        if (entry.$2) {
-          return const LockScreen();
+        if (!entry.onboardingDone) {
+          return const OnboardingScreen();
         }
 
-        return const OnboardingScreen();
+        if (!entry.googleLinked) {
+          return const GoogleSignInScreen();
+        }
+
+        return const LockScreen();
       },
     );
   }
+}
+
+class _AppEntryState {
+  const _AppEntryState({
+    required this.panic,
+    required this.onboardingDone,
+    required this.googleLinked,
+  });
+
+  final bool panic;
+  final bool onboardingDone;
+  final bool googleLinked;
 }

@@ -647,6 +647,162 @@ abstract class AppLocalizations {
   /// **'Wrong password or corrupted file.'**
   String get backupWrongPassword;
 
+  /// No description provided for @googleLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to GenAuth'**
+  String get googleLoginTitle;
+
+  /// No description provided for @googleLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your Google account to set up GenAuth on this device.'**
+  String get googleLoginSubtitle;
+
+  /// No description provided for @googleLoginBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Tied to your Google identity — easy to recognize this device later.'**
+  String get googleLoginBenefit1;
+
+  /// No description provided for @googleLoginBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Enables optional encrypted backup to your private Google Drive folder.'**
+  String get googleLoginBenefit2;
+
+  /// No description provided for @googleLoginBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily unlock still uses biometrics or PIN — your secrets stay on this device.'**
+  String get googleLoginBenefit3;
+
+  /// No description provided for @googleLoginCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get googleLoginCta;
+
+  /// No description provided for @googleLoginInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in...'**
+  String get googleLoginInProgress;
+
+  /// No description provided for @googleLoginDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'GenAuth only reads your basic profile (email, name, photo). It cannot access your other Google data.'**
+  String get googleLoginDisclaimer;
+
+  /// No description provided for @driveBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive Backup'**
+  String get driveBackupTitle;
+
+  /// No description provided for @driveBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google to upload encrypted backups to a hidden app folder in your Drive.'**
+  String get driveBackupDesc;
+
+  /// No description provided for @driveBackupSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get driveBackupSignIn;
+
+  /// No description provided for @driveBackupSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get driveBackupSignOut;
+
+  /// No description provided for @driveBackupSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String driveBackupSignedInAs(Object email);
+
+  /// No description provided for @driveBackupUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup to Drive'**
+  String get driveBackupUpload;
+
+  /// No description provided for @driveBackupUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get driveBackupUploading;
+
+  /// No description provided for @driveBackupRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Drive'**
+  String get driveBackupRestore;
+
+  /// No description provided for @driveBackupLoadingList.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading backups...'**
+  String get driveBackupLoadingList;
+
+  /// No description provided for @driveBackupEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No backups found on Drive yet.'**
+  String get driveBackupEmpty;
+
+  /// No description provided for @driveBackupPickFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose backup'**
+  String get driveBackupPickFile;
+
+  /// No description provided for @driveBackupUploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded {fileName} to Drive.'**
+  String driveBackupUploadSuccess(Object fileName);
+
+  /// No description provided for @driveBackupSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed: {error}'**
+  String driveBackupSignInFailed(Object error);
+
+  /// No description provided for @driveBackupUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive upload failed: {error}'**
+  String driveBackupUploadFailed(Object error);
+
+  /// No description provided for @driveBackupRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive restore failed: {error}'**
+  String driveBackupRestoreFailed(Object error);
+
+  /// No description provided for @driveBackupConfirmDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete backup?'**
+  String get driveBackupConfirmDeleteTitle;
+
+  /// No description provided for @driveBackupConfirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {fileName} from your Drive? This cannot be undone.'**
+  String driveBackupConfirmDelete(Object fileName);
+
+  /// No description provided for @driveBackupDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get driveBackupDelete;
+
   /// No description provided for @backupExportFailed.
   ///
   /// In en, this message translates to:

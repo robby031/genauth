@@ -303,6 +303,96 @@ class AppLocalizationsId extends AppLocalizations {
   String get backupWrongPassword => 'Kata sandi salah atau file rusak.';
 
   @override
+  String get googleLoginTitle => 'Masuk ke GenAuth';
+
+  @override
+  String get googleLoginSubtitle => 'Gunakan akun Google kamu untuk menyiapkan GenAuth di perangkat ini.';
+
+  @override
+  String get googleLoginBenefit1 => 'Terhubung dengan identitas Google kamu — perangkat ini mudah dikenali.';
+
+  @override
+  String get googleLoginBenefit2 => 'Mengaktifkan backup terenkripsi opsional ke folder pribadi di Google Drive kamu.';
+
+  @override
+  String get googleLoginBenefit3 => 'Buka harian tetap pakai biometrik atau PIN — secret kamu tetap di perangkat ini.';
+
+  @override
+  String get googleLoginCta => 'Lanjut dengan Google';
+
+  @override
+  String get googleLoginInProgress => 'Sedang masuk...';
+
+  @override
+  String get googleLoginDisclaimer => 'GenAuth hanya membaca profil dasar kamu (email, nama, foto). Tidak bisa mengakses data Google lainnya.';
+
+  @override
+  String get driveBackupTitle => 'Backup Google Drive';
+
+  @override
+  String get driveBackupDesc => 'Masuk dengan akun Google untuk mengunggah backup terenkripsi ke folder tersembunyi di Drive kamu.';
+
+  @override
+  String get driveBackupSignIn => 'Masuk dengan Google';
+
+  @override
+  String get driveBackupSignOut => 'Keluar';
+
+  @override
+  String driveBackupSignedInAs(Object email) {
+    return 'Masuk sebagai $email';
+  }
+
+  @override
+  String get driveBackupUpload => 'Backup ke Drive';
+
+  @override
+  String get driveBackupUploading => 'Mengunggah...';
+
+  @override
+  String get driveBackupRestore => 'Pulihkan dari Drive';
+
+  @override
+  String get driveBackupLoadingList => 'Memuat daftar backup...';
+
+  @override
+  String get driveBackupEmpty => 'Belum ada backup di Drive.';
+
+  @override
+  String get driveBackupPickFile => 'Pilih backup';
+
+  @override
+  String driveBackupUploadSuccess(Object fileName) {
+    return 'Berhasil mengunggah $fileName ke Drive.';
+  }
+
+  @override
+  String driveBackupSignInFailed(Object error) {
+    return 'Gagal masuk Google: $error';
+  }
+
+  @override
+  String driveBackupUploadFailed(Object error) {
+    return 'Gagal unggah ke Drive: $error';
+  }
+
+  @override
+  String driveBackupRestoreFailed(Object error) {
+    return 'Gagal pulihkan dari Drive: $error';
+  }
+
+  @override
+  String get driveBackupConfirmDeleteTitle => 'Hapus backup?';
+
+  @override
+  String driveBackupConfirmDelete(Object fileName) {
+    return 'Hapus $fileName dari Drive kamu? Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get driveBackupDelete => 'Hapus';
+
+  @override
   String backupExportFailed(Object error) {
     return 'Ekspor gagal: $error';
   }

@@ -19,6 +19,7 @@ class StorageService {
   static const _panicPinHashKey = 'genauth_panic_pin_hash';
   static const _panicPinSaltKey = 'genauth_panic_pin_salt';
   static const _panicTriggeredKey = 'genauth_panic_triggered';
+  static const _googleProfileKey = 'genauth_google_profile';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -180,4 +181,57 @@ class StorageService {
   Future<void> setOnboardingCompleted(bool done) async {
     await _storage.write(key: _onboardingKey, value: done.toString());
   }
+
+  Future<void> saveGoogleProfile({
+    required String email,
+    String? displayName,
+    String? photoUrl,
+    String? googleId,
+  }) async {
+    final payload = jsonEncode({
+      'email': email,
+      'displayName': displayName,
+      'photoUrl': photoUrl,
+      'googleId': googleId,
+    });
+    await _storage.write(key: _googleProfileKey, value: payload);
+  }
+
+  Future<GoogleProfile?> getGoogleProfile() async {
+    final raw = await _storage.read(key: _googleProfileKey);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      final email = map['email'] as String?;
+      if (email == null || email.isEmpty) return null;
+      return GoogleProfile(
+        email: email,
+        displayName: map['displayName'] as String?,
+        photoUrl: map['photoUrl'] as String?,
+        googleId: map['googleId'] as String?,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> hasGoogleProfile() async => (await getGoogleProfile()) != null;
+
+  Future<void> clearGoogleProfile() async {
+    await _storage.delete(key: _googleProfileKey);
+  }
+}
+
+class GoogleProfile {
+  const GoogleProfile({
+    required this.email,
+    this.displayName,
+    this.photoUrl,
+    this.googleId,
+  });
+
+  final String email;
+  final String? displayName;
+  final String? photoUrl;
+  final String? googleId;
 }
