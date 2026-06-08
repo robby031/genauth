@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:genauth/controllers/add_account_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -96,16 +96,14 @@ class _ScanQrTab extends StatefulWidget {
 
 class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   bool _done = false;
-  bool _isStartingScanner = false;
   late final AnimationController _scanLineController;
   late final AnimationController _framePulseController;
-  late MobileScannerController _scannerController;
   int _scannerSession = 0;
+  String? _scannerErrorMessage;
 
   @override
   void initState() {
     super.initState();
-    _scannerController = _createScannerController();
     _scanLineController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -117,9 +115,7 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
       upperBound: 1.0,
     )..repeat(reverse: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.isActive) {
-        unawaited(_startScanner());
-      } else {
+      if (!widget.isActive) {
         _scanLineController.stop();
         _framePulseController.stop();
       }
@@ -131,9 +127,10 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isActive == widget.isActive) return;
     if (widget.isActive) {
-      unawaited(_restartScanner(recreateController: true));
+      _restartScanner();
+      _scanLineController.repeat();
+      _framePulseController.repeat(reverse: true);
     } else {
-      unawaited(_stopScanner());
       _scanLineController.stop();
       _framePulseController.stop();
     }
@@ -143,79 +140,32 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   void dispose() {
     _scanLineController.dispose();
     _framePulseController.dispose();
-    unawaited(_scannerController.dispose());
     super.dispose();
   }
 
-  MobileScannerController _createScannerController() {
-    return MobileScannerController(
-      autoStart: false,
-      formats: const [BarcodeFormat.qrCode],
-    );
-  }
-
-  Future<void> _startScanner() async {
-    if (!mounted ||
-        !widget.isActive ||
-        _done ||
-        _isStartingScanner ||
-        _scannerController.value.isRunning) {
-      return;
-    }
-
-    _isStartingScanner = true;
-    try {
-      await _scannerController.start();
-    } catch (_) {
-      // The scanner widget reflects startup errors through controller state.
-    } finally {
-      _isStartingScanner = false;
-      if (mounted && _scannerController.value.error == null) {
-        _scanLineController.repeat();
-        _framePulseController.repeat(reverse: true);
-      }
-    }
-  }
-
-  Future<void> _stopScanner() async {
-    try {
-      await _scannerController.stop();
-    } catch (_) {
-      // Ignore native stop failures and let scanner recover on next start.
-    }
-  }
-
-  Future<void> _restartScanner({bool recreateController = true}) async {
+  Future<void> _restartScanner() async {
     if (!mounted || !widget.isActive) return;
-    _done = false;
-    await _stopScanner();
-    if (recreateController) {
-      final oldController = _scannerController;
-      final newController = _createScannerController();
-      setState(() {
-        _scannerController = newController;
-        _scannerSession++;
-      });
-      await oldController.dispose();
-    }
-    await _startScanner();
+    setState(() {
+      _done = false;
+      _scannerErrorMessage = null;
+      _scannerSession++;
+    });
   }
 
-  Future<void> _onDetect(BarcodeCapture capture) async {
+  Future<void> _onDetect(Code code) async {
     if (_done) return;
-    final code = capture.barcodes.firstOrNull?.rawValue;
-    if (code == null) return;
+    final rawValue = code.text;
+    if (rawValue == null || rawValue.isEmpty) return;
     final isSupported =
-        code.startsWith('otpauth://') ||
-        code.startsWith('otpauth-migration://');
+        rawValue.startsWith('otpauth://') ||
+        rawValue.startsWith('otpauth-migration://');
     if (!isSupported) return;
 
     _done = true;
     _scanLineController.stop();
     _framePulseController.stop();
-    await _stopScanner();
     try {
-      final importedCount = await widget.controller.saveFromQrCode(code);
+      final importedCount = await widget.controller.saveFromQrCode(rawValue);
       if (!mounted) return;
 
       final message = importedCount > 0
@@ -231,10 +181,10 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
 
       Navigator.pop(context, importedCount > 0);
     } catch (e) {
-      _done = false;
-      _scanLineController.repeat();
-      _framePulseController.repeat(reverse: true);
       if (mounted) {
+        _done = false;
+        _scanLineController.repeat();
+        _framePulseController.repeat(reverse: true);
         SnackMessage.show(
           context,
           context.l10n.invalidQr('$e'),
@@ -243,6 +193,48 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
         );
       }
     }
+  }
+
+  void _onScanFailure(Code code) {
+    if (!mounted || _done) return;
+    final error = code.error;
+    if (error == null || error.isEmpty) return;
+
+    final normalizedError = error.toLowerCase();
+    if (normalizedError.contains('not found') ||
+        normalizedError.contains('no barcode') ||
+        normalizedError.contains('no qrcode')) {
+      return;
+    }
+
+    setState(() {
+      _scannerErrorMessage = error;
+    });
+    _scanLineController.stop();
+    _framePulseController.stop();
+  }
+
+  void _onControllerCreated(CameraController? controller, Exception? error) {
+    if (!mounted) return;
+    if (error == null && controller != null) {
+      if (_scannerErrorMessage != null) {
+        setState(() {
+          _scannerErrorMessage = null;
+        });
+      }
+      _scanLineController.repeat();
+      _framePulseController.repeat(reverse: true);
+      return;
+    }
+
+    setState(() {
+      _scannerErrorMessage =
+          error?.toString().trim().isNotEmpty == true
+          ? error.toString()
+          : context.l10n.scannerUnavailableMessage;
+    });
+    _scanLineController.stop();
+    _framePulseController.stop();
   }
 
   @override
@@ -255,39 +247,43 @@ class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
           320.0,
         );
 
-        return ValueListenableBuilder<MobileScannerState>(
-          valueListenable: _scannerController,
-          builder: (context, scannerState, _) {
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                if (widget.isActive)
-                  MobileScanner(
-                    key: ValueKey(_scannerSession),
-                    controller: _scannerController,
-                    onDetect: _onDetect,
-                    errorBuilder: (context, error) {
-                      return _ScannerErrorView(
-                        title: context.l10n.scannerUnavailableTitle,
-                        message: error.errorDetails?.message?.isNotEmpty == true
-                            ? error.errorDetails!.message!
-                            : context.l10n.scannerUnavailableMessage,
-                        actionLabel: context.l10n.scannerRetry,
-                        onRetry: _restartScanner,
-                      );
-                    },
-                  )
-                else
-                  const ColoredBox(color: Colors.black),
-                if (scannerState.error == null)
-                  CamScanOverlay(
-                    scanAnimation: _scanLineController,
-                    framePulseAnimation: _framePulseController,
-                    scanBoxSize: scanBoxSize,
-                  ),
-              ],
-            );
-          },
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            if (!widget.isActive)
+              const ColoredBox(color: Colors.black)
+            else if (_scannerErrorMessage != null)
+              _ScannerErrorView(
+                title: context.l10n.scannerUnavailableTitle,
+                message: _scannerErrorMessage!,
+                actionLabel: context.l10n.scannerRetry,
+                onRetry: _restartScanner,
+              )
+            else
+              ReaderWidget(
+                key: ValueKey(_scannerSession),
+                onScan: _onDetect,
+                onScanFailure: _onScanFailure,
+                onControllerCreated: _onControllerCreated,
+                codeFormat: Format.qrCode,
+                showScannerOverlay: false,
+                showFlashlight: false,
+                showGallery: false,
+                showToggleCamera: false,
+                scanDelay: const Duration(milliseconds: 220),
+                scanDelaySuccess: const Duration(milliseconds: 1200),
+                cropPercent: 0.72,
+                resolution: ResolutionPreset.high,
+                lensDirection: CameraLensDirection.back,
+                loading: const ColoredBox(color: Colors.black),
+              ),
+            if (widget.isActive && _scannerErrorMessage == null)
+              CamScanOverlay(
+                scanAnimation: _scanLineController,
+                framePulseAnimation: _framePulseController,
+                scanBoxSize: scanBoxSize,
+              ),
+          ],
         );
       },
     );
