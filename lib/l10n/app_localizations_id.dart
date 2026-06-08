@@ -30,7 +30,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get authenticator => 'Autentikator';
 
   @override
-  String get unlock => 'Buka Kunci';
+  String get unlock => 'Biometrik';
 
   @override
   String get authFailed => 'Autentikasi gagal. Silakan coba lagi.';
@@ -433,7 +433,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get pinRemoved => 'PIN dihapus';
 
   @override
-  String get usePin => 'Gunakan PIN';
+  String get usePin => 'PIN';
 
   @override
   String get setPinOption => 'Atur PIN';

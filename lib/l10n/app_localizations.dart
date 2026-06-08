@@ -140,7 +140,7 @@ abstract class AppLocalizations {
   /// No description provided for @unlock.
   ///
   /// In en, this message translates to:
-  /// **'Unlock'**
+  /// **'Biometric'**
   String get unlock;
 
   /// No description provided for @authFailed.
@@ -878,7 +878,7 @@ abstract class AppLocalizations {
   /// No description provided for @usePin.
   ///
   /// In en, this message translates to:
-  /// **'Use PIN'**
+  /// **'PIN'**
   String get usePin;
 
   /// No description provided for @setPinOption.

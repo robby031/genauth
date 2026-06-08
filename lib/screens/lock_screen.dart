@@ -136,7 +136,7 @@ class _LockScreenState extends State<LockScreen> {
                   vertical: 24,
                 ),
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 360),
+                  constraints: const BoxConstraints(maxWidth: 240),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,7 +146,7 @@ class _LockScreenState extends State<LockScreen> {
                         width: 84,
                         height: 84,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
                       Text(
                         context.l10n.appTitle,
                         textAlign: TextAlign.center,
@@ -161,24 +161,45 @@ class _LockScreenState extends State<LockScreen> {
                           context,
                         ).textTheme.titleSmall?.copyWith(color: scheme.outline),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 8),
                       if (!_ready || _controller.authenticating)
                         const Center(child: CircularProgressIndicator())
                       else ...[
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed: _authenticateAndRoute,
-                            child: Text(context.l10n.unlock),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton(
-                            onPressed: _openPin,
-                            child: Text(context.l10n.usePin),
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton.icon(
+                                onPressed: _openPin,
+                                icon: const Icon(Icons.pin_outlined),
+                                label: Text(context.l10n.usePin),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: scheme.secondary,
+                                  foregroundColor: scheme.onSecondary,
+                                  visualDensity: VisualDensity.compact,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: _authenticateAndRoute,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: scheme.primary,
+                                foregroundColor: scheme.onPrimary,
+                                visualDensity: VisualDensity.compact,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                minimumSize: const Size(44, 40),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                              ),
+                              child: const Icon(Icons.fingerprint),
+                            ),
+                          ],
                         ),
                       ],
                     ],

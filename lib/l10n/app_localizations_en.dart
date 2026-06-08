@@ -30,7 +30,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authenticator => 'Authenticator';
 
   @override
-  String get unlock => 'Unlock';
+  String get unlock => 'Biometric';
 
   @override
   String get authFailed => 'Authentication failed. Please try again.';
@@ -433,7 +433,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pinRemoved => 'PIN removed';
 
   @override
-  String get usePin => 'Use PIN';
+  String get usePin => 'PIN';
 
   @override
   String get setPinOption => 'Set PIN';
