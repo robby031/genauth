@@ -361,10 +361,10 @@ packages:
     dependency: "direct main"
     description:
       name: genotp_flutter
-      sha256: "1bdd2a38c2199e506e8db4217defe99b688033981b86a8305e32d5c556a3c15a"
+      sha256: b6aeb3fa99415a587cd6d4037be002754305d36823ffabd1450c4ffa3cd7f7af
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.5"
+    version: "0.0.6"
   google_fonts:
     dependency: "direct main"
     description:
