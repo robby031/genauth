@@ -6,10 +6,8 @@ import 'package:genauth/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/app_lock_state.dart';
 import 'package:genauth/services/auto_backup_service.dart';
-import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
-import 'package:genauth/screens/google_signin_screen.dart';
 import 'package:genauth/screens/onboarding_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/panic_corrupted_screen.dart';
@@ -19,7 +17,6 @@ const _brandSeedColor = Color(0xFF2F6BDE);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  unawaited(GoogleAccountService.instance.initialize());
   runApp(const GenAuthApp());
 }
 
@@ -205,12 +202,7 @@ class _AppEntryScreen extends StatelessWidget {
         final storage = StorageService.instance;
         final panic = await storage.isPanicTriggered();
         final onboardingDone = await storage.isOnboardingCompleted();
-        final googleLinked = await storage.hasGoogleProfile();
-        return _AppEntryState(
-          panic: panic,
-          onboardingDone: onboardingDone,
-          googleLinked: googleLinked,
-        );
+        return _AppEntryState(panic: panic, onboardingDone: onboardingDone);
       }(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -228,10 +220,6 @@ class _AppEntryScreen extends StatelessWidget {
           return const OnboardingScreen();
         }
 
-        if (!entry.googleLinked) {
-          return const GoogleSignInScreen();
-        }
-
         return const LockScreen();
       },
     );
@@ -239,13 +227,8 @@ class _AppEntryScreen extends StatelessWidget {
 }
 
 class _AppEntryState {
-  const _AppEntryState({
-    required this.panic,
-    required this.onboardingDone,
-    required this.googleLinked,
-  });
+  const _AppEntryState({required this.panic, required this.onboardingDone});
 
   final bool panic;
   final bool onboardingDone;
-  final bool googleLinked;
 }

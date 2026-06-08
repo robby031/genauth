@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
@@ -652,6 +653,7 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
   @override
   void initState() {
     super.initState();
+    unawaited(_service.initialize());
     _loadAutoBackupSettings();
   }
 

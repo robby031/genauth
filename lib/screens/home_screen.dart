@@ -15,7 +15,7 @@ import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'google_signin_screen.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -137,10 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
       await AuditLogService.instance.log('google_logout');
       await GoogleAccountService.instance.signOut();
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
+      SnackMessage.show(
         context,
-        MaterialPageRoute(builder: (_) => const GoogleSignInScreen()),
-        (_) => false,
+        context.l10n.driveBackupSignOut,
+        icon: Icons.cloud_off_rounded,
+        backgroundColor: Colors.blueGrey.shade600,
       );
     }
   }

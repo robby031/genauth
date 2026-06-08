@@ -18,6 +18,17 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
   bool _busy = false;
   String? _error;
 
+  void _continueWithoutGoogle() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      return;
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LockScreen()),
+    );
+  }
+
   Future<void> _signIn() async {
     setState(() {
       _busy = true;
@@ -164,6 +175,11 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                     label: Text(
                       _busy ? l10n.googleLoginInProgress : l10n.googleLoginCta,
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: _busy ? null : _continueWithoutGoogle,
+                    child: Text(l10n.skip),
                   ),
                   const SizedBox(height: 16),
                   Text(

@@ -44,6 +44,8 @@ class GoogleAccountService {
     await signIn.attemptLightweightAuthentication();
   }
 
+  Future<void> ensureInitialized() => initialize();
+
   void _setUser(GoogleSignInAccount? user) {
     _currentUser = user;
     userNotifier.value = user;
@@ -62,6 +64,7 @@ class GoogleAccountService {
   bool get isSignedIn => _currentUser != null;
 
   Future<GoogleSignInAccount> signIn() async {
+    await ensureInitialized();
     final signIn = GoogleSignIn.instance;
     if (!signIn.supportsAuthenticate()) {
       throw const GoogleAccountException(
@@ -75,6 +78,7 @@ class GoogleAccountService {
   }
 
   Future<void> signOut({bool clearProfile = true}) async {
+    await ensureInitialized();
     await GoogleSignIn.instance.signOut();
     _setUser(null);
     if (clearProfile) {
@@ -83,6 +87,7 @@ class GoogleAccountService {
   }
 
   Future<void> disconnect({bool clearProfile = true}) async {
+    await ensureInitialized();
     await GoogleSignIn.instance.disconnect();
     _setUser(null);
     if (clearProfile) {
