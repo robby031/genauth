@@ -13,6 +13,8 @@ class CamScanOverlay extends StatelessWidget {
   final Animation<double> framePulseAnimation;
   final double scanBoxSize;
 
+  static const double _scanRadius = 18;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -27,33 +29,19 @@ class CamScanOverlay extends StatelessWidget {
         return IgnorePointer(
           child: Stack(
             children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                right: 0,
-                height: top,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                left: 0,
-                top: top,
-                width: left,
-                height: scanBoxSize,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                right: 0,
-                top: top,
-                width: left,
-                height: scanBoxSize,
-                child: const ColoredBox(color: overlayColor),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: top + scanBoxSize,
-                bottom: 0,
-                child: const ColoredBox(color: overlayColor),
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _OverlayCutoutPainter(
+                    color: overlayColor,
+                    cutoutRect: Rect.fromLTWH(
+                      left,
+                      top,
+                      scanBoxSize,
+                      scanBoxSize,
+                    ),
+                    radius: _scanRadius,
+                  ),
+                ),
               ),
               Positioned(
                 left: left,
@@ -72,7 +60,7 @@ class CamScanOverlay extends StatelessWidget {
                     return DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border.all(color: borderColor!, width: 2),
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(_scanRadius),
                       ),
                     );
                   },
@@ -85,7 +73,7 @@ class CamScanOverlay extends StatelessWidget {
                 height: scanBoxSize,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(_scanRadius),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -189,6 +177,34 @@ class CamScanOverlay extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _OverlayCutoutPainter extends CustomPainter {
+  const _OverlayCutoutPainter({
+    required this.color,
+    required this.cutoutRect,
+    required this.radius,
+  });
+
+  final Color color;
+  final Rect cutoutRect;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final full = Path()..addRect(Offset.zero & size);
+    final cutout = Path()
+      ..addRRect(RRect.fromRectAndRadius(cutoutRect, Radius.circular(radius)));
+    final overlay = Path.combine(PathOperation.difference, full, cutout);
+    canvas.drawPath(overlay, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant _OverlayCutoutPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.cutoutRect != cutoutRect ||
+        oldDelegate.radius != radius;
   }
 }
 

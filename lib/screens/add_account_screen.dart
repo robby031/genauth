@@ -23,17 +23,24 @@ class _AddAccountScreenState extends State<AddAccountScreen>
   TabController? _tabs;
   late final AddAccountController _controller;
 
+  void _onTabChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     if (!widget.importMode) {
       _tabs = TabController(length: 2, vsync: this);
+      _tabs!.addListener(_onTabChanged);
     }
     _controller = AddAccountController(storage: StorageService.instance);
   }
 
   @override
   void dispose() {
+    _tabs?.removeListener(_onTabChanged);
     _tabs?.dispose();
     _controller.dispose();
     super.dispose();
@@ -62,11 +69,14 @@ class _AddAccountScreenState extends State<AddAccountScreen>
               ),
       ),
       body: widget.importMode
-          ? _ScanQrTab(controller: _controller)
+          ? _ScanQrTab(controller: _controller, isActive: true)
           : TabBarView(
               controller: _tabs,
               children: [
-                _ScanQrTab(controller: _controller),
+                _ScanQrTab(
+                  controller: _controller,
+                  isActive: _tabs?.index == 0,
+                ),
                 _ManualTab(controller: _controller),
               ],
             ),
@@ -75,9 +85,10 @@ class _AddAccountScreenState extends State<AddAccountScreen>
 }
 
 class _ScanQrTab extends StatefulWidget {
-  const _ScanQrTab({required this.controller});
+  const _ScanQrTab({required this.controller, required this.isActive});
 
   final AddAccountController controller;
+  final bool isActive;
 
   @override
   State<_ScanQrTab> createState() => _ScanQrTabState();
@@ -110,8 +121,26 @@ class _ScanQrTabState extends State<_ScanQrTab>
       upperBound: 1.0,
     )..repeat(reverse: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_startScanner());
+      if (widget.isActive) {
+        unawaited(_startScanner());
+      } else {
+        _scanLineController.stop();
+        _framePulseController.stop();
+      }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _ScanQrTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive == widget.isActive) return;
+    if (widget.isActive) {
+      unawaited(_startScanner());
+    } else {
+      unawaited(_scannerController.pause());
+      _scanLineController.stop();
+      _framePulseController.stop();
+    }
   }
 
   @override
@@ -125,7 +154,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_done) return;
+    if (_done || !widget.isActive) return;
 
     switch (state) {
       case AppLifecycleState.resumed:
@@ -141,6 +170,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
 
   Future<void> _startScanner() async {
     if (!mounted ||
+        !widget.isActive ||
         _done ||
         _isStartingScanner ||
         _scannerController.value.isRunning) {
@@ -162,7 +192,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
   }
 
   Future<void> _restartScanner() async {
-    if (!mounted) return;
+    if (!mounted || !widget.isActive) return;
     _done = false;
     await _scannerController.stop();
     await _startScanner();
@@ -180,6 +210,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
     _done = true;
     _scanLineController.stop();
     _framePulseController.stop();
+    await _scannerController.pause();
     try {
       final importedCount = await widget.controller.saveFromQrCode(code);
       if (!mounted) return;
