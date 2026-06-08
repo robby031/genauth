@@ -162,18 +162,16 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                           )
                         : const Icon(Icons.login),
                     label: Text(
-                      _busy
-                          ? l10n.googleLoginInProgress
-                          : l10n.googleLoginCta,
+                      _busy ? l10n.googleLoginInProgress : l10n.googleLoginCta,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     l10n.googleLoginDisclaimer,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.outline,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: scheme.outline),
                   ),
                 ],
               ),
@@ -202,9 +200,9 @@ class _BulletItem extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
         ),
       ],

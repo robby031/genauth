@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controllers/lock_controller.dart';
+import 'package:genauth/controllers/lock_controller.dart';
 import 'package:genauth/services/app_lock_state.dart';
 import 'package:genauth/services/auth_service.dart';
 import 'package:genauth/services/storage_service.dart';
@@ -7,6 +7,7 @@ import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/home_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class LockScreen extends StatefulWidget {
   const LockScreen({
@@ -66,18 +67,12 @@ class _LockScreenState extends State<LockScreen> {
     final isAvailable = await AuthService.isAvailable();
     if (!mounted) return;
     if (!isAvailable) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            content: Text(context.l10n.deviceAuthUnsupported),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        context.l10n.deviceAuthUnsupported,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
       return;
     }
 
@@ -85,34 +80,12 @@ class _LockScreenState extends State<LockScreen> {
     if (!mounted) return;
 
     if (!ok && reportFailure) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            backgroundColor: Colors.red.shade600,
-            duration: const Duration(seconds: 3),
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    context.l10n.authFailed,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        context.l10n.authFailed,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
+      );
     }
 
     if (ok) {
@@ -158,7 +131,10 @@ class _LockScreenState extends State<LockScreen> {
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 360),
                   child: Column(
@@ -172,7 +148,7 @@ class _LockScreenState extends State<LockScreen> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'GenAuth',
+                        context.l10n.appTitle,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(fontWeight: FontWeight.bold),

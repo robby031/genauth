@@ -13,6 +13,7 @@ import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/add_account_screen.dart';
 import 'package:genauth/screens/google_auth_export_screen.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class BackupScreen extends StatelessWidget {
   const BackupScreen({super.key});
@@ -82,18 +83,12 @@ class _GoogleAuthMigrationCardState extends State<_GoogleAuthMigrationCard> {
           detail: 'no_accounts',
         );
         if (!mounted) return;
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.googleAuthNoAccounts),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          );
+        SnackMessage.show(
+          context,
+          context.l10n.googleAuthNoAccounts,
+          icon: Icons.warning_amber_outlined,
+          backgroundColor: Colors.orange.shade600,
+        );
         return;
       }
 
@@ -198,7 +193,12 @@ class _ExportCardState extends State<_ExportCard> {
       final accounts = await StorageService().loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
-        _showSnack(context.l10n.backupNoAccounts);
+        SnackMessage.show(
+          context,
+          context.l10n.backupNoAccounts,
+          icon: Icons.warning_amber_outlined,
+          backgroundColor: Colors.orange.shade600,
+        );
         return;
       }
 
@@ -268,25 +268,15 @@ class _ExportCardState extends State<_ExportCard> {
         detail: e.toString(),
       );
       if (!mounted) return;
-      _showSnack(context.l10n.backupExportFailed(e.toString()));
+      SnackMessage.show(
+        context,
+        context.l10n.backupExportFailed(e.toString()),
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  void _showSnack(String msg) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
   }
 
   String _p(int n) => n.toString().padLeft(2, '0');
@@ -421,11 +411,21 @@ class _ImportCardState extends State<_ImportCard> {
   Future<void> _restore() async {
     final l10n = context.l10n;
     if (_pickedBytes == null) {
-      _showSnack(l10n.backupChooseFile);
+      SnackMessage.show(
+        context,
+        l10n.backupChooseFile,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
       return;
     }
     if (_pwCtrl.text.isEmpty) {
-      _showSnack(l10n.backupPassword);
+      SnackMessage.show(
+        context,
+        l10n.backupPassword,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
       return;
     }
 
@@ -500,14 +500,28 @@ class _ImportCardState extends State<_ImportCard> {
         status: 'failed',
         detail: e.message,
       );
-      if (mounted) _showSnack(context.l10n.backupInvalidFile(e.message));
+      if (mounted) {
+        SnackMessage.show(
+          context,
+          context.l10n.backupInvalidFile(e.message),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
+      }
     } catch (_) {
       await AuditLogService.instance.log(
         'backup_restore_failed',
         status: 'failed',
         detail: 'wrong_password_or_corrupted_file',
       );
-      if (mounted) _showSnack(context.l10n.backupWrongPassword);
+      if (mounted) {
+        SnackMessage.show(
+          context,
+          context.l10n.backupWrongPassword,
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -536,21 +550,6 @@ class _ImportCardState extends State<_ImportCard> {
         ],
       ),
     );
-  }
-
-  void _showSnack(String msg) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
   }
 
   @override
@@ -649,22 +648,6 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
     super.dispose();
   }
 
-  void _showSnack(String message, {Color? color}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          backgroundColor: color,
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
-  }
-
   Future<void> _signIn() async {
     setState(() => _busy = true);
     await AuditLogService.instance.log('drive_backup_signin_attempt');
@@ -685,8 +668,11 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
         detail: e.code.name,
       );
       if (mounted) {
-        _showSnack(
+        SnackMessage.show(
+          context,
           context.l10n.driveBackupSignInFailed(e.description ?? e.code.name),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
         );
       }
     } catch (e) {
@@ -696,7 +682,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
         detail: e.toString(),
       );
       if (mounted) {
-        _showSnack(context.l10n.driveBackupSignInFailed(e.toString()));
+        SnackMessage.show(
+          context,
+          context.l10n.driveBackupSignInFailed(e.toString()),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -706,7 +697,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
   Future<void> _upload() async {
     final l10n = context.l10n;
     if (_pwCtrl.text.length < 8) {
-      _showSnack(l10n.backupPasswordMin);
+      SnackMessage.show(
+        context,
+        l10n.backupPasswordMin,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
       return;
     }
 
@@ -716,7 +712,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
       final accounts = await StorageService().loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
-        _showSnack(l10n.backupNoAccounts);
+        SnackMessage.show(
+          context,
+          l10n.backupNoAccounts,
+          icon: Icons.warning_amber_outlined,
+          backgroundColor: Colors.orange.shade600,
+        );
         return;
       }
 
@@ -742,9 +743,11 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
 
       if (!mounted) return;
       _pwCtrl.clear();
-      _showSnack(
+      SnackMessage.show(
+        context,
         l10n.driveBackupUploadSuccess(uploaded.name),
-        color: Colors.green.shade600,
+        icon: Icons.check_circle_outline,
+        backgroundColor: Colors.green.shade600,
       );
     } catch (e) {
       await AuditLogService.instance.log(
@@ -753,7 +756,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
         detail: e.toString(),
       );
       if (mounted) {
-        _showSnack(context.l10n.driveBackupUploadFailed(e.toString()));
+        SnackMessage.show(
+          context,
+          context.l10n.driveBackupUploadFailed(e.toString()),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -768,7 +776,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
       if (!mounted) return;
 
       if (files.isEmpty) {
-        _showSnack(l10n.driveBackupEmpty);
+        SnackMessage.show(
+          context,
+          l10n.driveBackupEmpty,
+          icon: Icons.warning_amber_outlined,
+          backgroundColor: Colors.orange.shade600,
+        );
         return;
       }
 
@@ -818,9 +831,11 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
       );
 
       if (!mounted) return;
-      _showSnack(
+      SnackMessage.show(
+        context,
         l10n.backupRestoredSuccess(imported.length),
-        color: Colors.green.shade600,
+        icon: Icons.check_circle_outline,
+        backgroundColor: Colors.green.shade600,
       );
     } catch (e) {
       await AuditLogService.instance.log(
@@ -829,7 +844,12 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
         detail: e.toString(),
       );
       if (mounted) {
-        _showSnack(context.l10n.driveBackupRestoreFailed(e.toString()));
+        SnackMessage.show(
+          context,
+          context.l10n.driveBackupRestoreFailed(e.toString()),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);

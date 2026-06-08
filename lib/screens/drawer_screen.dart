@@ -10,6 +10,7 @@ import 'package:genauth/screens/backup_screen.dart';
 import 'package:genauth/screens/audit_log_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/services/storage_service.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class DrawerScreen extends StatefulWidget {
   final VoidCallback onLock;
@@ -69,13 +70,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
     await StorageService().clearPin();
     _refreshPinState();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.pinRemoved),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.pinRemoved,
+        icon: Icons.check_circle_outline,
+        backgroundColor: Colors.green.shade600,
       );
     }
   }
@@ -96,13 +95,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
     await StorageService().clearPanicPin();
     _refreshPinState();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.panicPinRemoved),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.panicPinRemoved,
+        icon: Icons.check_circle_outline,
+        backgroundColor: Colors.green.shade600,
       );
     }
   }
@@ -113,19 +110,12 @@ class _DrawerScreenState extends State<DrawerScreen> {
       mode: LaunchMode.externalApplication,
     );
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentMaterialBanner()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.githubLinkOpenFailed),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            duration: const Duration(seconds: 3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        context.l10n.githubLinkOpenFailed,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
+      );
     }
   }
 
@@ -135,12 +125,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
     final raw = AppLinks.privacyPolicyUrl.trim();
     if (raw.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.privacyPolicyNotConfigured),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.privacyPolicyNotConfigured,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
       return;
     }
@@ -149,24 +138,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
     if (uri == null ||
         !(uri.hasScheme && (uri.scheme == 'https' || uri.scheme == 'http'))) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.privacyPolicyInvalidUrl),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.privacyPolicyInvalidUrl,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
       return;
     }
 
     final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.privacyPolicyLoadFailed),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.privacyPolicyLoadFailed,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
     }
   }
@@ -177,12 +164,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
     final raw = AppLinks.termsConditionsUrl.trim();
     if (raw.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.termsConditionsNotConfigured),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.termsConditionsNotConfigured,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
       return;
     }
@@ -191,24 +177,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
     if (uri == null ||
         !(uri.hasScheme && (uri.scheme == 'https' || uri.scheme == 'http'))) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.termsConditionsInvalidUrl),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.termsConditionsInvalidUrl,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
       return;
     }
 
     final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.termsConditionsLoadFailed),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-        ),
+      SnackMessage.show(
+        context,
+        context.l10n.termsConditionsLoadFailed,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
     }
   }
@@ -227,7 +211,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
       borderRadius: BorderRadius.circular(14),
       child: ListTile(
         dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         minLeadingWidth: 20,
         visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -273,7 +257,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
       ),
       builder: (context) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 14),
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -405,7 +389,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 subtitle: context.l10n.panicPinOptionSubtitle,
                 onTap: _hasPanicPin ? _removePanicPin : _openPanicPinSetup,
               ),
-              const SizedBox(height: 6),
               _sectionHeader(context, context.l10n.drawerSectionData),
               _menuTile(
                 context: context,
@@ -443,7 +426,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 title: context.l10n.termsConditionsMenu,
                 onTap: _openTermsConditionsDirect,
               ),
-              const SizedBox(height: 6),
               _sectionHeader(context, context.l10n.drawerSectionApp),
               _menuTile(
                 context: context,
@@ -499,7 +481,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'GenAuth',
+                context.l10n.appTitle,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 11,
                   color: scheme.outline,
@@ -507,7 +489,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
               ),
               Text(
-                '© 2026 GenAuth. ${context.l10n.allRightsReserved}',
+                '© 2026 ${context.l10n.appTitle}. ${context.l10n.allRightsReserved}',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontSize: 10,
                   color: scheme.outlineVariant,

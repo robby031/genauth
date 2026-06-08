@@ -4,6 +4,7 @@ import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 enum PinMode { setup, verify, panicSetup }
 
@@ -134,18 +135,13 @@ class _PinScreenState extends State<PinScreen> {
       await StorageService().savePin(_pin);
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          widget.mode == PinMode.panicSetup
-              ? context.l10n.panicPinSaved
-              : context.l10n.pinSaved,
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+    SnackMessage.show(
+      context,
+      widget.mode == PinMode.panicSetup
+          ? context.l10n.panicPinSaved
+          : context.l10n.pinSaved,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green,
     );
     Navigator.pop(context, true);
   }

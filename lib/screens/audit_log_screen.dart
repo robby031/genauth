@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class AuditLogScreen extends StatefulWidget {
   const AuditLogScreen({super.key});
@@ -51,16 +52,12 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
     await AuditLogService.instance.clearAll();
     await _reload();
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.auditLogCleared),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+    SnackMessage.show(
+      context,
+      context.l10n.auditLogCleared,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green.shade600,
+    );
   }
 
   String _prettyAction(String action) {

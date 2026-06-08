@@ -7,6 +7,7 @@ import 'package:genauth/controllers/add_account_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/cam_scan_overlay.dart';
+import 'package:genauth/widgets/snack_message.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({super.key, this.importMode = false});
@@ -42,10 +43,13 @@ class _AddAccountScreenState extends State<AddAccountScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
+        centerTitle: false,
         title: Text(
           widget.importMode
               ? context.l10n.googleAuthImportAction
               : context.l10n.addAccount,
+          style: const TextStyle(fontSize: 16),
         ),
         bottom: widget.importMode
             ? null
@@ -184,19 +188,12 @@ class _ScanQrTabState extends State<_ScanQrTab>
           ? context.l10n.accountsImported(importedCount)
           : context.l10n.accountsAlreadyImported;
 
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: const Duration(seconds: 3),
-            content: Text(message),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        message,
+        icon: Icons.check_circle_outline,
+        backgroundColor: Colors.green.shade600,
+      );
 
       Navigator.pop(context, importedCount > 0);
     } catch (e) {
@@ -204,34 +201,12 @@ class _ScanQrTabState extends State<_ScanQrTab>
       _scanLineController.repeat();
       _framePulseController.repeat(reverse: true);
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentMaterialBanner()
-          ..showSnackBar(
-            SnackBar(
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.all(12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              backgroundColor: Colors.red.shade600,
-              duration: const Duration(seconds: 3),
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.white),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      context.l10n.invalidQr('$e'),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+        SnackMessage.show(
+          context,
+          context.l10n.invalidQr('$e'),
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red.shade600,
+        );
       }
     }
   }
@@ -258,10 +233,9 @@ class _ScanQrTabState extends State<_ScanQrTab>
                   errorBuilder: (context, error) {
                     return _ScannerErrorView(
                       title: context.l10n.scannerUnavailableTitle,
-                      message:
-                          error.errorDetails?.message?.isNotEmpty == true
-                              ? error.errorDetails!.message!
-                              : context.l10n.scannerUnavailableMessage,
+                      message: error.errorDetails?.message?.isNotEmpty == true
+                          ? error.errorDetails!.message!
+                          : context.l10n.scannerUnavailableMessage,
                       actionLabel: context.l10n.scannerRetry,
                       onRetry: _restartScanner,
                     );
