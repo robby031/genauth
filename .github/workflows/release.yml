@@ -145,19 +145,38 @@ jobs:
 
           test -s android/upload-keystore.jks || (echo "Decoded keystore is empty" && exit 1)
 
+          KEYSTORE_TYPE=""
+          for TYPE in PKCS12 JKS; do
+            if keytool -list \
+              -storetype "$TYPE" \
+              -keystore android/upload-keystore.jks \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+              -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
+              KEYSTORE_TYPE="$TYPE"
+              break
+            fi
+          done
+
+          if [[ -z "$KEYSTORE_TYPE" ]]; then
+            echo "Unable to open keystore with alias '$ANDROID_KEY_ALIAS'."
+            echo "Check ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD secrets."
+            exit 1
+          fi
+
           cat > android/key.properties <<EOF
           storeFile=upload-keystore.jks
           storePassword=$ANDROID_KEYSTORE_PASSWORD
           keyAlias=$ANDROID_KEY_ALIAS
           keyPassword=$ANDROID_KEY_PASSWORD
-          storeType=PKCS12
+          storeType=$KEYSTORE_TYPE
           EOF
 
       - name: Validate Android keystore contents
         shell: bash
         run: |
+          STORE_TYPE=$(grep '^storeType=' android/key.properties | cut -d'=' -f2)
           keytool -list \
-            -storetype PKCS12 \
+            -storetype "$STORE_TYPE" \
             -keystore android/upload-keystore.jks \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
             -alias "$ANDROID_KEY_ALIAS"
