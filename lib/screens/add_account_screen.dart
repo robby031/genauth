@@ -94,8 +94,7 @@ class _ScanQrTab extends StatefulWidget {
   State<_ScanQrTab> createState() => _ScanQrTabState();
 }
 
-class _ScanQrTabState extends State<_ScanQrTab>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+class _ScanQrTabState extends State<_ScanQrTab> with TickerProviderStateMixin {
   bool _done = false;
   bool _isStartingScanner = false;
   late final AnimationController _scanLineController;
@@ -105,7 +104,6 @@ class _ScanQrTabState extends State<_ScanQrTab>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _scannerController = MobileScannerController(autoStart: false);
     _scanLineController = AnimationController(
       vsync: this,
@@ -134,7 +132,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
     if (widget.isActive) {
       unawaited(_startScanner());
     } else {
-      unawaited(_scannerController.pause());
+      unawaited(_stopScanner());
       _scanLineController.stop();
       _framePulseController.stop();
     }
@@ -142,27 +140,10 @@ class _ScanQrTabState extends State<_ScanQrTab>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _scanLineController.dispose();
     _framePulseController.dispose();
     unawaited(_scannerController.dispose());
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_done || !widget.isActive) return;
-
-    switch (state) {
-      case AppLifecycleState.resumed:
-        unawaited(_startScanner());
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.hidden:
-      case AppLifecycleState.paused:
-        unawaited(_scannerController.pause());
-      case AppLifecycleState.detached:
-        break;
-    }
   }
 
   Future<void> _startScanner() async {
@@ -188,10 +169,19 @@ class _ScanQrTabState extends State<_ScanQrTab>
     }
   }
 
+  Future<void> _stopScanner() async {
+    if (!_scannerController.value.isRunning) return;
+    try {
+      await _scannerController.stop();
+    } catch (_) {
+      // Ignore native stop failures and let scanner recover on next start.
+    }
+  }
+
   Future<void> _restartScanner() async {
     if (!mounted || !widget.isActive) return;
     _done = false;
-    await _scannerController.stop();
+    await _stopScanner();
     await _startScanner();
   }
 
@@ -207,7 +197,7 @@ class _ScanQrTabState extends State<_ScanQrTab>
     _done = true;
     _scanLineController.stop();
     _framePulseController.stop();
-    await _scannerController.pause();
+    await _stopScanner();
     try {
       final importedCount = await widget.controller.saveFromQrCode(code);
       if (!mounted) return;
