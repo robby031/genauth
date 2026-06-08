@@ -4,6 +4,7 @@ import 'package:genauth/models/otp_account.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/clipboard_security_service.dart';
 import 'package:genauth/services/otp_service.dart';
+import 'package:genauth/services/second_tick_service.dart';
 import 'package:genauth/widgets/service_icon.dart';
 import 'package:genauth/widgets/tag_editor_sheet.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -303,46 +304,41 @@ class _TotpProgress extends StatefulWidget {
 }
 
 class _TotpProgressState extends State<_TotpProgress> {
-  late int _remaining;
-
-  @override
-  void initState() {
-    super.initState();
-    _tick();
-    Stream.periodic(const Duration(seconds: 1)).listen((_) {
-      if (mounted) setState(_tick);
-    });
-  }
-
-  void _tick() => _remaining = OtpService.remainingSeconds(widget.period);
-
   @override
   Widget build(BuildContext context) {
-    final urgent = _remaining <= 5;
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircularProgressIndicator(
-            value: OtpService.progress(widget.period),
-            strokeWidth: 3,
-            color: urgent ? Colors.red : Theme.of(context).colorScheme.primary,
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest,
+    return ValueListenableBuilder<int>(
+      valueListenable: SecondTickService.instance.secondListenable,
+      builder: (context, _, child) {
+        final remaining = OtpService.remainingSeconds(widget.period);
+        final urgent = remaining <= 5;
+        return SizedBox(
+          width: 24,
+          height: 24,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularProgressIndicator(
+                value: OtpService.progress(widget.period),
+                strokeWidth: 3,
+                color: urgent
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.primary,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest,
+              ),
+              Text(
+                '$remaining',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                  color: urgent ? Colors.red : null,
+                ),
+              ),
+            ],
           ),
-          Text(
-            '$_remaining',
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: urgent ? Colors.red : null,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

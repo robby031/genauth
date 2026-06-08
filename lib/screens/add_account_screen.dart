@@ -18,68 +18,177 @@ class AddAccountScreen extends StatefulWidget {
   State<AddAccountScreen> createState() => _AddAccountScreenState();
 }
 
-class _AddAccountScreenState extends State<AddAccountScreen>
-    with SingleTickerProviderStateMixin {
-  TabController? _tabs;
-  late final AddAccountController _controller;
+enum _AddAccountMode { chooser, scan, manual }
 
-  void _onTabChanged() {
-    if (!mounted) return;
-    setState(() {});
-  }
+class _AddAccountScreenState extends State<AddAccountScreen> {
+  late final AddAccountController _controller;
+  late _AddAccountMode _mode;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.importMode) {
-      _tabs = TabController(length: 2, vsync: this);
-      _tabs!.addListener(_onTabChanged);
-    }
     _controller = AddAccountController(storage: StorageService.instance);
+    _mode = widget.importMode ? _AddAccountMode.scan : _AddAccountMode.chooser;
   }
 
   @override
   void dispose() {
-    _tabs?.removeListener(_onTabChanged);
-    _tabs?.dispose();
     _controller.dispose();
     super.dispose();
   }
 
+  void _openMode(_AddAccountMode mode) {
+    setState(() => _mode = mode);
+  }
+
+  void _backToChooser() {
+    if (_mode == _AddAccountMode.chooser || widget.importMode) {
+      Navigator.pop(context);
+      return;
+    }
+    setState(() => _mode = _AddAccountMode.chooser);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final title = switch (_mode) {
+      _AddAccountMode.scan => widget.importMode
+          ? context.l10n.googleAuthImportAction
+          : context.l10n.scanQr,
+      _AddAccountMode.manual => context.l10n.manualEntry,
+      _AddAccountMode.chooser => context.l10n.addAccount,
+    };
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
         centerTitle: false,
-        title: Text(
-          widget.importMode
-              ? context.l10n.googleAuthImportAction
-              : context.l10n.addAccount,
-          style: const TextStyle(fontSize: 16),
-        ),
-        bottom: widget.importMode
-            ? null
-            : TabBar(
-                controller: _tabs,
-                tabs: [
-                  Tab(text: context.l10n.scanQr),
-                  Tab(text: context.l10n.manualEntry),
-                ],
-              ),
+        leading: (_mode != _AddAccountMode.chooser || widget.importMode)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: _backToChooser,
+              )
+            : null,
+        title: Text(title, style: const TextStyle(fontSize: 16)),
       ),
-      body: widget.importMode
-          ? _ScanQrTab(controller: _controller, isActive: true)
-          : TabBarView(
-              controller: _tabs,
-              children: [
-                _ScanQrTab(
-                  controller: _controller,
-                  isActive: _tabs?.index == 0,
+      body: switch (_mode) {
+        _AddAccountMode.scan => _ScanQrTab(controller: _controller, isActive: true),
+        _AddAccountMode.manual => _ManualTab(controller: _controller),
+        _AddAccountMode.chooser => _AddAccountChooser(
+            onScanSelected: () => _openMode(_AddAccountMode.scan),
+            onManualSelected: () => _openMode(_AddAccountMode.manual),
+          ),
+      },
+    );
+  }
+}
+
+class _AddAccountChooser extends StatelessWidget {
+  const _AddAccountChooser({
+    required this.onScanSelected,
+    required this.onManualSelected,
+  });
+
+  final VoidCallback onScanSelected;
+  final VoidCallback onManualSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Text(
+          context.l10n.addAccount,
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          context.l10n.googleAuthSectionDesc,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: 18),
+        _AddMethodCard(
+          icon: Icons.qr_code_scanner_rounded,
+          title: context.l10n.scanQr,
+          subtitle: context.l10n.googleAuthImportAction,
+          onTap: onScanSelected,
+        ),
+        const SizedBox(height: 12),
+        _AddMethodCard(
+          icon: Icons.edit_note_rounded,
+          title: context.l10n.manualEntry,
+          subtitle: context.l10n.addAccount,
+          onTap: onManualSelected,
+        ),
+      ],
+    );
+  }
+}
+
+class _AddMethodCard extends StatelessWidget {
+  const _AddMethodCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                _ManualTab(controller: _controller),
-              ],
-            ),
+                child: Icon(icon, color: scheme.primary),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: scheme.outline),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

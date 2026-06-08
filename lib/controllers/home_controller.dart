@@ -78,10 +78,9 @@ class HomeController extends ChangeNotifier {
   Future<void> loadAndRefresh() async {
     final accounts = await _storage.loadAccounts();
     _accounts = accounts;
-
-    for (final account in accounts) {
-      await _generateIfNeeded(account, force: true);
-    }
+    await Future.wait(
+      accounts.map((account) => _generateIfNeeded(account, force: true)),
+    );
 
     notifyListeners();
   }
@@ -160,23 +159,32 @@ class HomeController extends ChangeNotifier {
   }
 
   void _refreshCodes() {
-    var changed = false;
+    unawaited(_refreshCodesAsync());
+  }
+
+  Future<void> _refreshCodesAsync() async {
+    final accountsToRefresh = <OtpAccount>[];
+
     for (final account in _accounts) {
       if (account.isHotp) continue;
 
       final counter = OtpService.periodCounter(account.period);
       if (_lastCounters[account.id] != counter) {
         _lastCounters[account.id] = counter;
-        changed = true;
-        OtpService.generateCode(account).then((code) {
-          _codes[account.id] = code;
-          notifyListeners();
-        });
+        accountsToRefresh.add(account);
       }
     }
 
-    if (changed) {
-      notifyListeners();
+    if (accountsToRefresh.isEmpty) return;
+
+    final refreshedCodes = await Future.wait(
+      accountsToRefresh.map(OtpService.generateCode),
+    );
+
+    for (var i = 0; i < accountsToRefresh.length; i++) {
+      _codes[accountsToRefresh[i].id] = refreshedCodes[i];
     }
+
+    notifyListeners();
   }
 }

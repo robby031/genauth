@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:genauth/screens/audit_log_screen.dart';
+import 'package:genauth/screens/backup_screen.dart';
+import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/locale_service.dart';
+import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/app_links.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/screens/backup_screen.dart';
-import 'package:genauth/screens/audit_log_screen.dart';
-import 'package:genauth/screens/pin_screen.dart';
-import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
 class DrawerScreen extends StatefulWidget {
-  final VoidCallback onLock;
-  final VoidCallback onAbout;
-  final VoidCallback onOpenOnboarding;
   const DrawerScreen({
     super.key,
     required this.onLock,
@@ -23,11 +20,17 @@ class DrawerScreen extends StatefulWidget {
     required this.onOpenOnboarding,
   });
 
+  final VoidCallback onLock;
+  final VoidCallback onAbout;
+  final VoidCallback onOpenOnboarding;
+
   @override
   State<DrawerScreen> createState() => _DrawerScreenState();
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
+  final StorageService _storage = StorageService.instance;
+
   bool _hasPin = false;
   bool _hasPanicPin = false;
   String _appVersion = '';
@@ -35,25 +38,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
   @override
   void initState() {
     super.initState();
-    _refreshPinState();
-    _loadAppVersion();
+    _loadDrawerState();
   }
 
-  Future<void> _refreshPinState() async {
-    final has = await StorageService().hasPin();
-    final hasPanic = await StorageService().hasPanicPin();
-    if (mounted) {
-      setState(() {
-        _hasPin = has;
-        _hasPanicPin = hasPanic;
-      });
-    }
-  }
-
-  Future<void> _loadAppVersion() async {
-    final version = await AppInfoService.versionLabel();
+  Future<void> _loadDrawerState() async {
+    final results = await Future.wait<Object>([
+      _storage.hasPin(),
+      _storage.hasPanicPin(),
+      AppInfoService.versionLabel(),
+    ]);
     if (!mounted) return;
-    setState(() => _appVersion = version);
+
+    setState(() {
+      _hasPin = results[0] as bool;
+      _hasPanicPin = results[1] as bool;
+      _appVersion = results[2] as String;
+    });
   }
 
   Future<void> _openPinSetup() async {
@@ -62,21 +62,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
       context,
       MaterialPageRoute(builder: (_) => const PinScreen(mode: PinMode.setup)),
     );
-    if (ok == true) _refreshPinState();
+    if (ok == true) {
+      await _loadDrawerState();
+    }
   }
 
   Future<void> _removePin() async {
     Navigator.pop(context);
-    await StorageService().clearPin();
-    _refreshPinState();
-    if (mounted) {
-      SnackMessage.show(
-        context,
-        context.l10n.pinRemoved,
-        icon: Icons.check_circle_outline,
-        backgroundColor: Colors.green.shade600,
-      );
-    }
+    await _storage.clearPin();
+    await _loadDrawerState();
+    if (!mounted) return;
+    SnackMessage.show(
+      context,
+      context.l10n.pinRemoved,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green.shade600,
+    );
   }
 
   Future<void> _openPanicPinSetup() async {
@@ -87,21 +88,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
         builder: (_) => const PinScreen(mode: PinMode.panicSetup),
       ),
     );
-    if (ok == true) _refreshPinState();
+    if (ok == true) {
+      await _loadDrawerState();
+    }
   }
 
   Future<void> _removePanicPin() async {
     Navigator.pop(context);
-    await StorageService().clearPanicPin();
-    _refreshPinState();
-    if (mounted) {
-      SnackMessage.show(
-        context,
-        context.l10n.panicPinRemoved,
-        icon: Icons.check_circle_outline,
-        backgroundColor: Colors.green.shade600,
-      );
-    }
+    await _storage.clearPanicPin();
+    await _loadDrawerState();
+    if (!mounted) return;
+    SnackMessage.show(
+      context,
+      context.l10n.panicPinRemoved,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green.shade600,
+    );
   }
 
   Future<void> _openGithubRepo(BuildContext context) async {
@@ -197,56 +199,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
     }
   }
 
-  Widget _menuTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    Widget? trailing,
-    VoidCallback? onTap,
-  }) {
-    final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: scheme.surfaceContainerLow.withValues(alpha: 0.45),
-      borderRadius: BorderRadius.circular(14),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        minLeadingWidth: 20,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        leading: Icon(icon, color: scheme.primary, size: 20),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: subtitle == null
-            ? null
-            : Text(
-                subtitle,
-                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12),
-              ),
-        trailing: trailing,
-        onTap: onTap,
-      ),
-    );
-  }
-
-  Widget _sectionHeader(BuildContext context, String title) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 4, 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: scheme.onSurfaceVariant,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
-          ),
-        ),
-      ),
-    );
-  }
-
   void _showLanguageBottomSheet(BuildContext context, Locale currentLocale) {
     final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
@@ -261,8 +213,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _menuTile(
-                context: context,
+              _MenuTile(
                 icon: Icons.language,
                 title: context.l10n.english,
                 trailing: currentLocale.languageCode == 'en'
@@ -273,8 +224,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   Navigator.pop(context);
                 },
               ),
-              _menuTile(
-                context: context,
+              _MenuTile(
                 icon: Icons.translate,
                 title: context.l10n.indonesian,
                 trailing: currentLocale.languageCode == 'id'
@@ -294,220 +244,321 @@ class _DrawerScreenState extends State<DrawerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+
+    final securityItems = <Widget>[
+      _MenuTile(
+        icon: Icons.lock_outline,
+        title: l10n.lockapp,
+        onTap: widget.onLock,
+      ),
+      _MenuTile(
+        icon: Icons.pin_outlined,
+        title: _hasPin ? l10n.removePinOption : l10n.setPinOption,
+        onTap: _hasPin ? _removePin : _openPinSetup,
+      ),
+      _MenuTile(
+        icon: Icons.warning_amber_outlined,
+        title: _hasPanicPin
+            ? l10n.removePanicPinOption
+            : l10n.setPanicPinOption,
+        subtitle: l10n.panicPinOptionSubtitle,
+        onTap: _hasPanicPin ? _removePanicPin : _openPanicPinSetup,
+      ),
+    ];
+
+    final dataItems = <Widget>[
+      _MenuTile(
+        icon: Icons.backup_outlined,
+        title: l10n.backupAndRestore,
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const BackupScreen()),
+          );
+        },
+      ),
+      _MenuTile(
+        icon: Icons.history_edu_outlined,
+        title: l10n.auditLogMenu,
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AuditLogScreen()),
+          );
+        },
+      ),
+      _MenuTile(
+        icon: Icons.privacy_tip_outlined,
+        title: l10n.privacyPolicyMenu,
+        onTap: _openPrivacyPolicyDirect,
+      ),
+      _MenuTile(
+        icon: Icons.gavel_outlined,
+        title: l10n.termsConditionsMenu,
+        onTap: _openTermsConditionsDirect,
+      ),
+    ];
+
+    final appItems = <Widget>[
+      _MenuTile(
+        icon: Icons.info_outline,
+        title: l10n.about,
+        onTap: widget.onAbout,
+      ),
+      _MenuTile(
+        icon: Icons.rocket_launch_outlined,
+        title: l10n.getStarted,
+        onTap: widget.onOpenOnboarding,
+      ),
+      ValueListenableBuilder<Locale>(
+        valueListenable: LocaleService.localeNotifier,
+        builder: (context, currentLocale, child) {
+          final currentLangName = currentLocale.languageCode == 'id'
+              ? l10n.indonesian
+              : l10n.english;
+
+          return _MenuTile(
+            icon: Icons.language,
+            title: l10n.language,
+            subtitle: currentLangName,
+            trailing: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onTap: () => _showLanguageBottomSheet(context, currentLocale),
+          );
+        },
+      ),
+    ];
+
     return Drawer(
       width: 292,
       child: SafeArea(
-        child: SingleChildScrollView(
+        child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      scheme.primaryContainer,
-                      scheme.surfaceContainerHigh,
-                    ],
-                  ),
-                  border: Border.all(
-                    color: scheme.primary.withValues(alpha: 0.15),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Image.asset(AppAssets.logoNoBackground),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'GenAuth',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: scheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            context.l10n.authenticator,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  fontSize: 11,
-                                  color: scheme.onPrimaryContainer.withValues(
-                                    alpha: 0.78,
-                                  ),
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              _sectionHeader(context, context.l10n.drawerSectionSecurity),
-              _menuTile(
-                context: context,
-                icon: Icons.lock_outline,
-                title: context.l10n.lockapp,
-                onTap: widget.onLock,
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.pin_outlined,
-                title: _hasPin
-                    ? context.l10n.removePinOption
-                    : context.l10n.setPinOption,
-                onTap: _hasPin ? _removePin : _openPinSetup,
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.warning_amber_outlined,
-                title: _hasPanicPin
-                    ? context.l10n.removePanicPinOption
-                    : context.l10n.setPanicPinOption,
-                subtitle: context.l10n.panicPinOptionSubtitle,
-                onTap: _hasPanicPin ? _removePanicPin : _openPanicPinSetup,
-              ),
-              _sectionHeader(context, context.l10n.drawerSectionData),
-              _menuTile(
-                context: context,
-                icon: Icons.backup_outlined,
-                title: context.l10n.backupAndRestore,
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const BackupScreen()),
-                  );
-                },
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.history_edu_outlined,
-                title: context.l10n.auditLogMenu,
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AuditLogScreen()),
-                  );
-                },
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.privacy_tip_outlined,
-                title: context.l10n.privacyPolicyMenu,
-                onTap: _openPrivacyPolicyDirect,
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.gavel_outlined,
-                title: context.l10n.termsConditionsMenu,
-                onTap: _openTermsConditionsDirect,
-              ),
-              _sectionHeader(context, context.l10n.drawerSectionApp),
-              _menuTile(
-                context: context,
-                icon: Icons.info_outline,
-                title: context.l10n.about,
-                onTap: widget.onAbout,
-              ),
-              _menuTile(
-                context: context,
-                icon: Icons.rocket_launch_outlined,
-                title: context.l10n.getStarted,
-                onTap: widget.onOpenOnboarding,
-              ),
-              ValueListenableBuilder<Locale>(
-                valueListenable: LocaleService.localeNotifier,
-                builder: (context, currentLocale, child) {
-                  final currentLangName = currentLocale.languageCode == 'id'
-                      ? context.l10n.indonesian
-                      : context.l10n.english;
-
-                  return _menuTile(
-                    context: context,
-                    icon: Icons.language,
-                    title: context.l10n.language,
-                    subtitle: currentLangName,
-                    trailing: Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: scheme.primary,
-                    ),
-                    onTap: () =>
-                        _showLanguageBottomSheet(context, currentLocale),
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton.filledTonal(
-                    tooltip: context.l10n.openGithubRepository,
-                    onPressed: () => _openGithubRepo(context),
-                    icon: SvgPicture.asset(
-                      AppAssets.githubSvg,
-                      width: 18,
-                      height: 18,
-                      colorFilter: ColorFilter.mode(
-                        scheme.primary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                context.l10n.appTitle,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 11,
-                  color: scheme.outline,
-                  letterSpacing: 0.4,
-                ),
-              ),
-              Text(
-                '© 2026 ${context.l10n.appTitle}. ${context.l10n.allRightsReserved}',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 10,
-                  color: scheme.outlineVariant,
-                ),
-              ),
-              Text(
-                context.l10n.versionLabel(
-                  _appVersion.isEmpty ? '...' : _appVersion,
-                ),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 10,
-                  color: scheme.outlineVariant,
-                ),
-              ),
-            ],
-          ),
+          children: [
+            const _DrawerHeaderCard(),
+            const SizedBox(height: 10),
+            _SectionGroup(title: l10n.drawerSectionSecurity, children: securityItems),
+            _SectionGroup(title: l10n.drawerSectionData, children: dataItems),
+            _SectionGroup(title: l10n.drawerSectionApp, children: appItems),
+            const SizedBox(height: 12),
+            _DrawerFooter(
+              appVersion: _appVersion,
+              onOpenGithub: () => _openGithubRepo(context),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _DrawerHeaderCard extends StatelessWidget {
+  const _DrawerHeaderCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.primaryContainer, scheme.surfaceContainerHigh],
+        ),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Image.asset(AppAssets.logoNoBackground),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'GenAuth',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: scheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  context.l10n.authenticator,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 11,
+                    color: scheme.onPrimaryContainer.withValues(alpha: 0.78),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionGroup extends StatelessWidget {
+  const _SectionGroup({required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 8, 4, 4),
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Material(
+        color: scheme.surfaceContainerLow.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(14),
+        child: ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          minLeadingWidth: 20,
+          visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          leading: Icon(icon, color: scheme.primary, size: 20),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: subtitle == null
+              ? null
+              : Text(
+                  subtitle!,
+                  style: TextStyle(
+                    color: scheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+          trailing: trailing,
+          onTap: onTap,
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerFooter extends StatelessWidget {
+  const _DrawerFooter({
+    required this.appVersion,
+    required this.onOpenGithub,
+  });
+
+  final String appVersion;
+  final VoidCallback onOpenGithub;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton.filledTonal(
+              tooltip: context.l10n.openGithubRepository,
+              onPressed: onOpenGithub,
+              icon: SvgPicture.asset(
+                AppAssets.githubSvg,
+                width: 18,
+                height: 18,
+                colorFilter: ColorFilter.mode(
+                  scheme.primary,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          context.l10n.appTitle,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: 11,
+            color: scheme.outline,
+            letterSpacing: 0.4,
+          ),
+        ),
+        Text(
+          '© 2026 ${context.l10n.appTitle}. ${context.l10n.allRightsReserved}',
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: 10,
+            color: scheme.outlineVariant,
+          ),
+        ),
+        Text(
+          context.l10n.versionLabel(appVersion.isEmpty ? '...' : appVersion),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: 10,
+            color: scheme.outlineVariant,
+          ),
+        ),
+      ],
     );
   }
 }
