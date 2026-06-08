@@ -69,6 +69,7 @@ jobs:
           VERSION_FROM_TAG="${VERSION_FROM_TAG%-stable}"
           VERSION_FROM_PUBSPEC=$(grep '^version:' pubspec.yaml | head -n1 | awk '{print $2}')
           VERSION_FROM_PUBSPEC_BASE="${VERSION_FROM_PUBSPEC%%+*}"
+          VERSION_FROM_PUBSPEC_BASE="${VERSION_FROM_PUBSPEC_BASE%-stable}"
 
           if [[ "$VERSION_FROM_PUBSPEC_BASE" != "$VERSION_FROM_TAG" ]]; then
             echo "Tag version does not match pubspec.yaml"
