@@ -207,9 +207,12 @@ class _ExportCardState extends State<_ExportCard> {
       if (!mounted) return;
 
       try {
-        await Share.shareXFiles([
-          XFile(file.path, mimeType: 'application/octet-stream'),
-        ], subject: context.l10n.backupShareSubject);
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(file.path, mimeType: 'application/octet-stream')],
+            subject: context.l10n.backupShareSubject,
+          ),
+        );
       } catch (_) {
         // share sheet unavailable — user can still grab the file from Files.app
       }
