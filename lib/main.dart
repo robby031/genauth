@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/app_lock_state.dart';
+import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
@@ -46,6 +47,7 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _lifecycleState = WidgetsBinding.instance.lifecycleState;
+    unawaited(AutoBackupService.instance.maybeRun(reason: 'app_start'));
   }
 
   @override
@@ -64,6 +66,7 @@ class _GenAuthAppState extends State<GenAuthApp> with WidgetsBindingObserver {
       case AppLifecycleState.paused:
         _armLockOnBackground();
       case AppLifecycleState.resumed:
+        unawaited(AutoBackupService.instance.maybeRun(reason: 'app_resumed'));
         if (_lockArmed) {
           _presentResumeLock();
         }

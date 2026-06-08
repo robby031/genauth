@@ -43,6 +43,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Clean workspace before build checks
+        shell: bash
+        run: |
+          flutter clean
+          rm -rf build .dart_tool android/.gradle
+          flutter pub get
+          flutter gen-l10n
+
       - name: Generate localization
         run: flutter gen-l10n
 

@@ -382,6 +382,36 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get driveAutoBackupTitle => 'Auto backup';
+
+  @override
+  String get driveAutoBackupDesc => 'Automatically uploads an encrypted backup to Drive when the selected interval has elapsed and the app is opened again.';
+
+  @override
+  String get driveAutoBackupEnable => 'Enable auto backup';
+
+  @override
+  String get driveAutoBackupInterval => 'Interval';
+
+  @override
+  String get driveAutoBackupDaily => 'Daily';
+
+  @override
+  String get driveAutoBackupWeekly => 'Weekly';
+
+  @override
+  String get driveAutoBackupPassword => 'Auto backup password';
+
+  @override
+  String get driveAutoBackupSaved => 'Auto backup settings saved.';
+
+  @override
+  String get driveAutoBackupDisabled => 'Auto backup disabled.';
+
+  @override
+  String get driveAutoBackupPasswordMin => 'Auto backup password must be at least 8 characters.';
+
+  @override
   String get driveBackupConfirmDeleteTitle => 'Delete backup?';
 
   @override

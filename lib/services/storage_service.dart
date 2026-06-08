@@ -20,6 +20,10 @@ class StorageService {
   static const _panicPinSaltKey = 'genauth_panic_pin_salt';
   static const _panicTriggeredKey = 'genauth_panic_triggered';
   static const _googleProfileKey = 'genauth_google_profile';
+  static const _autoBackupEnabledKey = 'genauth_auto_backup_enabled';
+  static const _autoBackupIntervalKey = 'genauth_auto_backup_interval';
+  static const _autoBackupPasswordKey = 'genauth_auto_backup_password';
+  static const _autoBackupLastRunAtKey = 'genauth_auto_backup_last_run_at';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -220,6 +224,48 @@ class StorageService {
   Future<void> clearGoogleProfile() async {
     await _storage.delete(key: _googleProfileKey);
   }
+
+  Future<bool> isAutoBackupEnabled() async {
+    final raw = await _storage.read(key: _autoBackupEnabledKey);
+    return raw == 'true';
+  }
+
+  Future<void> setAutoBackupEnabled(bool enabled) async {
+    await _storage.write(key: _autoBackupEnabledKey, value: enabled.toString());
+  }
+
+  Future<String> getAutoBackupInterval() async {
+    return (await _storage.read(key: _autoBackupIntervalKey)) ?? 'daily';
+  }
+
+  Future<void> setAutoBackupInterval(String interval) async {
+    await _storage.write(key: _autoBackupIntervalKey, value: interval);
+  }
+
+  Future<String?> getAutoBackupPassword() async {
+    return _storage.read(key: _autoBackupPasswordKey);
+  }
+
+  Future<void> setAutoBackupPassword(String password) async {
+    await _storage.write(key: _autoBackupPasswordKey, value: password);
+  }
+
+  Future<void> clearAutoBackupPassword() async {
+    await _storage.delete(key: _autoBackupPasswordKey);
+  }
+
+  Future<DateTime?> getAutoBackupLastRunAt() async {
+    final raw = await _storage.read(key: _autoBackupLastRunAtKey);
+    if (raw == null || raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
+  }
+
+  Future<void> setAutoBackupLastRunAt(DateTime when) async {
+    await _storage.write(
+      key: _autoBackupLastRunAtKey,
+      value: when.toUtc().toIso8601String(),
+    );
+  }
 }
 
 class GoogleProfile {
@@ -234,4 +280,18 @@ class GoogleProfile {
   final String? displayName;
   final String? photoUrl;
   final String? googleId;
+}
+
+class AutoBackupSettings {
+  const AutoBackupSettings({
+    required this.enabled,
+    required this.interval,
+    required this.password,
+    required this.lastRunAt,
+  });
+
+  final bool enabled;
+  final String interval;
+  final String? password;
+  final DateTime? lastRunAt;
 }

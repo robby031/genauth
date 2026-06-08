@@ -382,6 +382,36 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get driveAutoBackupTitle => 'Backup otomatis';
+
+  @override
+  String get driveAutoBackupDesc => 'Secara otomatis mengunggah backup terenkripsi ke Drive saat interval terpilih sudah lewat dan aplikasi dibuka kembali.';
+
+  @override
+  String get driveAutoBackupEnable => 'Aktifkan backup otomatis';
+
+  @override
+  String get driveAutoBackupInterval => 'Interval';
+
+  @override
+  String get driveAutoBackupDaily => 'Harian';
+
+  @override
+  String get driveAutoBackupWeekly => 'Mingguan';
+
+  @override
+  String get driveAutoBackupPassword => 'Kata sandi auto backup';
+
+  @override
+  String get driveAutoBackupSaved => 'Pengaturan auto backup disimpan.';
+
+  @override
+  String get driveAutoBackupDisabled => 'Auto backup dimatikan.';
+
+  @override
+  String get driveAutoBackupPasswordMin => 'Kata sandi auto backup minimal 8 karakter.';
+
+  @override
   String get driveBackupConfirmDeleteTitle => 'Hapus backup?';
 
   @override

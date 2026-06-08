@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:genauth/services/audit_log_service.dart';
+import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/backup_service.dart';
 import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/storage_service.dart';
@@ -638,14 +639,38 @@ class _DriveBackupCard extends StatefulWidget {
 
 class _DriveBackupCardState extends State<_DriveBackupCard> {
   final _service = GoogleAccountService.instance;
+  final _autoBackupService = AutoBackupService.instance;
   final _pwCtrl = TextEditingController();
+  final _autoPwCtrl = TextEditingController();
   bool _obscure = true;
+  bool _autoObscure = true;
   bool _busy = false;
+  bool _autoEnabled = false;
+  String _autoInterval = 'daily';
+  bool _settingsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAutoBackupSettings();
+  }
 
   @override
   void dispose() {
     _pwCtrl.dispose();
+    _autoPwCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAutoBackupSettings() async {
+    final settings = await _autoBackupService.loadSettings();
+    if (!mounted) return;
+    _autoPwCtrl.text = settings.password ?? '';
+    setState(() {
+      _autoEnabled = settings.enabled;
+      _autoInterval = settings.interval;
+      _settingsLoaded = true;
+    });
   }
 
   Future<void> _signIn() async {
@@ -856,6 +881,49 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
     }
   }
 
+  Future<void> _saveAutoBackupSettings() async {
+    final l10n = context.l10n;
+    if (_autoEnabled && _autoPwCtrl.text.length < 8) {
+      SnackMessage.show(
+        context,
+        l10n.driveAutoBackupPasswordMin,
+        icon: Icons.warning_amber_outlined,
+        backgroundColor: Colors.orange.shade600,
+      );
+      return;
+    }
+
+    setState(() => _busy = true);
+    try {
+      if (_autoEnabled) {
+        await _autoBackupService.saveSettings(
+          enabled: true,
+          interval: _autoInterval,
+          password: _autoPwCtrl.text,
+        );
+        await _autoBackupService.maybeRun(reason: 'auto_backup_enabled');
+        if (!mounted) return;
+        SnackMessage.show(
+          context,
+          l10n.driveAutoBackupSaved,
+          icon: Icons.check_circle_outline,
+          backgroundColor: Colors.green.shade600,
+        );
+      } else {
+        await _autoBackupService.disable();
+        if (!mounted) return;
+        SnackMessage.show(
+          context,
+          l10n.driveAutoBackupDisabled,
+          icon: Icons.info_outline,
+          backgroundColor: Colors.blueGrey.shade600,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<String?> _promptPassword() async {
     return showDialog<String>(
       context: context,
@@ -978,6 +1046,80 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
                     onPressed: _busy ? null : _restore,
                     icon: const Icon(Icons.cloud_download_outlined),
                     label: Text(l10n.driveBackupRestore),
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.driveAutoBackupTitle,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.driveAutoBackupDesc,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: scheme.outline),
+                  ),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.driveAutoBackupEnable),
+                    value: _autoEnabled,
+                    onChanged: !_settingsLoaded || _busy
+                        ? null
+                        : (value) => setState(() => _autoEnabled = value),
+                  ),
+                  DropdownButtonFormField<String>(
+                    initialValue: _autoInterval,
+                    decoration: InputDecoration(
+                      labelText: l10n.driveAutoBackupInterval,
+                      labelStyle: const TextStyle(fontSize: 12),
+                      isDense: true,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'daily',
+                        child: Text(l10n.driveAutoBackupDaily),
+                      ),
+                      DropdownMenuItem(
+                        value: 'weekly',
+                        child: Text(l10n.driveAutoBackupWeekly),
+                      ),
+                    ],
+                    onChanged: !_autoEnabled || _busy
+                        ? null
+                        : (value) {
+                            if (value != null) {
+                              setState(() => _autoInterval = value);
+                            }
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _autoPwCtrl,
+                    obscureText: _autoObscure,
+                    enabled: _autoEnabled && !_busy,
+                    decoration: InputDecoration(
+                      labelText: l10n.driveAutoBackupPassword,
+                      labelStyle: const TextStyle(fontSize: 12),
+                      isDense: true,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _autoObscure ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () =>
+                            setState(() => _autoObscure = !_autoObscure),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _busy ? null : _saveAutoBackupSettings,
+                    icon: const Icon(Icons.schedule_send_outlined),
+                    label: Text(l10n.done),
                   ),
                 ],
               ],

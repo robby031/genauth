@@ -1,7 +1,7 @@
 name: genauth
 description: "GenAuth - TOTP/2FA Authenticator"
 publish_to: 'none' 
-version: 1.0.0-stable
+version: 1.0.1-stable
 
 environment:
   sdk: ^3.12.0

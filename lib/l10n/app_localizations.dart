@@ -785,6 +785,66 @@ abstract class AppLocalizations {
   /// **'Drive restore failed: {error}'**
   String driveBackupRestoreFailed(Object error);
 
+  /// No description provided for @driveAutoBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto backup'**
+  String get driveAutoBackupTitle;
+
+  /// No description provided for @driveAutoBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically uploads an encrypted backup to Drive when the selected interval has elapsed and the app is opened again.'**
+  String get driveAutoBackupDesc;
+
+  /// No description provided for @driveAutoBackupEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable auto backup'**
+  String get driveAutoBackupEnable;
+
+  /// No description provided for @driveAutoBackupInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get driveAutoBackupInterval;
+
+  /// No description provided for @driveAutoBackupDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get driveAutoBackupDaily;
+
+  /// No description provided for @driveAutoBackupWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get driveAutoBackupWeekly;
+
+  /// No description provided for @driveAutoBackupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto backup password'**
+  String get driveAutoBackupPassword;
+
+  /// No description provided for @driveAutoBackupSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto backup settings saved.'**
+  String get driveAutoBackupSaved;
+
+  /// No description provided for @driveAutoBackupDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto backup disabled.'**
+  String get driveAutoBackupDisabled;
+
+  /// No description provided for @driveAutoBackupPasswordMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto backup password must be at least 8 characters.'**
+  String get driveAutoBackupPasswordMin;
+
   /// No description provided for @driveBackupConfirmDeleteTitle.
   ///
   /// In en, this message translates to:
