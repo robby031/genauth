@@ -1205,6 +1205,12 @@ abstract class AppLocalizations {
   /// **'Edit Tags'**
   String get editTags;
 
+  /// No description provided for @tagDomainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: add domain mapping tags like domain:github.com or host:accounts.google.com for Android OTP autofill.'**
+  String get tagDomainHint;
+
   /// No description provided for @tagHint.
   ///
   /// In en, this message translates to:
@@ -1312,6 +1318,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in with Google to view your profile.'**
   String get profileSignInPrompt;
+
+  /// No description provided for @autofillServiceMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill Service'**
+  String get autofillServiceMenu;
+
+  /// No description provided for @autofillServiceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable GenAuth OTP autofill in Android settings'**
+  String get autofillServiceSubtitle;
+
+  /// No description provided for @autofillServiceOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open Android Autofill settings on this device.'**
+  String get autofillServiceOpenFailed;
+
+  /// No description provided for @autofillDomainMappedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill domain mapped'**
+  String get autofillDomainMappedStatus;
+
+  /// No description provided for @autofillDomainNotMappedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill domain not mapped'**
+  String get autofillDomainNotMappedStatus;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

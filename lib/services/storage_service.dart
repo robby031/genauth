@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/services/android_autofill_sync_service.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/google_auth_migration_service.dart';
 
@@ -42,6 +44,7 @@ class StorageService {
 
   Future<void> saveAccounts(List<OtpAccount> accounts) async {
     await _storage.write(key: _key, value: OtpAccount.listToJson(accounts));
+    unawaited(AndroidAutofillSyncService.syncAccounts(accounts));
   }
 
   Future<void> addAccount(OtpAccount account) async {
@@ -168,6 +171,7 @@ class StorageService {
       detail: 'All local OTP data was wiped by panic PIN trigger.',
     );
     await _storage.delete(key: _key);
+    unawaited(AndroidAutofillSyncService.clearAccounts());
     await clearPin();
     await clearPanicPin();
     await _storage.write(key: _panicTriggeredKey, value: 'true');

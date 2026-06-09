@@ -246,6 +246,7 @@
   "tags": "Tag",
   "addTag": "Tambah",
   "editTags": "Edit Tag",
+  "tagDomainHint": "Tips: tambahkan tag mapping domain seperti domain:github.com atau host:accounts.google.com untuk autofill OTP Android.",
   "tagHint": "Nama tag...",
   "done": "Selesai",
   "githubLinkOpenFailed": "Tidak dapat membuka tautan GitHub.",
@@ -268,5 +269,10 @@
   "profileLocale": "Lokal",
   "profileGoogleId": "ID Google",
   "profileNotAvailable": "-",
-  "profileSignInPrompt": "Masuk dengan Google untuk melihat profil Anda."
+  "profileSignInPrompt": "Masuk dengan Google untuk melihat profil Anda.",
+  "autofillServiceMenu": "Layanan Autofill",
+  "autofillServiceSubtitle": "Aktifkan autofill OTP GenAuth di pengaturan Android",
+  "autofillServiceOpenFailed": "Tidak dapat membuka pengaturan Autofill Android di perangkat ini.",
+  "autofillDomainMappedStatus": "Domain autofill sudah dipetakan",
+  "autofillDomainNotMappedStatus": "Domain autofill belum dipetakan"
 }

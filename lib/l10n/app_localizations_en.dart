@@ -598,6 +598,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editTags => 'Edit Tags';
 
   @override
+  String get tagDomainHint => 'Tip: add domain mapping tags like domain:github.com or host:accounts.google.com for Android OTP autofill.';
+
+  @override
   String get tagHint => 'Tag name...';
 
   @override
@@ -652,4 +655,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSignInPrompt => 'Sign in with Google to view your profile.';
+
+  @override
+  String get autofillServiceMenu => 'Autofill Service';
+
+  @override
+  String get autofillServiceSubtitle => 'Enable GenAuth OTP autofill in Android settings';
+
+  @override
+  String get autofillServiceOpenFailed => 'Unable to open Android Autofill settings on this device.';
+
+  @override
+  String get autofillDomainMappedStatus => 'Autofill domain mapped';
+
+  @override
+  String get autofillDomainNotMappedStatus => 'Autofill domain not mapped';
 }

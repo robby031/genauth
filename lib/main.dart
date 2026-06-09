@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/l10n/app_localizations.dart';
 import 'package:genauth/providers/app_state_provider.dart';
+import 'package:genauth/services/android_autofill_telemetry_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/storage_service.dart';
@@ -47,6 +48,7 @@ class _GenAuthAppState extends ConsumerState<GenAuthApp>
     _lifecycleState = WidgetsBinding.instance.lifecycleState;
     unawaited(AutoBackupService.instance.maybeRun(reason: 'app_start'));
     unawaited(ref.read(localeProvider.notifier).initialize());
+    unawaited(AndroidAutofillTelemetryService.flushPendingTelemetry());
   }
 
   @override
@@ -66,6 +68,7 @@ class _GenAuthAppState extends ConsumerState<GenAuthApp>
         _armLockOnBackground();
       case AppLifecycleState.resumed:
         unawaited(AutoBackupService.instance.maybeRun(reason: 'app_resumed'));
+        unawaited(AndroidAutofillTelemetryService.flushPendingTelemetry());
         if (_lockArmed) {
           _presentResumeLock();
         }

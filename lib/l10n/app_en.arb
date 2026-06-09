@@ -246,6 +246,7 @@
   "tags": "Tags",
   "addTag": "Add",
   "editTags": "Edit Tags",
+  "tagDomainHint": "Tip: add domain mapping tags like domain:github.com or host:accounts.google.com for Android OTP autofill.",
   "tagHint": "Tag name...",
   "done": "Done",
   "githubLinkOpenFailed": "Unable to open GitHub link.",
@@ -268,5 +269,10 @@
   "profileLocale": "Locale",
   "profileGoogleId": "Google ID",
   "profileNotAvailable": "-",
-  "profileSignInPrompt": "Sign in with Google to view your profile."
+  "profileSignInPrompt": "Sign in with Google to view your profile.",
+  "autofillServiceMenu": "Autofill Service",
+  "autofillServiceSubtitle": "Enable GenAuth OTP autofill in Android settings",
+  "autofillServiceOpenFailed": "Unable to open Android Autofill settings on this device.",
+  "autofillDomainMappedStatus": "Autofill domain mapped",
+  "autofillDomainNotMappedStatus": "Autofill domain not mapped"
 }

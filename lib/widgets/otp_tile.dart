@@ -40,6 +40,25 @@ class _OtpTileState extends State<OtpTile> {
   bool _revealed = false;
   Timer? _hideTimer;
 
+  bool _hasManualDomainMapping(List<String> tags) {
+    for (final rawTag in tags) {
+      final tag = rawTag.trim();
+      if (tag.isEmpty) continue;
+
+      final lower = tag.toLowerCase();
+      if (lower.startsWith('domain:') ||
+          lower.startsWith('host:') ||
+          lower.startsWith('site:') ||
+          lower.startsWith('web:')) {
+        final mapped = tag.substring(tag.indexOf(':') + 1).trim();
+        if (mapped.isNotEmpty) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @override
   void dispose() {
     _hideTimer?.cancel();
@@ -119,6 +138,7 @@ class _OtpTileState extends State<OtpTile> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final hasDomainMapping = _hasManualDomainMapping(widget.account.tags);
     return Slidable(
       key: ValueKey(widget.account.id),
       startActionPane: ActionPane(
@@ -210,6 +230,21 @@ class _OtpTileState extends State<OtpTile> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Tooltip(
+                  message: hasDomainMapping
+                      ? context.l10n.autofillDomainMappedStatus
+                      : context.l10n.autofillDomainNotMappedStatus,
+                  child: Icon(
+                    hasDomainMapping
+                        ? Icons.domain_verification_outlined
+                        : Icons.domain_disabled_outlined,
+                    size: 18,
+                    color: hasDomainMapping
+                        ? Colors.green.shade600
+                        : scheme.outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
                 if (widget.account.isHotp)
                   IconButton(
                     icon: const Icon(Icons.refresh),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/providers/app_state_provider.dart';
+import 'package:genauth/services/android_autofill_settings_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:genauth/screens/audit/audit_log_screen.dart';
 import 'package:genauth/screens/backup/backup_screen.dart';
@@ -202,6 +205,20 @@ class _DrawerScreenState extends ConsumerState<DrawerScreen> {
     }
   }
 
+  Future<void> _openAutofillServiceSettings() async {
+    Navigator.pop(context);
+
+    final ok = await AndroidAutofillSettingsService.openAutofillSettings();
+    if (!ok && mounted) {
+      SnackMessage.show(
+        context,
+        context.l10n.autofillServiceOpenFailed,
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
+      );
+    }
+  }
+
   void _showLanguageBottomSheet(BuildContext context, Locale currentLocale) {
     final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
@@ -276,6 +293,13 @@ class _DrawerScreenState extends ConsumerState<DrawerScreen> {
     ];
 
     final dataItems = <Widget>[
+      if (Platform.isAndroid)
+        MenuTile(
+          icon: Icons.sms_outlined,
+          title: l10n.autofillServiceMenu,
+          subtitle: l10n.autofillServiceSubtitle,
+          onTap: _openAutofillServiceSettings,
+        ),
       MenuTile(
         icon: Icons.backup_outlined,
         title: l10n.backupAndRestore,

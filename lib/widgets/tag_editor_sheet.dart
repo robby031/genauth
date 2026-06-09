@@ -77,6 +77,13 @@ class _TagEditorSheetState extends State<TagEditorSheet> {
                   context,
                 ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
+              const SizedBox(height: 6),
+              Text(
+                context.l10n.tagDomainHint,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.outline),
+              ),
               const SizedBox(height: 16),
               if (_tags.isNotEmpty) ...[
                 Wrap(
