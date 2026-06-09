@@ -4,7 +4,7 @@ import 'package:genauth/controllers/home_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/widgets/otp_tile.dart';
 import 'package:genauth/widgets/tag_filter_bar.dart';
-import 'package:genauth/screens/add_account_screen.dart';
+import 'package:genauth/screens/add_account/add_account_screen.dart';
 import 'package:genauth/screens/backup_screen.dart';
 import 'package:genauth/screens/lock_screen.dart';
 import 'package:genauth/screens/drawer_screen.dart';

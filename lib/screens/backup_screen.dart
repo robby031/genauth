@@ -13,7 +13,7 @@ import 'package:genauth/services/backup_service.dart';
 import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/screens/add_account_screen.dart';
+import 'package:genauth/screens/add_account/add_account_screen.dart';
 import 'package:genauth/screens/google_auth_export_screen.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
@@ -1129,7 +1129,9 @@ class _DriveBackupCardState extends State<_DriveBackupCard> {
                       isDense: true,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _autoObscure ? Icons.visibility : Icons.visibility_off,
+                          _autoObscure
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                         onPressed: () =>
                             setState(() => _autoObscure = !_autoObscure),
