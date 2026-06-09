@@ -21,6 +21,16 @@ class GoogleAuthMigrationBatch {
 class GoogleAuthMigrationService {
   static const int maxAccountsPerQr = 10;
 
+  // Google Authenticator migration export in this app is limited to TOTP
+  // accounts with 6 digits to avoid platform-side encoding failures.
+  static bool isExportCompatible(OtpAccount account) {
+    return !account.isHotp && account.digits == 6;
+  }
+
+  static List<OtpAccount> exportCompatibleAccounts(List<OtpAccount> accounts) {
+    return accounts.where(isExportCompatible).toList();
+  }
+
   Future<List<OtpAccount>> decodeAccounts(String value) async {
     final normalized = value.trim();
 
@@ -43,16 +53,17 @@ class GoogleAuthMigrationService {
   Future<List<GoogleAuthMigrationBatch>> encodeAccounts(
     List<OtpAccount> accounts,
   ) async {
-    if (accounts.isEmpty) return const [];
+    final compatibleAccounts = exportCompatibleAccounts(accounts);
+    if (compatibleAccounts.isEmpty) return const [];
 
-    final totalBatches = (accounts.length / maxAccountsPerQr).ceil();
+    final totalBatches = (compatibleAccounts.length / maxAccountsPerQr).ceil();
     final batchId = Random.secure().nextInt(1 << 31);
     final batches = <GoogleAuthMigrationBatch>[];
 
     for (var batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
       final start = batchIndex * maxAccountsPerQr;
-      final end = min(start + maxAccountsPerQr, accounts.length);
-      final batchAccounts = accounts.sublist(start, end);
+      final end = min(start + maxAccountsPerQr, compatibleAccounts.length);
+      final batchAccounts = compatibleAccounts.sublist(start, end);
 
       final uri = await GenotpFlutter.buildOtpAuthMigrationUri(
         accounts: batchAccounts.map(_migrationFromAccount).toList(),

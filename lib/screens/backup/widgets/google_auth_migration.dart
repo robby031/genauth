@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/providers/audit_log_provider.dart';
+import 'package:genauth/services/google_auth_migration_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/add_account/add_account_screen.dart';
@@ -34,15 +35,17 @@ class _GoogleAuthMigrationState extends ConsumerState<GoogleAuthMigration> {
   Future<void> _openExport() async {
     setState(() => _loading = true);
     final audit = ref.read(auditLogProvider);
-    await audit.log('google_auth_export_attempt');
     try {
+      await audit.log('google_auth_export_attempt');
       final accounts = await StorageService().loadAccounts();
+      final compatibleAccounts =
+          GoogleAuthMigrationService.exportCompatibleAccounts(accounts);
       if (!mounted) return;
-      if (accounts.isEmpty) {
+      if (compatibleAccounts.isEmpty) {
         await audit.log(
           'google_auth_export_blocked',
           status: 'failed',
-          detail: 'no_accounts',
+          detail: 'no_compatible_accounts',
         );
         if (!mounted) return;
         SnackMessage.show(
@@ -62,7 +65,23 @@ class _GoogleAuthMigrationState extends ConsumerState<GoogleAuthMigration> {
       );
       await audit.log(
         'google_auth_export_opened',
-        metadata: {'accountCount': accounts.length},
+        metadata: {
+          'accountCount': compatibleAccounts.length,
+          'skippedCount': accounts.length - compatibleAccounts.length,
+        },
+      );
+    } catch (e) {
+      await audit.log(
+        'google_auth_export_failed',
+        status: 'failed',
+        detail: e.toString(),
+      );
+      if (!mounted) return;
+      SnackMessage.show(
+        context,
+        context.l10n.backupExportFailed(e.toString()),
+        icon: Icons.error_outline,
+        backgroundColor: Colors.red.shade600,
       );
     } finally {
       if (mounted) setState(() => _loading = false);

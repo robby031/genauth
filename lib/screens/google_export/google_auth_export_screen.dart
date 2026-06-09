@@ -27,8 +27,41 @@ class GoogleAuthExportScreen extends StatelessWidget {
           child: FutureBuilder<List<GoogleAuthMigrationBatch>>(
             future: GoogleAuthMigrationService().encodeAccounts(accounts),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.error_outline, size: 28),
+                        const SizedBox(height: 10),
+                        Text(
+                          context.l10n.backupExportFailed(
+                            snapshot.error.toString(),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      context.l10n.googleAuthNoAccounts,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
               }
 
               final batches = snapshot.data!;
@@ -65,7 +98,10 @@ class GoogleAuthExportScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         Expanded(
                           flex: 4,
-                          child: BatchAccountsTable(batches: batches),
+                          child: BatchAccountsTable(
+                            batches: batches,
+                            allAccounts: accounts,
+                          ),
                         ),
                       ],
                     ),
