@@ -110,34 +110,13 @@ class _ImportState extends ConsumerState<Import> {
       }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            backgroundColor: Colors.green.shade600,
-            duration: const Duration(seconds: 3),
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    l10n.backupRestoredSuccess(imported.length),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        l10n.backupRestoredSuccess(imported.length),
+        icon: Icons.check_circle,
+        backgroundColor: Colors.green.shade600,
+      );
+
       setState(() {
         _pickedFileName = null;
         _pickedBytes = null;

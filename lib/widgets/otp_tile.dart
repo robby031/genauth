@@ -6,6 +6,7 @@ import 'package:genauth/services/clipboard_security_service.dart';
 import 'package:genauth/services/otp_service.dart';
 import 'package:genauth/services/second_tick_service.dart';
 import 'package:genauth/widgets/service_icon.dart';
+import 'package:genauth/widgets/snack_message.dart';
 import 'package:genauth/widgets/tag_editor_sheet.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -75,17 +76,12 @@ class _OtpTileState extends State<OtpTile> {
       if (mounted) setState(() => _revealed = false);
     });
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.codeCopied),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+    SnackMessage.show(
+      context,
+      context.l10n.codeCopied,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green.shade600,
+    );
   }
 
   Future<void> _openTagEditor(BuildContext context) async {

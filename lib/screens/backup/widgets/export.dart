@@ -90,34 +90,12 @@ class _ExportState extends ConsumerState<Export> {
         metadata: {'fileName': name, 'accountCount': accounts.length},
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentMaterialBanner()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            backgroundColor: Colors.green.shade600,
-            duration: const Duration(seconds: 3),
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.l10n.backupSavedFile(name),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        context.l10n.backupSavedFile(name),
+        icon: Icons.check_circle,
+        backgroundColor: Colors.green.shade600,
+      );
     } catch (e) {
       await audit.log(
         'backup_export_failed',
