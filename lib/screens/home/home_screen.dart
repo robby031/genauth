@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:genauth/controllers/home_controller.dart';
-import 'package:genauth/services/storage_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/home_provider.dart';
 import 'package:genauth/widgets/otp_tile.dart';
 import 'package:genauth/widgets/tag_filter_bar.dart';
 import 'package:genauth/screens/add_account/add_account_screen.dart';
@@ -9,7 +9,6 @@ import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/screens/drawer/drawer_screen.dart';
 import 'package:genauth/screens/onboarding/onboarding_screen.dart';
-import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/google_account_service.dart';
@@ -18,31 +17,19 @@ import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 import 'widgets/smart_floating.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
-  late final HomeController _controller;
   bool _bubbleExpanded = false;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = HomeController(
-      storage: StorageService.instance,
-      otpRepository: OtpRepository(StorageService.instance),
-    );
-    _controller.initialize();
-  }
-
-  @override
   void dispose() {
-    _controller.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -53,7 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (_) => const AddAccountScreen()),
     );
-    if (result == true) await _controller.loadAndRefresh();
+    if (result == true) {
+      await ref.read(homeProvider.notifier).loadAndRefresh();
+    }
   }
 
   Future<void> _openBackup() async {
@@ -67,12 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void _startSearch() {
     _collapseBubble();
     _searchController.clear();
-    _controller.startSearch();
+    ref.read(homeProvider.notifier).startSearch();
   }
 
   void _stopSearch() {
     _searchController.clear();
-    _controller.stopSearch();
+    ref.read(homeProvider.notifier).stopSearch();
   }
 
   void _lockApp() {
@@ -159,195 +148,183 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final scheme = Theme.of(context).colorScheme;
-        final filtered = _controller.filteredAccounts;
-        final tagBar = TagFilterBar(
-          allTags: _controller.allTags,
-          selectedTags: _controller.selectedTags,
-          onToggle: _controller.toggleTag,
-        );
+    final homeState = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
 
-        final emptyState = ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _controller.isSearching
-                          ? Icons.search_off
-                          : Icons.lock_outline,
-                      size: 64,
-                      color: scheme.outlineVariant,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _controller.isSearching
-                          ? context.l10n.noResults
-                          : context.l10n.noAccountsYet,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    if (!_controller.isSearching)
-                      Text(context.l10n.tapToAddFirstAccount),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+    final scheme = Theme.of(context).colorScheme;
+    final filtered = homeState.filteredAccounts;
+    final tagBar = TagFilterBar(
+      allTags: homeState.allTags,
+      selectedTags: homeState.selectedTags,
+      onToggle: homeNotifier.toggleTag,
+    );
 
-        final accountList = ReorderableListView.builder(
-          buildDefaultDragHandles: false,
-          padding: EdgeInsets.zero,
-          physics: const AlwaysScrollableScrollPhysics(),
-          onReorderItem: _controller.isSearching
-              ? (oldIdx, newIdx) {}
-              : _controller.reorderAccounts,
-          proxyDecorator: (child, _, animation) => Material(
-            elevation: 4,
-            shadowColor: Colors.black26,
-            borderRadius: BorderRadius.circular(8),
-            child: child,
-          ),
-          itemCount: filtered.length,
-          itemBuilder: (_, i) {
-            final account = filtered[i];
-            return Column(
-              key: ValueKey(account.id),
+    final emptyState = ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Center(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                OtpTile(
-                  reorderIndex: i,
-                  account: account,
-                  code: _controller.codeFor(account.id),
-                  onDelete: () => _controller.deleteAccount(account.id),
-                  onHotpIncrement: account.isHotp
-                      ? () => _controller.incrementHotp(account)
-                      : null,
-                  showDragHandle: !_controller.isSearching,
-                  onEditTags: (tags) =>
-                      _controller.updateAccountTags(account.id, tags),
+                Icon(
+                  homeState.isSearching ? Icons.search_off : Icons.lock_outline,
+                  size: 64,
+                  color: scheme.outlineVariant,
                 ),
-                const Divider(height: 1),
+                const SizedBox(height: 16),
+                Text(
+                  homeState.isSearching
+                      ? context.l10n.noResults
+                      : context.l10n.noAccountsYet,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                if (!homeState.isSearching)
+                  Text(context.l10n.tapToAddFirstAccount),
               ],
-            );
-          },
-        );
+            ),
+          ),
+        ),
+      ],
+    );
 
-        final body = Column(
+    final accountList = ReorderableListView.builder(
+      buildDefaultDragHandles: false,
+      padding: EdgeInsets.zero,
+      physics: const AlwaysScrollableScrollPhysics(),
+      onReorderItem: homeState.isSearching
+          ? (oldIdx, newIdx) {}
+          : homeNotifier.reorderAccounts,
+      proxyDecorator: (child, _, animation) => Material(
+        elevation: 4,
+        shadowColor: Colors.black26,
+        borderRadius: BorderRadius.circular(8),
+        child: child,
+      ),
+      itemCount: filtered.length,
+      itemBuilder: (_, i) {
+        final account = filtered[i];
+        return Column(
+          key: ValueKey(account.id),
+          mainAxisSize: MainAxisSize.min,
           children: [
-            tagBar,
-            Expanded(child: filtered.isEmpty ? emptyState : accountList),
+            OtpTile(
+              reorderIndex: i,
+              account: account,
+              code: homeState.codeFor(account.id),
+              onDelete: () => homeNotifier.deleteAccount(account.id),
+              onHotpIncrement: account.isHotp
+                  ? () => homeNotifier.incrementHotp(account)
+                  : null,
+              showDragHandle: !homeState.isSearching,
+              onEditTags: (tags) =>
+                  homeNotifier.updateAccountTags(account.id, tags),
+            ),
+            const Divider(height: 1),
           ],
         );
+      },
+    );
 
-        return Scaffold(
-          appBar: AppBar(
-            titleSpacing: 0,
-            centerTitle: false,
-            title: _controller.isSearching
-                ? TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.searchHint,
-                      border: InputBorder.none,
-                      isDense: true,
-                    ),
-                    onChanged: _controller.setSearchQuery,
-                  )
-                : Text(
-                    context.l10n.appTitle,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-            actions: [
-              if (_controller.isSearching)
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: _stopSearch,
-                )
-              else ...[
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _startSearch,
+    final body = Column(
+      children: [
+        tagBar,
+        Expanded(child: filtered.isEmpty ? emptyState : accountList),
+      ],
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        titleSpacing: 0,
+        centerTitle: false,
+        title: homeState.isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchHint,
+                  border: InputBorder.none,
+                  isDense: true,
                 ),
-                ValueListenableBuilder(
-                  valueListenable: GoogleAccountService.instance.userNotifier,
-                  builder: (context, user, _) {
-                    if (user == null || user.photoUrl == null) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: GestureDetector(
-                        onTap: _signOut,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.outlineVariant,
-                              width: 1,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.transparent,
-                            child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: user.photoUrl!,
-                                placeholder: (context, url) =>
-                                    const Icon(Icons.account_circle, size: 32),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.account_circle, size: 32),
-                                fit: BoxFit.cover,
-                                width: 32,
-                                height: 32,
-                              ),
-                            ),
+                onChanged: homeNotifier.setSearchQuery,
+              )
+            : Text(
+                context.l10n.appTitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+        actions: [
+          if (homeState.isSearching)
+            IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
+          else ...[
+            IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
+            ValueListenableBuilder(
+              valueListenable: GoogleAccountService.instance.userNotifier,
+              builder: (context, user, _) {
+                if (user == null || user.photoUrl == null) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: GestureDetector(
+                    onTap: _signOut,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          width: 1,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.transparent,
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: user.photoUrl!,
+                            placeholder: (context, url) =>
+                                const Icon(Icons.account_circle, size: 32),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.account_circle, size: 32),
+                            fit: BoxFit.cover,
+                            width: 32,
+                            height: 32,
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ],
-            ],
-          ),
-          drawer: DrawerScreen(
-            onLock: _lockApp,
-            onAbout: _showAbout,
-            onOpenOnboarding: _openOnboardingFromDrawer,
-          ),
-          body: RefreshIndicator(
-            onRefresh: _controller.loadAndRefresh,
-            child: body,
-          ),
-          floatingActionButton: _controller.isSearching
-              ? null
-              : SmartFloatingBubble(
-                  expanded: _bubbleExpanded,
-                  onToggle: _toggleBubble,
-                  onAdd: _openAdd,
-                  onSearch: _startSearch,
-                  onBackup: _openBackup,
-                  addLabel: context.l10n.addAccount,
-                  searchLabel: context.l10n.searchHint,
-                  backupLabel: context.l10n.backupAndRestore,
-                ),
-        );
-      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+      drawer: DrawerScreen(
+        onLock: _lockApp,
+        onAbout: _showAbout,
+        onOpenOnboarding: _openOnboardingFromDrawer,
+      ),
+      body: RefreshIndicator(
+        onRefresh: homeNotifier.loadAndRefresh,
+        child: body,
+      ),
+      floatingActionButton: homeState.isSearching
+          ? null
+          : SmartFloatingBubble(
+              expanded: _bubbleExpanded,
+              onToggle: _toggleBubble,
+              onAdd: _openAdd,
+              onSearch: _startSearch,
+              onBackup: _openBackup,
+              addLabel: context.l10n.addAccount,
+              searchLabel: context.l10n.searchHint,
+              backupLabel: context.l10n.backupAndRestore,
+            ),
     );
   }
 }

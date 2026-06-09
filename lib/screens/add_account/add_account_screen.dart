@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:genauth/controllers/add_account_controller.dart';
-import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'widgets/add_account_chooser.dart';
 import 'package:genauth/widgets/scan_qr.dart';
@@ -18,20 +16,12 @@ class AddAccountScreen extends StatefulWidget {
 enum _AddAccountMode { chooser, scan, manual }
 
 class _AddAccountScreenState extends State<AddAccountScreen> {
-  late final AddAccountController _controller;
   late _AddAccountMode _mode;
 
   @override
   void initState() {
     super.initState();
-    _controller = AddAccountController(storage: StorageService.instance);
     _mode = widget.importMode ? _AddAccountMode.scan : _AddAccountMode.chooser;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   void _openMode(_AddAccountMode mode) {
@@ -70,8 +60,8 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
         title: Text(title, style: const TextStyle(fontSize: 16)),
       ),
       body: switch (_mode) {
-        _AddAccountMode.scan => ScanQr(controller: _controller, isActive: true),
-        _AddAccountMode.manual => ManualAdd(controller: _controller),
+        _AddAccountMode.scan => const ScanQr(isActive: true),
+        _AddAccountMode.manual => const ManualAdd(),
         _AddAccountMode.chooser => AddAccountChooser(
           onScanSelected: () => _openMode(_AddAccountMode.scan),
           onManualSelected: () => _openMode(_AddAccountMode.manual),

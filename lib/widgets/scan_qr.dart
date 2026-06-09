@@ -2,23 +2,23 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
-import 'package:genauth/controllers/add_account_controller.dart';
+import 'package:genauth/providers/add_account_provider.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/cam_scan_overlay.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
-class ScanQr extends StatefulWidget {
-  const ScanQr({super.key, required this.controller, required this.isActive});
+class ScanQr extends ConsumerStatefulWidget {
+  const ScanQr({super.key, required this.isActive});
 
-  final AddAccountController controller;
   final bool isActive;
 
   @override
-  State<ScanQr> createState() => _ScanQrState();
+  ConsumerState<ScanQr> createState() => _ScanQrState();
 }
 
-class _ScanQrState extends State<ScanQr> with TickerProviderStateMixin {
+class _ScanQrState extends ConsumerState<ScanQr> with TickerProviderStateMixin {
   bool _done = false;
   late final AnimationController _scanLineController;
   late final AnimationController _framePulseController;
@@ -89,7 +89,9 @@ class _ScanQrState extends State<ScanQr> with TickerProviderStateMixin {
     _scanLineController.stop();
     _framePulseController.stop();
     try {
-      final importedCount = await widget.controller.saveFromQrCode(rawValue);
+      final importedCount = await ref
+          .read(addAccountProvider.notifier)
+          .saveFromQrCode(rawValue);
       if (!mounted) return;
 
       final message = importedCount > 0
