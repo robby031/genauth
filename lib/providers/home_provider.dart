@@ -191,6 +191,47 @@ class HomeNotifier extends AutoDisposeNotifier<HomeState> {
     state = state.copyWith(accounts: nextAccounts);
   }
 
+  Future<void> reorderVisibleAccounts(
+    List<OtpAccount> visibleAccounts,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    if (visibleAccounts.length < 2) return;
+    if (oldIndex == newIndex) return;
+
+    final ids = visibleAccounts.map((a) => a.id).toList();
+    final from = oldIndex;
+    var to = newIndex;
+    if (to > from) to -= 1;
+    if (from < 0 || from >= ids.length || to < 0 || to >= ids.length) return;
+
+    final movedId = ids.removeAt(from);
+    ids.insert(to, movedId);
+
+    final current = List<OtpAccount>.from(state.accounts);
+    final visibleSet = ids.toSet();
+    final byId = <String, OtpAccount>{
+      for (final account in current)
+        if (visibleSet.contains(account.id)) account.id: account,
+    };
+
+    final reorderedVisible = ids.map((id) => byId[id]!).toList();
+    var cursor = 0;
+    final nextAccounts = <OtpAccount>[];
+
+    for (final account in current) {
+      if (visibleSet.contains(account.id)) {
+        nextAccounts.add(reorderedVisible[cursor]);
+        cursor += 1;
+      } else {
+        nextAccounts.add(account);
+      }
+    }
+
+    await ref.read(homeStorageServiceProvider).saveAccounts(nextAccounts);
+    state = state.copyWith(accounts: nextAccounts);
+  }
+
   Future<void> incrementHotp(OtpAccount account) async {
     final result = await ref.read(otpRepositoryProvider).hotpIncrement(account);
     final updated = result['account'] as OtpAccount;
