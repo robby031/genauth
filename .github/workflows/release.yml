@@ -151,15 +151,15 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         shell: bash
         run: |
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/genauth-production.jks
 
-          test -s android/upload-keystore.jks || (echo "Decoded keystore is empty" && exit 1)
+          test -s android/genauth-production.jks || (echo "Decoded keystore is empty" && exit 1)
 
           KEYSTORE_TYPE=""
           for TYPE in PKCS12 JKS; do
             if keytool -list \
               -storetype "$TYPE" \
-              -keystore android/upload-keystore.jks \
+              -keystore android/genauth-production.jks \
               -storepass "$ANDROID_KEYSTORE_PASSWORD" \
               -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
               KEYSTORE_TYPE="$TYPE"
@@ -174,7 +174,7 @@ jobs:
           fi
 
           cat > android/key.properties <<EOF
-          storeFile=upload-keystore.jks
+          storeFile=genauth-production.jks
           storePassword=$ANDROID_KEYSTORE_PASSWORD
           keyAlias=$ANDROID_KEY_ALIAS
           keyPassword=$ANDROID_KEY_PASSWORD
@@ -187,7 +187,7 @@ jobs:
           STORE_TYPE=$(grep '^storeType=' android/key.properties | cut -d'=' -f2)
           keytool -list \
             -storetype "$STORE_TYPE" \
-            -keystore android/upload-keystore.jks \
+            -keystore android/genauth-production.jks \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
             -alias "$ANDROID_KEY_ALIAS"
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
-import 'package:genauth/screens/pin_screen.dart';
+import 'package:genauth/screens/pin/pin_screen.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 

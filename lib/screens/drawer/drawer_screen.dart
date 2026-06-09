@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:genauth/screens/audit_log_screen.dart';
-import 'package:genauth/screens/backup_screen.dart';
-import 'package:genauth/screens/pin_screen.dart';
+import 'package:genauth/screens/audit/audit_log_screen.dart';
+import 'package:genauth/screens/backup/backup_screen.dart';
+import 'package:genauth/screens/pin/pin_screen.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
-import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/app_links.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
+import 'widgets/drawer_header.dart';
+import 'widgets/drawer_footer.dart';
 
 class DrawerScreen extends StatefulWidget {
   const DrawerScreen({
@@ -340,79 +340,21 @@ class _DrawerScreenState extends State<DrawerScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
           children: [
-            const _DrawerHeaderCard(),
+            AppDrawerHeader(),
             const SizedBox(height: 10),
-            _SectionGroup(title: l10n.drawerSectionSecurity, children: securityItems),
+            _SectionGroup(
+              title: l10n.drawerSectionSecurity,
+              children: securityItems,
+            ),
             _SectionGroup(title: l10n.drawerSectionData, children: dataItems),
             _SectionGroup(title: l10n.drawerSectionApp, children: appItems),
             const SizedBox(height: 12),
-            _DrawerFooter(
+            DrawerFooter(
               appVersion: _appVersion,
               onOpenGithub: () => _openGithubRepo(context),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _DrawerHeaderCard extends StatelessWidget {
-  const _DrawerHeaderCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [scheme.primaryContainer, scheme.surfaceContainerHigh],
-        ),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.15)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Image.asset(AppAssets.logoNoBackground),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'GenAuth',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: scheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  context.l10n.authenticator,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: scheme.onPrimaryContainer.withValues(alpha: 0.78),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -475,7 +417,10 @@ class _MenuTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: ListTile(
           dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 2,
+          ),
           minLeadingWidth: 20,
           visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
           shape: RoundedRectangleBorder(
@@ -499,66 +444,6 @@ class _MenuTile extends StatelessWidget {
           onTap: onTap,
         ),
       ),
-    );
-  }
-}
-
-class _DrawerFooter extends StatelessWidget {
-  const _DrawerFooter({
-    required this.appVersion,
-    required this.onOpenGithub,
-  });
-
-  final String appVersion;
-  final VoidCallback onOpenGithub;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton.filledTonal(
-              tooltip: context.l10n.openGithubRepository,
-              onPressed: onOpenGithub,
-              icon: SvgPicture.asset(
-                AppAssets.githubSvg,
-                width: 18,
-                height: 18,
-                colorFilter: ColorFilter.mode(
-                  scheme.primary,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text(
-          context.l10n.appTitle,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: 11,
-            color: scheme.outline,
-            letterSpacing: 0.4,
-          ),
-        ),
-        Text(
-          '© 2026 ${context.l10n.appTitle}. ${context.l10n.allRightsReserved}',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: 10,
-            color: scheme.outlineVariant,
-          ),
-        ),
-        Text(
-          context.l10n.versionLabel(appVersion.isEmpty ? '...' : appVersion),
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: 10,
-            color: scheme.outlineVariant,
-          ),
-        ),
-      ],
     );
   }
 }

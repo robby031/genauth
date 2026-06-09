@@ -4,11 +4,11 @@ import 'package:genauth/controllers/home_controller.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/widgets/otp_tile.dart';
 import 'package:genauth/widgets/tag_filter_bar.dart';
-import 'package:genauth/screens/add_account_screen.dart';
-import 'package:genauth/screens/backup_screen.dart';
-import 'package:genauth/screens/lock_screen.dart';
-import 'package:genauth/screens/drawer_screen.dart';
-import 'package:genauth/screens/onboarding_screen.dart';
+import 'package:genauth/screens/add_account/add_account_screen.dart';
+import 'package:genauth/screens/backup/backup_screen.dart';
+import 'package:genauth/screens/lock/lock_screen.dart';
+import 'package:genauth/screens/drawer/drawer_screen.dart';
+import 'package:genauth/screens/onboarding/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
@@ -16,6 +16,7 @@ import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
+import 'widgets/smart_floating.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -335,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           floatingActionButton: _controller.isSearching
               ? null
-              : _SmartFloatingBubble(
+              : SmartFloatingBubble(
                   expanded: _bubbleExpanded,
                   onToggle: _toggleBubble,
                   onAdd: _openAdd,
@@ -347,81 +348,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
         );
       },
-    );
-  }
-}
-
-class _SmartFloatingBubble extends StatelessWidget {
-  const _SmartFloatingBubble({
-    required this.expanded,
-    required this.onToggle,
-    required this.onAdd,
-    required this.onSearch,
-    required this.onBackup,
-    required this.addLabel,
-    required this.searchLabel,
-    required this.backupLabel,
-  });
-
-  final bool expanded;
-  final VoidCallback onToggle;
-  final VoidCallback onAdd;
-  final VoidCallback onSearch;
-  final VoidCallback onBackup;
-  final String addLabel;
-  final String searchLabel;
-  final String backupLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (expanded) ...[
-            FloatingActionButton.small(
-              heroTag: 'bubble-backup',
-              onPressed: onBackup,
-              tooltip: backupLabel,
-              child: const Icon(Icons.backup_outlined),
-            ),
-            const SizedBox(height: 8),
-            FloatingActionButton.small(
-              heroTag: 'bubble-search',
-              onPressed: onSearch,
-              tooltip: searchLabel,
-              child: const Icon(Icons.search),
-            ),
-            const SizedBox(height: 8),
-            FloatingActionButton.small(
-              heroTag: 'bubble-add',
-              onPressed: onAdd,
-              tooltip: addLabel,
-              child: const Icon(Icons.add),
-            ),
-            const SizedBox(height: 10),
-          ],
-          FloatingActionButton(
-            heroTag: 'bubble-main',
-            onPressed: onToggle,
-            tooltip: expanded ? context.l10n.close : context.l10n.quickActions,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
-              transitionBuilder: (child, animation) =>
-                  ScaleTransition(scale: animation, child: child),
-              child: Icon(
-                expanded
-                    ? Icons.keyboard_arrow_down_rounded
-                    : Icons.bolt_rounded,
-                key: ValueKey(expanded),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
