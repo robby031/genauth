@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:genauth/screens/panic/panic_corrupted_screen.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
@@ -82,13 +81,9 @@ class _PinScreenState extends State<PinScreen> {
         'auth_pin_panic_trigger',
         status: 'critical',
       );
-      await storage.triggerPanicDestruct();
+      await storage.activateDecoyVaultForDuress();
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const PanicCorruptedScreen()),
-        (_) => false,
-      );
+      Navigator.pop(context, true);
       return;
     }
 
@@ -99,6 +94,7 @@ class _PinScreenState extends State<PinScreen> {
     );
     if (!mounted) return;
     if (ok) {
+      await storage.activateRealVault();
       Navigator.pop(context, true);
     } else {
       setState(() {

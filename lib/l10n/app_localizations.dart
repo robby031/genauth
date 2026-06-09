@@ -410,7 +410,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.'**
+  /// **'Use lock, PIN, or Decoy PIN for protection, and keep backups ready with Backup & Restore.'**
   String get onboardingGuideDesc3;
 
   /// No description provided for @onboardingDone.
@@ -956,74 +956,56 @@ abstract class AppLocalizations {
   /// No description provided for @setPanicPinOption.
   ///
   /// In en, this message translates to:
-  /// **'Set Panic PIN'**
+  /// **'Set Decoy PIN'**
   String get setPanicPinOption;
 
   /// No description provided for @removePanicPinOption.
   ///
   /// In en, this message translates to:
-  /// **'Remove Panic PIN'**
+  /// **'Remove Decoy PIN'**
   String get removePanicPinOption;
 
   /// No description provided for @panicPinOptionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Emergency self-destruct PIN'**
+  /// **'Emergency decoy-vault PIN'**
   String get panicPinOptionSubtitle;
 
   /// No description provided for @panicPinRemoved.
   ///
   /// In en, this message translates to:
-  /// **'Panic PIN removed'**
+  /// **'Decoy PIN removed'**
   String get panicPinRemoved;
 
   /// No description provided for @panicPinSetupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Set Panic PIN'**
+  /// **'Set Decoy PIN'**
   String get panicPinSetupTitle;
 
   /// No description provided for @panicPinConfirmTitle.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Panic PIN'**
+  /// **'Confirm Decoy PIN'**
   String get panicPinConfirmTitle;
 
   /// No description provided for @panicPinSetupDesc.
   ///
   /// In en, this message translates to:
-  /// **'This emergency PIN will wipe all OTP data when used'**
+  /// **'This emergency PIN opens a decoy vault when used'**
   String get panicPinSetupDesc;
 
   /// No description provided for @panicPinConfirmDesc.
   ///
   /// In en, this message translates to:
-  /// **'Enter the same Panic PIN again to confirm'**
+  /// **'Enter the same Decoy PIN again to confirm'**
   String get panicPinConfirmDesc;
 
   /// No description provided for @panicPinSaved.
   ///
   /// In en, this message translates to:
-  /// **'Panic PIN set successfully'**
+  /// **'Decoy PIN set successfully'**
   String get panicPinSaved;
-
-  /// No description provided for @panicCorruptedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Database Error'**
-  String get panicCorruptedTitle;
-
-  /// No description provided for @panicCorruptedDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'The app cannot load local data due to a storage integrity failure.'**
-  String get panicCorruptedDesc;
-
-  /// No description provided for @panicCorruptedHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'Please restore from an available backup or reinstall the application.'**
-  String get panicCorruptedHelp;
 
   /// No description provided for @quickActions.
   ///

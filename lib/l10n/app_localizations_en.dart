@@ -169,7 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGuideTitle3 => 'Protect and Recover Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.';
+  String get onboardingGuideDesc3 => 'Use lock, PIN, or Decoy PIN for protection, and keep backups ready with Backup & Restore.';
 
   @override
   String get onboardingDone => 'Done';
@@ -472,40 +472,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removePinOption => 'Remove PIN';
 
   @override
-  String get setPanicPinOption => 'Set Panic PIN';
+  String get setPanicPinOption => 'Set Decoy PIN';
 
   @override
-  String get removePanicPinOption => 'Remove Panic PIN';
+  String get removePanicPinOption => 'Remove Decoy PIN';
 
   @override
-  String get panicPinOptionSubtitle => 'Emergency self-destruct PIN';
+  String get panicPinOptionSubtitle => 'Emergency decoy-vault PIN';
 
   @override
-  String get panicPinRemoved => 'Panic PIN removed';
+  String get panicPinRemoved => 'Decoy PIN removed';
 
   @override
-  String get panicPinSetupTitle => 'Set Panic PIN';
+  String get panicPinSetupTitle => 'Set Decoy PIN';
 
   @override
-  String get panicPinConfirmTitle => 'Confirm Panic PIN';
+  String get panicPinConfirmTitle => 'Confirm Decoy PIN';
 
   @override
-  String get panicPinSetupDesc => 'This emergency PIN will wipe all OTP data when used';
+  String get panicPinSetupDesc => 'This emergency PIN opens a decoy vault when used';
 
   @override
-  String get panicPinConfirmDesc => 'Enter the same Panic PIN again to confirm';
+  String get panicPinConfirmDesc => 'Enter the same Decoy PIN again to confirm';
 
   @override
-  String get panicPinSaved => 'Panic PIN set successfully';
-
-  @override
-  String get panicCorruptedTitle => 'Database Error';
-
-  @override
-  String get panicCorruptedDesc => 'The app cannot load local data due to a storage integrity failure.';
-
-  @override
-  String get panicCorruptedHelp => 'Please restore from an available backup or reinstall the application.';
+  String get panicPinSaved => 'Decoy PIN set successfully';
 
   @override
   String get quickActions => 'Quick Actions';

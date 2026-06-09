@@ -15,12 +15,15 @@ class StorageService {
   factory StorageService() => instance;
 
   static const _key = 'genauth_accounts';
+  static const _decoyKey = 'genauth_accounts_decoy';
+  static const _activeVaultKey = 'genauth_active_vault';
+  static const _vaultReal = 'real';
+  static const _vaultDecoy = 'decoy';
   static const _onboardingKey = 'genauth_onboarding_done';
   static const _pinHashKey = 'genauth_pin_hash';
   static const _pinSaltKey = 'genauth_pin_salt';
   static const _panicPinHashKey = 'genauth_panic_pin_hash';
   static const _panicPinSaltKey = 'genauth_panic_pin_salt';
-  static const _panicTriggeredKey = 'genauth_panic_triggered';
   static const _googleProfileKey = 'genauth_google_profile';
   static const _autoBackupEnabledKey = 'genauth_auto_backup_enabled';
   static const _autoBackupIntervalKey = 'genauth_auto_backup_interval';
@@ -37,14 +40,43 @@ class StorageService {
   );
 
   Future<List<OtpAccount>> loadAccounts() async {
-    final raw = await _storage.read(key: _key);
+    final raw = await _storage.read(key: await _accountsKeyForActiveVault());
     if (raw == null || raw.isEmpty) return [];
     return OtpAccount.listFromJson(raw);
   }
 
   Future<void> saveAccounts(List<OtpAccount> accounts) async {
-    await _storage.write(key: _key, value: OtpAccount.listToJson(accounts));
+    await _storage.write(
+      key: await _accountsKeyForActiveVault(),
+      value: OtpAccount.listToJson(accounts),
+    );
     unawaited(AndroidAutofillSyncService.syncAccounts(accounts));
+  }
+
+  Future<bool> isDecoyVaultActive() async {
+    return (await _activeVault()) == _vaultDecoy;
+  }
+
+  Future<void> activateRealVault() async {
+    await _setActiveVault(_vaultReal);
+    await _syncAutofillForActiveVault();
+  }
+
+  Future<void> activateDecoyVault({bool seedIfEmpty = true}) async {
+    await _setActiveVault(_vaultDecoy);
+    if (seedIfEmpty) {
+      await _seedDecoyAccountsIfEmpty();
+    }
+    await _syncAutofillForActiveVault();
+  }
+
+  Future<void> activateDecoyVaultForDuress() async {
+    await activateDecoyVault();
+    await AuditLogService.instance.log(
+      'panic_pin_duress_activated',
+      status: 'critical',
+      detail: 'Switched to decoy vault using emergency PIN.',
+    );
   }
 
   Future<void> addAccount(OtpAccount account) async {
@@ -159,22 +191,66 @@ class StorageService {
     await AuditLogService.instance.log('panic_pin_removed');
   }
 
-  Future<bool> isPanicTriggered() async {
-    final raw = await _storage.read(key: _panicTriggeredKey);
-    return raw == 'true';
+  Future<String> _activeVault() async {
+    final raw = await _storage.read(key: _activeVaultKey);
+    if (raw == _vaultDecoy) return _vaultDecoy;
+    return _vaultReal;
   }
 
-  Future<void> triggerPanicDestruct() async {
-    await AuditLogService.instance.log(
-      'panic_destruct_triggered',
-      status: 'critical',
-      detail: 'All local OTP data was wiped by panic PIN trigger.',
+  Future<void> _setActiveVault(String vault) async {
+    await _storage.write(key: _activeVaultKey, value: vault);
+  }
+
+  Future<String> _accountsKeyForActiveVault() async {
+    return (await _activeVault()) == _vaultDecoy ? _decoyKey : _key;
+  }
+
+  Future<void> _syncAutofillForActiveVault() async {
+    final accounts = await loadAccounts();
+    unawaited(AndroidAutofillSyncService.syncAccounts(accounts));
+  }
+
+  Future<void> _seedDecoyAccountsIfEmpty() async {
+    final raw = await _storage.read(key: _decoyKey);
+    if (raw != null && raw.isNotEmpty) {
+      final existing = OtpAccount.listFromJson(raw);
+      if (existing.isNotEmpty) return;
+    }
+
+    final dummyAccounts = <OtpAccount>[
+      OtpAccount(
+        id: OtpAccount.newId(),
+        issuer: 'GitHub',
+        label: 'ops@acme.dev',
+        secretB32: 'JBSWY3DPEHPK3PXP',
+        digits: 6,
+        period: 30,
+        tags: const ['work', 'domain:github.com'],
+      ),
+      OtpAccount(
+        id: OtpAccount.newId(),
+        issuer: 'Google',
+        label: 'admin@acme.dev',
+        secretB32: 'JBSWY3DPEHPK3PXQ',
+        digits: 6,
+        period: 30,
+        tags: const ['infra', 'domain:accounts.google.com'],
+      ),
+      OtpAccount(
+        id: OtpAccount.newId(),
+        issuer: 'AWS',
+        label: 'root@acme.dev',
+        secretB32: 'JBSWY3DPEHPK3PXR',
+        digits: 6,
+        period: 30,
+        tags: const ['cloud', 'domain:signin.aws.amazon.com'],
+      ),
+    ];
+
+    await _storage.write(
+      key: _decoyKey,
+      value: OtpAccount.listToJson(dummyAccounts),
     );
-    await _storage.delete(key: _key);
-    unawaited(AndroidAutofillSyncService.clearAccounts());
-    await clearPin();
-    await clearPanicPin();
-    await _storage.write(key: _panicTriggeredKey, value: 'true');
   }
 
   static Future<List<int>> _hashPin(String pin, List<int> salt) async {

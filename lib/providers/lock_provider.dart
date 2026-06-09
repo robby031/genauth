@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/auth_service.dart';
+import 'package:genauth/services/storage_service.dart';
 
 final lockProvider = AutoDisposeNotifierProvider<LockNotifier, LockState>(
   LockNotifier.new,
@@ -49,6 +50,10 @@ class LockNotifier extends AutoDisposeNotifier<LockState> {
       'auth_biometric_result',
       status: ok ? 'success' : 'failed',
     );
+
+    if (ok) {
+      await StorageService.instance.activateRealVault();
+    }
 
     return ok;
   }

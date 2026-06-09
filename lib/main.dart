@@ -11,7 +11,6 @@ import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/screens/onboarding/onboarding_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
-import 'package:genauth/screens/panic/panic_corrupted_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
 
@@ -81,9 +80,8 @@ class _GenAuthAppState extends ConsumerState<GenAuthApp>
   Future<void> _armLockOnBackground() async {
     final onboardingDone = await StorageService.instance
         .isOnboardingCompleted();
-    final panicTriggered = await StorageService.instance.isPanicTriggered();
     if (!mounted) return;
-    if (!onboardingDone || panicTriggered) {
+    if (!onboardingDone) {
       return;
     }
     if (ref.read(isLockScreenVisibleProvider)) {
@@ -202,12 +200,11 @@ class _AppEntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<_AppEntryState>(
+    return FutureBuilder<bool>(
       future: () async {
         final storage = StorageService.instance;
-        final panic = await storage.isPanicTriggered();
         final onboardingDone = await storage.isOnboardingCompleted();
-        return _AppEntryState(panic: panic, onboardingDone: onboardingDone);
+        return onboardingDone;
       }(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -216,12 +213,8 @@ class _AppEntryScreen extends StatelessWidget {
           );
         }
 
-        final entry = snapshot.data!;
-        if (entry.panic) {
-          return const PanicCorruptedScreen();
-        }
-
-        if (!entry.onboardingDone) {
+        final onboardingDone = snapshot.data!;
+        if (!onboardingDone) {
           return const OnboardingScreen();
         }
 
@@ -229,11 +222,4 @@ class _AppEntryScreen extends StatelessWidget {
       },
     );
   }
-}
-
-class _AppEntryState {
-  const _AppEntryState({required this.panic, required this.onboardingDone});
-
-  final bool panic;
-  final bool onboardingDone;
 }
