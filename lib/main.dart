@@ -8,7 +8,7 @@ import 'package:genauth/services/app_lock_state.dart';
 import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
-import 'package:genauth/screens/onboarding_screen.dart';
+import 'package:genauth/screens/onboarding/onboarding_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/screens/panic_corrupted_screen.dart';
 

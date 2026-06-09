@@ -8,7 +8,7 @@ import 'package:genauth/screens/add_account/add_account_screen.dart';
 import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/screens/drawer/drawer_screen.dart';
-import 'package:genauth/screens/onboarding_screen.dart';
+import 'package:genauth/screens/onboarding/onboarding_screen.dart';
 import 'package:genauth/repositories/otp_repository.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
