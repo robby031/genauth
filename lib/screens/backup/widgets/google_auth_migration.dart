@@ -4,7 +4,7 @@ import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/add_account/add_account_screen.dart';
-import 'package:genauth/screens/google_auth_export_screen.dart';
+import 'package:genauth/screens/google_export/google_auth_export_screen.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
 class GoogleAuthMigration extends StatefulWidget {
