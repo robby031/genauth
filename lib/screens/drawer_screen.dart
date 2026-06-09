@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:genauth/screens/audit_log_screen.dart';
-import 'package:genauth/screens/backup_screen.dart';
+import 'package:genauth/screens/audit/audit_log_screen.dart';
+import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/locale_service.dart';
@@ -342,7 +342,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
           children: [
             const _DrawerHeaderCard(),
             const SizedBox(height: 10),
-            _SectionGroup(title: l10n.drawerSectionSecurity, children: securityItems),
+            _SectionGroup(
+              title: l10n.drawerSectionSecurity,
+              children: securityItems,
+            ),
             _SectionGroup(title: l10n.drawerSectionData, children: dataItems),
             _SectionGroup(title: l10n.drawerSectionApp, children: appItems),
             const SizedBox(height: 12),
@@ -475,7 +478,10 @@ class _MenuTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: ListTile(
           dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 2,
+          ),
           minLeadingWidth: 20,
           visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
           shape: RoundedRectangleBorder(
@@ -504,10 +510,7 @@ class _MenuTile extends StatelessWidget {
 }
 
 class _DrawerFooter extends StatelessWidget {
-  const _DrawerFooter({
-    required this.appVersion,
-    required this.onOpenGithub,
-  });
+  const _DrawerFooter({required this.appVersion, required this.onOpenGithub});
 
   final String appVersion;
   final VoidCallback onOpenGithub;
@@ -527,10 +530,7 @@ class _DrawerFooter extends StatelessWidget {
                 AppAssets.githubSvg,
                 width: 18,
                 height: 18,
-                colorFilter: ColorFilter.mode(
-                  scheme.primary,
-                  BlendMode.srcIn,
-                ),
+                colorFilter: ColorFilter.mode(scheme.primary, BlendMode.srcIn),
               ),
             ),
           ],
