@@ -32,7 +32,7 @@ class AddMethod extends StatelessWidget {
                   color: scheme.primaryContainer,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: scheme.primary),
+                child: Icon(icon, color: scheme.onPrimary),
               ),
               const SizedBox(width: 14),
               Expanded(
