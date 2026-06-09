@@ -95,6 +95,7 @@ class _PinScreenState extends State<PinScreen> {
     if (!mounted) return;
     if (ok) {
       await storage.activateRealVault();
+      if (!mounted) return;
       Navigator.pop(context, true);
     } else {
       setState(() {
