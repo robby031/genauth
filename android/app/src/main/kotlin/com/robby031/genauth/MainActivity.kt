@@ -1,6 +1,5 @@
 package com.robby031.genauth
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -77,10 +76,10 @@ class MainActivity : FlutterActivity() {
 			return false
 		}
 
-		val component = ComponentName(this, GenAuthAutofillService::class.java)
+		val packageUri = Uri.parse("package:$packageName")
 
 		val requestIntent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
-			putExtra(Settings.EXTRA_AUTOFILL_SERVICE_COMPONENT_NAME, component)
+			data = packageUri
 			addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 		}
 
@@ -89,8 +88,7 @@ class MainActivity : FlutterActivity() {
 			return true
 		}
 
-		val fallbackIntent = Intent("android.settings.AUTOFILL_SETTINGS").apply {
-			data = Uri.parse("package:$packageName")
+		val fallbackIntent = Intent(Settings.ACTION_SETTINGS).apply {
 			addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 		}
 

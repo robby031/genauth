@@ -137,8 +137,9 @@ class GenAuthAutofillService : AutofillService() {
             parsed.webDomain = node.webDomain
         }
 
-        if (isOtpCandidate(node) && node.autofillId != null) {
-            parsed.otpFieldIds.add(node.autofillId)
+        val fieldId = node.autofillId
+        if (fieldId != null && isOtpCandidate(node)) {
+            parsed.otpFieldIds.add(fieldId)
         }
 
         for (i in 0 until node.childCount) {
