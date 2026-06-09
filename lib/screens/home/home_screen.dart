@@ -9,12 +9,12 @@ import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/screens/drawer/drawer_screen.dart';
 import 'package:genauth/screens/onboarding/onboarding_screen.dart';
+import 'package:genauth/screens/profile/profile_screen.dart';
+import 'package:genauth/providers/google_account_provider.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
-import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/widgets/snack_message.dart';
 import 'widgets/smart_floating.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -100,40 +100,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Future<void> _signOut() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.driveBackupSignOut),
-        content: Text(
-          context.l10n.driveBackupSignedInAs(
-            GoogleAccountService.instance.currentUser?.email ?? '',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(context.l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(context.l10n.driveBackupSignOut),
-          ),
-        ],
-      ),
+  Future<void> _openProfile() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProfileScreen()),
     );
-
-    if (confirmed == true) {
-      await AuditLogService.instance.log('google_logout');
-      await GoogleAccountService.instance.signOut();
-      if (!mounted) return;
-      SnackMessage.show(
-        context,
-        context.l10n.driveBackupSignOut,
-        icon: Icons.cloud_off_rounded,
-        backgroundColor: Colors.blueGrey.shade600,
-      );
-    }
   }
 
   void _toggleBubble() {
@@ -150,6 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
+    final googleUser = ref.watch(googleAccountUserProvider);
 
     final scheme = Theme.of(context).colorScheme;
     final filtered = homeState.filteredAccounts;
@@ -262,45 +234,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
           else ...[
             IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
-            ValueListenableBuilder(
-              valueListenable: GoogleAccountService.instance.userNotifier,
-              builder: (context, user, _) {
-                if (user == null || user.photoUrl == null) {
-                  return const SizedBox.shrink();
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: GestureDetector(
-                    onTap: _signOut,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                          width: 1,
-                        ),
+            if (googleUser != null && googleUser.photoUrl != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: GestureDetector(
+                  onTap: _openProfile,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                        width: 1,
                       ),
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.transparent,
-                        child: ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: user.photoUrl!,
-                            placeholder: (context, url) =>
-                                const Icon(Icons.account_circle, size: 32),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.account_circle, size: 32),
-                            fit: BoxFit.cover,
-                            width: 32,
-                            height: 32,
-                          ),
+                    ),
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.transparent,
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: googleUser.photoUrl!,
+                          placeholder: (context, url) =>
+                              const Icon(Icons.account_circle, size: 32),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.account_circle, size: 32),
+                          fit: BoxFit.cover,
+                          width: 32,
+                          height: 32,
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
           ],
         ],
       ),

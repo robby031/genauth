@@ -5,7 +5,7 @@ import 'package:genauth/services/google_auth_migration_service.dart';
 import 'package:genauth/services/otp_service.dart';
 import 'package:genauth/services/storage_service.dart';
 
-final storageServiceProvider = Provider<StorageService>((ref) {
+final addAccountStorageServiceProvider = Provider<StorageService>((ref) {
   return StorageService.instance;
 });
 
@@ -38,7 +38,7 @@ class AddAccountNotifier extends AutoDisposeNotifier<AddAccountState> {
 
   Future<int> saveFromQrCode(String code) async {
     final migration = ref.read(googleAuthMigrationServiceProvider);
-    final storage = ref.read(storageServiceProvider);
+    final storage = ref.read(addAccountStorageServiceProvider);
 
     final accounts = await migration.decodeAccounts(code);
     final imported = await storage.addAccountsUnique(accounts);
@@ -75,7 +75,7 @@ class AddAccountNotifier extends AutoDisposeNotifier<AddAccountState> {
         isHotp: isHotp,
       );
 
-      await ref.read(storageServiceProvider).addAccount(account);
+      await ref.read(addAccountStorageServiceProvider).addAccount(account);
       await AuditLogService.instance.log(
         'account_add_manual',
         metadata: {

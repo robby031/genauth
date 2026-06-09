@@ -96,7 +96,9 @@ class HomeNotifier extends AutoDisposeNotifier<HomeState> {
     });
 
     _startTicker();
-    unawaited(loadAndRefresh());
+    Future<void>(() async {
+      await loadAndRefresh();
+    });
 
     return HomeState();
   }

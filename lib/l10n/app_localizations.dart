@@ -410,7 +410,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideDesc3.
   ///
   /// In en, this message translates to:
-  /// **'Use lock, PIN, or Panic PIN for protection, and keep backups ready with Backup & Restore.'**
+  /// **'Use lock, PIN, or Decoy PIN for protection, and keep backups ready with Backup & Restore.'**
   String get onboardingGuideDesc3;
 
   /// No description provided for @onboardingDone.
@@ -956,74 +956,56 @@ abstract class AppLocalizations {
   /// No description provided for @setPanicPinOption.
   ///
   /// In en, this message translates to:
-  /// **'Set Panic PIN'**
+  /// **'Set Decoy PIN'**
   String get setPanicPinOption;
 
   /// No description provided for @removePanicPinOption.
   ///
   /// In en, this message translates to:
-  /// **'Remove Panic PIN'**
+  /// **'Remove Decoy PIN'**
   String get removePanicPinOption;
 
   /// No description provided for @panicPinOptionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Emergency self-destruct PIN'**
+  /// **'Emergency decoy-vault PIN'**
   String get panicPinOptionSubtitle;
 
   /// No description provided for @panicPinRemoved.
   ///
   /// In en, this message translates to:
-  /// **'Panic PIN removed'**
+  /// **'Decoy PIN removed'**
   String get panicPinRemoved;
 
   /// No description provided for @panicPinSetupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Set Panic PIN'**
+  /// **'Set Decoy PIN'**
   String get panicPinSetupTitle;
 
   /// No description provided for @panicPinConfirmTitle.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Panic PIN'**
+  /// **'Confirm Decoy PIN'**
   String get panicPinConfirmTitle;
 
   /// No description provided for @panicPinSetupDesc.
   ///
   /// In en, this message translates to:
-  /// **'This emergency PIN will wipe all OTP data when used'**
+  /// **'This emergency PIN opens a decoy vault when used'**
   String get panicPinSetupDesc;
 
   /// No description provided for @panicPinConfirmDesc.
   ///
   /// In en, this message translates to:
-  /// **'Enter the same Panic PIN again to confirm'**
+  /// **'Enter the same Decoy PIN again to confirm'**
   String get panicPinConfirmDesc;
 
   /// No description provided for @panicPinSaved.
   ///
   /// In en, this message translates to:
-  /// **'Panic PIN set successfully'**
+  /// **'Decoy PIN set successfully'**
   String get panicPinSaved;
-
-  /// No description provided for @panicCorruptedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Database Error'**
-  String get panicCorruptedTitle;
-
-  /// No description provided for @panicCorruptedDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'The app cannot load local data due to a storage integrity failure.'**
-  String get panicCorruptedDesc;
-
-  /// No description provided for @panicCorruptedHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'Please restore from an available backup or reinstall the application.'**
-  String get panicCorruptedHelp;
 
   /// No description provided for @quickActions.
   ///
@@ -1205,6 +1187,12 @@ abstract class AppLocalizations {
   /// **'Edit Tags'**
   String get editTags;
 
+  /// No description provided for @tagDomainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: add domain mapping tags like domain:github.com or host:accounts.google.com for Android OTP autofill.'**
+  String get tagDomainHint;
+
   /// No description provided for @tagHint.
   ///
   /// In en, this message translates to:
@@ -1240,6 +1228,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String versionLabel(Object version);
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @profileRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh profile'**
+  String get profileRefresh;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @profileSectionGoogleAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Account'**
+  String get profileSectionGoogleAccount;
+
+  /// No description provided for @profileDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get profileDisplayName;
+
+  /// No description provided for @profileGivenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Given name'**
+  String get profileGivenName;
+
+  /// No description provided for @profileFamilyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Family name'**
+  String get profileFamilyName;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @profileLocale.
+  ///
+  /// In en, this message translates to:
+  /// **'Locale'**
+  String get profileLocale;
+
+  /// No description provided for @profileGoogleId.
+  ///
+  /// In en, this message translates to:
+  /// **'Google ID'**
+  String get profileGoogleId;
+
+  /// No description provided for @profileNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'-'**
+  String get profileNotAvailable;
+
+  /// No description provided for @profileSignInPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google to view your profile.'**
+  String get profileSignInPrompt;
+
+  /// No description provided for @autofillServiceMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill Service'**
+  String get autofillServiceMenu;
+
+  /// No description provided for @autofillServiceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable GenAuth OTP autofill in Android settings'**
+  String get autofillServiceSubtitle;
+
+  /// No description provided for @autofillServiceOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open Android Autofill settings on this device.'**
+  String get autofillServiceOpenFailed;
+
+  /// No description provided for @autofillDomainMappedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill domain mapped'**
+  String get autofillDomainMappedStatus;
+
+  /// No description provided for @autofillDomainNotMappedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill domain not mapped'**
+  String get autofillDomainNotMappedStatus;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

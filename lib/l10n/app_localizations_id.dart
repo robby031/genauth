@@ -169,7 +169,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingGuideTitle3 => 'Lindungi dan Pulihkan Data';
 
   @override
-  String get onboardingGuideDesc3 => 'Gunakan lock, PIN, atau Panic PIN untuk perlindungan, dan siapkan cadangan lewat Backup & Restore.';
+  String get onboardingGuideDesc3 => 'Gunakan lock, PIN, atau Decoy PIN untuk perlindungan, dan siapkan cadangan lewat Backup & Restore.';
 
   @override
   String get onboardingDone => 'Selesai';
@@ -472,40 +472,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get removePinOption => 'Hapus PIN';
 
   @override
-  String get setPanicPinOption => 'Atur Panic PIN';
+  String get setPanicPinOption => 'Atur Decoy PIN';
 
   @override
-  String get removePanicPinOption => 'Hapus Panic PIN';
+  String get removePanicPinOption => 'Hapus Decoy PIN';
 
   @override
-  String get panicPinOptionSubtitle => 'PIN darurat penghancur data';
+  String get panicPinOptionSubtitle => 'PIN darurat ke vault umpan';
 
   @override
-  String get panicPinRemoved => 'Panic PIN dihapus';
+  String get panicPinRemoved => 'Decoy PIN dihapus';
 
   @override
-  String get panicPinSetupTitle => 'Atur Panic PIN';
+  String get panicPinSetupTitle => 'Atur Decoy PIN';
 
   @override
-  String get panicPinConfirmTitle => 'Konfirmasi Panic PIN';
+  String get panicPinConfirmTitle => 'Konfirmasi Decoy PIN';
 
   @override
-  String get panicPinSetupDesc => 'PIN darurat ini akan menghapus seluruh data OTP saat dipakai';
+  String get panicPinSetupDesc => 'PIN darurat ini akan membuka vault umpan saat dipakai';
 
   @override
-  String get panicPinConfirmDesc => 'Masukkan ulang Panic PIN yang sama untuk konfirmasi';
+  String get panicPinConfirmDesc => 'Masukkan ulang Decoy PIN yang sama untuk konfirmasi';
 
   @override
-  String get panicPinSaved => 'Panic PIN berhasil disimpan';
-
-  @override
-  String get panicCorruptedTitle => 'Kesalahan Database';
-
-  @override
-  String get panicCorruptedDesc => 'Aplikasi tidak dapat memuat data lokal karena kerusakan integritas penyimpanan.';
-
-  @override
-  String get panicCorruptedHelp => 'Silakan pulihkan dari backup yang tersedia atau instal ulang aplikasi.';
+  String get panicPinSaved => 'Decoy PIN berhasil disimpan';
 
   @override
   String get quickActions => 'Aksi Cepat';
@@ -598,6 +589,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get editTags => 'Edit Tag';
 
   @override
+  String get tagDomainHint => 'Tips: tambahkan tag mapping domain seperti domain:github.com atau host:accounts.google.com untuk autofill OTP Android.';
+
+  @override
   String get tagHint => 'Nama tag...';
 
   @override
@@ -616,4 +610,55 @@ class AppLocalizationsId extends AppLocalizations {
   String versionLabel(Object version) {
     return 'Versi $version';
   }
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileRefresh => 'Muat ulang profil';
+
+  @override
+  String get profileUpdated => 'Profil berhasil diperbarui';
+
+  @override
+  String get profileSectionGoogleAccount => 'Akun Google';
+
+  @override
+  String get profileDisplayName => 'Nama tampilan';
+
+  @override
+  String get profileGivenName => 'Nama depan';
+
+  @override
+  String get profileFamilyName => 'Nama belakang';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profileLocale => 'Lokal';
+
+  @override
+  String get profileGoogleId => 'ID Google';
+
+  @override
+  String get profileNotAvailable => '-';
+
+  @override
+  String get profileSignInPrompt => 'Masuk dengan Google untuk melihat profil Anda.';
+
+  @override
+  String get autofillServiceMenu => 'Layanan Autofill';
+
+  @override
+  String get autofillServiceSubtitle => 'Aktifkan autofill OTP GenAuth di pengaturan Android';
+
+  @override
+  String get autofillServiceOpenFailed => 'Tidak dapat membuka pengaturan Autofill Android di perangkat ini.';
+
+  @override
+  String get autofillDomainMappedStatus => 'Domain autofill sudah dipetakan';
+
+  @override
+  String get autofillDomainNotMappedStatus => 'Domain autofill belum dipetakan';
 }

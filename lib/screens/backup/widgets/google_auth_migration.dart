@@ -1,24 +1,27 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:genauth/services/audit_log_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/audit_log_provider.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/screens/add_account/add_account_screen.dart';
 import 'package:genauth/screens/google_export/google_auth_export_screen.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
-class GoogleAuthMigration extends StatefulWidget {
+class GoogleAuthMigration extends ConsumerStatefulWidget {
   const GoogleAuthMigration({super.key});
 
   @override
-  State<GoogleAuthMigration> createState() => _GoogleAuthMigrationState();
+  ConsumerState<GoogleAuthMigration> createState() =>
+      _GoogleAuthMigrationState();
 }
 
-class _GoogleAuthMigrationState extends State<GoogleAuthMigration> {
+class _GoogleAuthMigrationState extends ConsumerState<GoogleAuthMigration> {
   bool _loading = false;
 
   Future<void> _openImport() async {
-    await AuditLogService.instance.log('google_auth_import_opened');
+    final audit = ref.read(auditLogProvider);
+    await audit.log('google_auth_import_opened');
     if (!mounted) return;
     await Navigator.push<bool>(
       context,
@@ -30,12 +33,13 @@ class _GoogleAuthMigrationState extends State<GoogleAuthMigration> {
 
   Future<void> _openExport() async {
     setState(() => _loading = true);
-    await AuditLogService.instance.log('google_auth_export_attempt');
+    final audit = ref.read(auditLogProvider);
+    await audit.log('google_auth_export_attempt');
     try {
       final accounts = await StorageService().loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
-        await AuditLogService.instance.log(
+        await audit.log(
           'google_auth_export_blocked',
           status: 'failed',
           detail: 'no_accounts',
@@ -56,7 +60,7 @@ class _GoogleAuthMigrationState extends State<GoogleAuthMigration> {
           builder: (_) => GoogleAuthExportScreen(accounts: accounts),
         ),
       );
-      await AuditLogService.instance.log(
+      await audit.log(
         'google_auth_export_opened',
         metadata: {'accountCount': accounts.length},
       );

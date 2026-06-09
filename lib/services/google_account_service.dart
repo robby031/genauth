@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:googleapis/people/v1.dart' as people;
 import 'package:http/http.dart' as http;
 
 import 'package:genauth/services/storage_service.dart';
@@ -14,8 +15,13 @@ class GoogleAccountService {
       '392835116040-advgd18jo7241m66fb33ovj4nfaffpfc.apps.googleusercontent.com';
 
   static const String _driveScope = drive.DriveApi.driveAppdataScope;
+  static const String _profileScope =
+      'https://www.googleapis.com/auth/userinfo.profile';
+  static const String _emailScope =
+      'https://www.googleapis.com/auth/userinfo.email';
   static const String _appDataSpace = 'appDataFolder';
   static const List<String> _driveScopes = [_driveScope];
+  static const List<String> _profileScopes = [_profileScope, _emailScope];
 
   bool _initialized = false;
   Future<void>? _initializing;
@@ -39,7 +45,9 @@ class GoogleAccountService {
     return _initializing!;
   }
 
-  Future<void> _initializeInternal({required bool restorePreviousSignIn}) async {
+  Future<void> _initializeInternal({
+    required bool restorePreviousSignIn,
+  }) async {
     final signIn = GoogleSignIn.instance;
     await signIn.initialize(serverClientId: _serverClientId);
 
@@ -68,12 +76,82 @@ class GoogleAccountService {
   }
 
   Future<void> _persistProfile(GoogleSignInAccount user) async {
+    final peopleProfile = await _fetchPeopleProfile(user);
+
     await StorageService.instance.saveGoogleProfile(
-      email: user.email,
-      displayName: user.displayName,
-      photoUrl: user.photoUrl,
-      googleId: user.id,
+      email: peopleProfile?.email ?? user.email,
+      displayName: peopleProfile?.displayName ?? user.displayName,
+      photoUrl: peopleProfile?.photoUrl ?? user.photoUrl,
+      googleId: peopleProfile?.googleId ?? user.id,
+      givenName: peopleProfile?.givenName,
+      familyName: peopleProfile?.familyName,
+      localeCode: peopleProfile?.localeCode,
     );
+  }
+
+  Future<_PeopleProfileData?> _fetchPeopleProfile(
+    GoogleSignInAccount user,
+  ) async {
+    try {
+      final headers = await _profileAuthHeaders(user);
+      final api = people.PeopleServiceApi(_AuthedClient(headers));
+      final person = await api.people.get(
+        'people/me',
+        personFields: 'names,emailAddresses,photos,locales,metadata',
+      );
+
+      final name = _primaryByMetadata(person.names, (n) => n.metadata);
+      final email = _primaryByMetadata(
+        person.emailAddresses,
+        (e) => e.metadata,
+      );
+      final photo = _primaryByMetadata(person.photos, (p) => p.metadata);
+      final locale = _primaryByMetadata(person.locales, (l) => l.metadata);
+
+      return _PeopleProfileData(
+        email: email?.value ?? user.email,
+        displayName: name?.displayName ?? user.displayName,
+        givenName: name?.givenName,
+        familyName: name?.familyName,
+        photoUrl: photo?.url ?? user.photoUrl,
+        googleId: person.resourceName?.replaceFirst('people/', '') ?? user.id,
+        localeCode: locale?.value,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Map<String, String>> _profileAuthHeaders(
+    GoogleSignInAccount user,
+  ) async {
+    final auth = user.authorizationClient;
+    var authz = await auth.authorizationForScopes(_profileScopes);
+    authz ??= await auth.authorizeScopes(_profileScopes);
+    final headers = await auth.authorizationHeaders(_profileScopes);
+    if (headers == null) {
+      throw const GoogleAccountException(
+        'Gagal mendapatkan token profile Google. Izin ditolak.',
+      );
+    }
+    return headers;
+  }
+
+  T? _primaryByMetadata<T>(
+    List<T>? entries,
+    people.FieldMetadata? Function(T entry) metadataOf,
+  ) {
+    if (entries == null || entries.isEmpty) {
+      return null;
+    }
+
+    for (final entry in entries) {
+      if (metadataOf(entry)?.primary == true) {
+        return entry;
+      }
+    }
+
+    return entries.first;
   }
 
   GoogleSignInAccount? get currentUser => _currentUser;
@@ -91,6 +169,15 @@ class GoogleAccountService {
     await _persistProfile(account);
     _setUser(account);
     return account;
+  }
+
+  Future<void> refreshCurrentProfile() async {
+    await ensureInitialized();
+    final user = _currentUser;
+    if (user == null) {
+      throw const GoogleAccountException('Belum sign-in ke Google.');
+    }
+    await _persistProfile(user);
   }
 
   Future<void> signOut({bool clearProfile = true}) async {
@@ -219,6 +306,26 @@ class GoogleAccountException implements Exception {
 
   @override
   String toString() => message;
+}
+
+class _PeopleProfileData {
+  const _PeopleProfileData({
+    required this.email,
+    required this.displayName,
+    required this.givenName,
+    required this.familyName,
+    required this.photoUrl,
+    required this.googleId,
+    required this.localeCode,
+  });
+
+  final String email;
+  final String? displayName;
+  final String? givenName;
+  final String? familyName;
+  final String? photoUrl;
+  final String? googleId;
+  final String? localeCode;
 }
 
 class _AuthedClient extends http.BaseClient {

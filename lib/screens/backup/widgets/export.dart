@@ -3,24 +3,26 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/audit_log_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/backup_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
-class Export extends StatefulWidget {
+class Export extends ConsumerStatefulWidget {
   const Export({super.key});
 
   @override
-  State<Export> createState() => _ExportState();
+  ConsumerState<Export> createState() => _ExportState();
 }
 
-class _ExportState extends State<Export> {
+class _ExportState extends ConsumerState<Export> {
   final _formKey = GlobalKey<FormState>();
   final _pwCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+
   bool _obscure1 = true;
   bool _obscure2 = true;
   bool _loading = false;
@@ -35,12 +37,19 @@ class _ExportState extends State<Export> {
   Future<void> _export() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    await AuditLogService.instance.log('backup_export_attempt');
+    final audit = ref.read(auditLogProvider);
+    await audit.log('backup_export_attempt');
 
     try {
       final accounts = await StorageService().loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
+        await audit.log(
+          'backup_export_blocked',
+          status: 'failed',
+          detail: 'no_accounts',
+        );
+        if (!mounted) return;
         SnackMessage.show(
           context,
           context.l10n.backupNoAccounts,
@@ -76,41 +85,19 @@ class _ExportState extends State<Export> {
       _formKey.currentState!.reset();
       _pwCtrl.clear();
       _confirmCtrl.clear();
-      await AuditLogService.instance.log(
+      await audit.log(
         'backup_export_success',
         metadata: {'fileName': name, 'accountCount': accounts.length},
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentMaterialBanner()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            backgroundColor: Colors.green.shade600,
-            duration: const Duration(seconds: 3),
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.l10n.backupSavedFile(name),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+      SnackMessage.show(
+        context,
+        context.l10n.backupSavedFile(name),
+        icon: Icons.check_circle,
+        backgroundColor: Colors.green.shade600,
+      );
     } catch (e) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'backup_export_failed',
         status: 'failed',
         detail: e.toString(),

@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/models/otp_account.dart';
+import 'package:genauth/providers/second_tick_provider.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/clipboard_security_service.dart';
 import 'package:genauth/services/otp_service.dart';
-import 'package:genauth/services/second_tick_service.dart';
 import 'package:genauth/widgets/service_icon.dart';
+import 'package:genauth/widgets/snack_message.dart';
 import 'package:genauth/widgets/tag_editor_sheet.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -37,6 +39,25 @@ class OtpTile extends StatefulWidget {
 class _OtpTileState extends State<OtpTile> {
   bool _revealed = false;
   Timer? _hideTimer;
+
+  bool _hasManualDomainMapping(List<String> tags) {
+    for (final rawTag in tags) {
+      final tag = rawTag.trim();
+      if (tag.isEmpty) continue;
+
+      final lower = tag.toLowerCase();
+      if (lower.startsWith('domain:') ||
+          lower.startsWith('host:') ||
+          lower.startsWith('site:') ||
+          lower.startsWith('web:')) {
+        final mapped = tag.substring(tag.indexOf(':') + 1).trim();
+        if (mapped.isNotEmpty) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   @override
   void dispose() {
@@ -75,17 +96,12 @@ class _OtpTileState extends State<OtpTile> {
       if (mounted) setState(() => _revealed = false);
     });
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentMaterialBanner()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.codeCopied),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+    SnackMessage.show(
+      context,
+      context.l10n.codeCopied,
+      icon: Icons.check_circle_outline,
+      backgroundColor: Colors.green.shade600,
+    );
   }
 
   Future<void> _openTagEditor(BuildContext context) async {
@@ -122,6 +138,7 @@ class _OtpTileState extends State<OtpTile> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final hasDomainMapping = _hasManualDomainMapping(widget.account.tags);
     return Slidable(
       key: ValueKey(widget.account.id),
       startActionPane: ActionPane(
@@ -213,6 +230,21 @@ class _OtpTileState extends State<OtpTile> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Tooltip(
+                  message: hasDomainMapping
+                      ? context.l10n.autofillDomainMappedStatus
+                      : context.l10n.autofillDomainNotMappedStatus,
+                  child: Icon(
+                    hasDomainMapping
+                        ? Icons.domain_verification_outlined
+                        : Icons.domain_disabled_outlined,
+                    size: 18,
+                    color: hasDomainMapping
+                        ? Colors.green.shade600
+                        : scheme.outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
                 if (widget.account.isHotp)
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -295,50 +327,40 @@ class _TagChipsRow extends StatelessWidget {
   }
 }
 
-class _TotpProgress extends StatefulWidget {
+class _TotpProgress extends ConsumerWidget {
   final int period;
   const _TotpProgress({required this.period});
 
   @override
-  State<_TotpProgress> createState() => _TotpProgressState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(secondTickProvider);
 
-class _TotpProgressState extends State<_TotpProgress> {
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: SecondTickService.instance.secondListenable,
-      builder: (context, _, child) {
-        final remaining = OtpService.remainingSeconds(widget.period);
-        final urgent = remaining <= 5;
-        return SizedBox(
-          width: 24,
-          height: 24,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircularProgressIndicator(
-                value: OtpService.progress(widget.period),
-                strokeWidth: 3,
-                color: urgent
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.primary,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.surfaceContainerHighest,
-              ),
-              Text(
-                '$remaining',
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: urgent ? Colors.red : null,
-                ),
-              ),
-            ],
+    final remaining = OtpService.remainingSeconds(period);
+    final urgent = remaining <= 5;
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: OtpService.progress(period),
+            strokeWidth: 3,
+            color: urgent ? Colors.red : Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest,
           ),
-        );
-      },
+          Text(
+            '$remaining',
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+              color: urgent ? Colors.red : null,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
