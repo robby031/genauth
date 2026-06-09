@@ -3,23 +3,29 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:genauth/services/audit_log_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genauth/services/backup_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
+import 'package:genauth/providers/audit_log_provider.dart';
 
 enum RestoreAction { replace, merge }
 
-class Import extends StatefulWidget {
+final importStorageServiceProvider = Provider<StorageService>((ref) {
+  return StorageService.instance;
+});
+
+class Import extends ConsumerStatefulWidget {
   const Import({super.key});
 
   @override
-  State<Import> createState() => _ImportState();
+  ConsumerState<Import> createState() => _ImportState();
 }
 
-class _ImportState extends State<Import> {
+class _ImportState extends ConsumerState<Import> {
   final _pwCtrl = TextEditingController();
+
   bool _obscure = true;
   bool _loading = false;
   String? _pickedFileName;
@@ -51,6 +57,9 @@ class _ImportState extends State<Import> {
 
   Future<void> _restore() async {
     final l10n = context.l10n;
+    final audit = ref.read(auditLogProvider);
+    final storage = ref.read(importStorageServiceProvider);
+
     if (_pickedBytes == null) {
       SnackMessage.show(
         context,
@@ -71,7 +80,7 @@ class _ImportState extends State<Import> {
     }
 
     setState(() => _loading = true);
-    await AuditLogService.instance.log('backup_restore_attempt');
+    await audit.log('backup_restore_attempt');
 
     try {
       final imported = await BackupService.import(_pickedBytes!, _pwCtrl.text);
@@ -80,10 +89,9 @@ class _ImportState extends State<Import> {
       final action = await _askMergeOrReplace(imported.length);
       if (action == null || !mounted) return;
 
-      final storage = StorageService();
       if (action == RestoreAction.replace) {
         await storage.saveAccounts(imported);
-        await AuditLogService.instance.log(
+        await audit.log(
           'backup_restore_success',
           metadata: {'mode': 'replace', 'importedCount': imported.length},
         );
@@ -95,7 +103,7 @@ class _ImportState extends State<Import> {
           ...imported.where((a) => !existingIds.contains(a.id)),
         ];
         await storage.saveAccounts(merged);
-        await AuditLogService.instance.log(
+        await audit.log(
           'backup_restore_success',
           metadata: {'mode': 'merge', 'importedCount': imported.length},
         );
@@ -136,7 +144,7 @@ class _ImportState extends State<Import> {
         _pwCtrl.clear();
       });
     } on FormatException catch (e) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'backup_restore_failed',
         status: 'failed',
         detail: e.message,
@@ -150,7 +158,7 @@ class _ImportState extends State<Import> {
         );
       }
     } catch (_) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'backup_restore_failed',
         status: 'failed',
         detail: 'wrong_password_or_corrupted_file',

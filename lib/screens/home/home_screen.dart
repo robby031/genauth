@@ -24,6 +24,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
+final googleAccountProvider = Provider((ref) => GoogleAccountService.instance);
+
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
   bool _bubbleExpanded = false;
@@ -101,14 +103,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _signOut() async {
+    final service = ref.read(googleAccountProvider);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.l10n.driveBackupSignOut),
         content: Text(
-          context.l10n.driveBackupSignedInAs(
-            GoogleAccountService.instance.currentUser?.email ?? '',
-          ),
+          context.l10n.driveBackupSignedInAs(service.currentUser?.email ?? ''),
         ),
         actions: [
           TextButton(
@@ -124,8 +125,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (confirmed == true) {
+      await service.signOut();
       await AuditLogService.instance.log('google_logout');
-      await GoogleAccountService.instance.signOut();
       if (!mounted) return;
       SnackMessage.show(
         context,

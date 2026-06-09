@@ -2,30 +2,39 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:genauth/services/audit_log_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/services/google_account_service.dart'
+    show DriveBackupFile;
 import 'package:genauth/services/auto_backup_service.dart';
 import 'package:genauth/services/backup_service.dart';
-import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 import 'package:genauth/screens/backup/widgets/import.dart';
 import 'package:genauth/screens/backup/widgets/drive_picker.dart';
 import 'package:genauth/screens/backup/widgets/dialog_pasword.dart';
+import 'package:genauth/providers/audit_log_provider.dart';
+import 'package:genauth/providers/google_account_provider.dart';
 
-class DriveBackup extends StatefulWidget {
+final storageServiceProvider = Provider<StorageService>((ref) {
+  return StorageService.instance;
+});
+
+final autoBackupServiceProvider = Provider<AutoBackupService>((ref) {
+  return AutoBackupService.instance;
+});
+
+class DriveBackup extends ConsumerStatefulWidget {
   const DriveBackup({super.key});
 
   @override
-  State<DriveBackup> createState() => _DriveBackupState();
+  ConsumerState<DriveBackup> createState() => _DriveBackupState();
 }
 
-class _DriveBackupState extends State<DriveBackup> {
-  final _service = GoogleAccountService.instance;
-  final _autoBackupService = AutoBackupService.instance;
-  final _storage = StorageService.instance;
+class _DriveBackupState extends ConsumerState<DriveBackup> {
   final _pwCtrl = TextEditingController();
   final _autoPwCtrl = TextEditingController();
+
   bool _obscure = true;
   bool _autoObscure = true;
   bool _busy = false;
@@ -49,11 +58,12 @@ class _DriveBackupState extends State<DriveBackup> {
   }
 
   Future<void> _prepareGoogleState() async {
-    final hasStoredProfile = await _storage.hasGoogleProfile();
-    if (!hasStoredProfile) {
-      return;
-    }
-    await _service.initialize(restorePreviousSignIn: true);
+    final service = ref.read(googleAccountProvider);
+    final storage = ref.read(storageServiceProvider);
+    final hasStoredProfile = await storage.hasGoogleProfile();
+    if (!mounted) return;
+    if (!hasStoredProfile) return;
+    await service.initialize(restorePreviousSignIn: true);
   }
 
   @override
@@ -64,7 +74,8 @@ class _DriveBackupState extends State<DriveBackup> {
   }
 
   Future<void> _loadAutoBackupSettings() async {
-    final settings = await _autoBackupService.loadSettings();
+    final autoBackupService = ref.read(autoBackupServiceProvider);
+    final settings = await autoBackupService.loadSettings();
     if (!mounted) return;
     _autoPwCtrl.text = settings.password ?? '';
     setState(() {
@@ -76,19 +87,18 @@ class _DriveBackupState extends State<DriveBackup> {
 
   Future<void> _signIn() async {
     setState(() => _busy = true);
-    await AuditLogService.instance.log('drive_backup_signin_attempt');
+    final audit = ref.read(auditLogProvider);
+    await audit.log('drive_backup_signin_attempt');
+    final service = ref.read(googleAccountProvider);
     try {
-      await _service.signIn();
-      await AuditLogService.instance.log('drive_backup_signin_success');
+      await service.signIn();
+      await audit.log('drive_backup_signin_success');
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
-        await AuditLogService.instance.log(
-          'drive_backup_signin_canceled',
-          status: 'failed',
-        );
+        await audit.log('drive_backup_signin_canceled', status: 'failed');
         return;
       }
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_signin_failed',
         status: 'failed',
         detail: e.code.name,
@@ -102,7 +112,7 @@ class _DriveBackupState extends State<DriveBackup> {
         );
       }
     } catch (e) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_signin_failed',
         status: 'failed',
         detail: e.toString(),
@@ -133,9 +143,11 @@ class _DriveBackupState extends State<DriveBackup> {
     }
 
     setState(() => _busy = true);
-    await AuditLogService.instance.log('drive_backup_upload_attempt');
+    final audit = ref.read(auditLogProvider);
+    await audit.log('drive_backup_upload_attempt');
     try {
-      final accounts = await StorageService().loadAccounts();
+      final storage = ref.read(storageServiceProvider);
+      final accounts = await storage.loadAccounts();
       if (!mounted) return;
       if (accounts.isEmpty) {
         SnackMessage.show(
@@ -153,12 +165,13 @@ class _DriveBackupState extends State<DriveBackup> {
           '${now.year}${_p2(now.month)}${_p2(now.day)}-${_p2(now.hour)}${_p2(now.minute)}${_p2(now.second)}';
       final fileName = 'genauth-backup-$stamp.genauth';
 
-      final uploaded = await _service.uploadBackup(
+      final service = ref.read(googleAccountProvider);
+      final uploaded = await service.uploadBackup(
         bytes: bytes,
         fileName: fileName,
       );
 
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_upload_success',
         metadata: {
           'fileName': uploaded.name,
@@ -176,7 +189,7 @@ class _DriveBackupState extends State<DriveBackup> {
         backgroundColor: Colors.green.shade600,
       );
     } catch (e) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_upload_failed',
         status: 'failed',
         detail: e.toString(),
@@ -196,9 +209,12 @@ class _DriveBackupState extends State<DriveBackup> {
 
   Future<void> _restore() async {
     final l10n = context.l10n;
+    final service = ref.read(googleAccountProvider);
+    final audit = ref.read(auditLogProvider);
+    final files = await service.listBackups();
+
     setState(() => _busy = true);
     try {
-      final files = await _service.listBackups();
       if (!mounted) return;
 
       if (files.isEmpty) {
@@ -222,19 +238,19 @@ class _DriveBackupState extends State<DriveBackup> {
       if (!mounted || password == null) return;
 
       setState(() => _busy = true);
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_restore_attempt',
         metadata: {'fileId': picked.id, 'fileName': picked.name},
       );
 
-      final bytes = await _service.downloadBackup(picked.id);
+      final bytes = await service.downloadBackup(picked.id);
       final imported = await BackupService.import(bytes, password);
       if (!mounted) return;
 
       final action = await _askMergeOrReplace(imported.length);
       if (!mounted || action == null) return;
 
-      final storage = StorageService();
+      final storage = ref.read(storageServiceProvider);
       if (action == RestoreAction.replace) {
         await storage.saveAccounts(imported);
       } else {
@@ -247,7 +263,7 @@ class _DriveBackupState extends State<DriveBackup> {
         await storage.saveAccounts(merged);
       }
 
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_restore_success',
         metadata: {
           'mode': action == RestoreAction.replace ? 'replace' : 'merge',
@@ -264,7 +280,7 @@ class _DriveBackupState extends State<DriveBackup> {
         backgroundColor: Colors.green.shade600,
       );
     } catch (e) {
-      await AuditLogService.instance.log(
+      await audit.log(
         'drive_backup_restore_failed',
         status: 'failed',
         detail: e.toString(),
@@ -284,6 +300,8 @@ class _DriveBackupState extends State<DriveBackup> {
 
   Future<void> _saveAutoBackupSettings() async {
     final l10n = context.l10n;
+    final autoBackupService = ref.read(autoBackupServiceProvider);
+
     if (_autoEnabled && _autoPwCtrl.text.length < 8) {
       SnackMessage.show(
         context,
@@ -297,12 +315,12 @@ class _DriveBackupState extends State<DriveBackup> {
     setState(() => _busy = true);
     try {
       if (_autoEnabled) {
-        await _autoBackupService.saveSettings(
+        await autoBackupService.saveSettings(
           enabled: true,
           interval: _autoInterval,
           password: _autoPwCtrl.text,
         );
-        await _autoBackupService.maybeRun(reason: 'auto_backup_enabled');
+        await autoBackupService.maybeRun(reason: 'auto_backup_enabled');
         if (!mounted) return;
         SnackMessage.show(
           context,
@@ -311,7 +329,7 @@ class _DriveBackupState extends State<DriveBackup> {
           backgroundColor: Colors.green.shade600,
         );
       } else {
-        await _autoBackupService.disable();
+        await autoBackupService.disable();
         if (!mounted) return;
         SnackMessage.show(
           context,
@@ -364,12 +382,13 @@ class _DriveBackupState extends State<DriveBackup> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
+    final googleService = ref.read(googleAccountProvider);
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: ValueListenableBuilder<GoogleSignInAccount?>(
-          valueListenable: _service.userNotifier,
+          valueListenable: googleService.userNotifier,
           builder: (context, user, _) {
             final signedIn = user != null;
             return Column(
@@ -546,6 +565,7 @@ class _SignedInTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
     final photoUrl = user.photoUrl;
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
