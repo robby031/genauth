@@ -9,7 +9,10 @@ on:
       - 'v*'
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
+
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -22,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
