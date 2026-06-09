@@ -28,6 +28,7 @@ class LockScreen extends ConsumerStatefulWidget {
 
 class _LockScreenState extends ConsumerState<LockScreen> {
   final _storage = StorageService.instance;
+  late final StateController<bool> _lockVisibility;
   bool _ready = false;
   bool _hasPin = false;
 
@@ -42,13 +43,18 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(isLockScreenVisibleProvider.notifier).state = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+    _lockVisibility = ref.read(isLockScreenVisibleProvider.notifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _lockVisibility.state = true;
+      _bootstrap();
+    });
   }
 
   @override
   void dispose() {
-    ref.read(isLockScreenVisibleProvider.notifier).state = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _lockVisibility.state = false;
+    });
     super.dispose();
   }
 
