@@ -5,7 +5,7 @@ import 'package:genauth/services/auth_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/screens/home_screen.dart';
+import 'package:genauth/screens/home/home_screen.dart';
 import 'package:genauth/screens/pin_screen.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
