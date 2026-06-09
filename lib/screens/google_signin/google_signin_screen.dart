@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:genauth/screens/lock_screen.dart';
+import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/google_account_service.dart';
 import 'package:genauth/utils/app_assets.dart';

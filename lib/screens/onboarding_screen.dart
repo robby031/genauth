@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:genauth/screens/lock_screen.dart';
+import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
