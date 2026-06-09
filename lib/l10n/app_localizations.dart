@@ -1240,6 +1240,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String versionLabel(Object version);
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @profileRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh profile'**
+  String get profileRefresh;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @profileSectionGoogleAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Account'**
+  String get profileSectionGoogleAccount;
+
+  /// No description provided for @profileDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get profileDisplayName;
+
+  /// No description provided for @profileGivenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Given name'**
+  String get profileGivenName;
+
+  /// No description provided for @profileFamilyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Family name'**
+  String get profileFamilyName;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @profileLocale.
+  ///
+  /// In en, this message translates to:
+  /// **'Locale'**
+  String get profileLocale;
+
+  /// No description provided for @profileGoogleId.
+  ///
+  /// In en, this message translates to:
+  /// **'Google ID'**
+  String get profileGoogleId;
+
+  /// No description provided for @profileNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'-'**
+  String get profileNotAvailable;
+
+  /// No description provided for @profileSignInPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google to view your profile.'**
+  String get profileSignInPrompt;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

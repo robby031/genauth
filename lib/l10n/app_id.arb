@@ -256,5 +256,17 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "profileTitle": "Profil",
+  "profileRefresh": "Muat ulang profil",
+  "profileUpdated": "Profil berhasil diperbarui",
+  "profileSectionGoogleAccount": "Akun Google",
+  "profileDisplayName": "Nama tampilan",
+  "profileGivenName": "Nama depan",
+  "profileFamilyName": "Nama belakang",
+  "profileEmail": "Email",
+  "profileLocale": "Lokal",
+  "profileGoogleId": "ID Google",
+  "profileNotAvailable": "-",
+  "profileSignInPrompt": "Masuk dengan Google untuk melihat profil Anda."
 }

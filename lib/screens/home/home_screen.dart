@@ -9,12 +9,12 @@ import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
 import 'package:genauth/screens/drawer/drawer_screen.dart';
 import 'package:genauth/screens/onboarding/onboarding_screen.dart';
+import 'package:genauth/screens/profile/profile_screen.dart';
 import 'package:genauth/providers/google_account_provider.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/utils/app_assets.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
-import 'package:genauth/widgets/snack_message.dart';
 import 'widgets/smart_floating.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -100,39 +100,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Future<void> _signOut() async {
-    final service = ref.read(googleAccountProvider);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.driveBackupSignOut),
-        content: Text(
-          context.l10n.driveBackupSignedInAs(service.currentUser?.email ?? ''),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(context.l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(context.l10n.driveBackupSignOut),
-          ),
-        ],
-      ),
+  Future<void> _openProfile() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProfileScreen()),
     );
-
-    if (confirmed == true) {
-      await service.signOut();
-      await AuditLogService.instance.log('google_logout');
-      if (!mounted) return;
-      SnackMessage.show(
-        context,
-        context.l10n.driveBackupSignOut,
-        icon: Icons.cloud_off_rounded,
-        backgroundColor: Colors.blueGrey.shade600,
-      );
-    }
   }
 
   void _toggleBubble() {
@@ -266,7 +238,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: GestureDetector(
-                  onTap: _signOut,
+                  onTap: _openProfile,
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,

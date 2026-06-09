@@ -192,12 +192,18 @@ class StorageService {
     String? displayName,
     String? photoUrl,
     String? googleId,
+    String? givenName,
+    String? familyName,
+    String? localeCode,
   }) async {
     final payload = jsonEncode({
       'email': email,
       'displayName': displayName,
       'photoUrl': photoUrl,
       'googleId': googleId,
+      'givenName': givenName,
+      'familyName': familyName,
+      'localeCode': localeCode,
     });
     await _storage.write(key: _googleProfileKey, value: payload);
   }
@@ -214,6 +220,9 @@ class StorageService {
         displayName: map['displayName'] as String?,
         photoUrl: map['photoUrl'] as String?,
         googleId: map['googleId'] as String?,
+        givenName: map['givenName'] as String?,
+        familyName: map['familyName'] as String?,
+        localeCode: map['localeCode'] as String?,
       );
     } catch (_) {
       return null;
@@ -285,12 +294,18 @@ class GoogleProfile {
     this.displayName,
     this.photoUrl,
     this.googleId,
+    this.givenName,
+    this.familyName,
+    this.localeCode,
   });
 
   final String email;
   final String? displayName;
   final String? photoUrl;
   final String? googleId;
+  final String? givenName;
+  final String? familyName;
+  final String? localeCode;
 }
 
 class AutoBackupSettings {

@@ -616,4 +616,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String versionLabel(Object version) {
     return 'Version $version';
   }
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileRefresh => 'Refresh profile';
+
+  @override
+  String get profileUpdated => 'Profile updated';
+
+  @override
+  String get profileSectionGoogleAccount => 'Google Account';
+
+  @override
+  String get profileDisplayName => 'Display name';
+
+  @override
+  String get profileGivenName => 'Given name';
+
+  @override
+  String get profileFamilyName => 'Family name';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profileLocale => 'Locale';
+
+  @override
+  String get profileGoogleId => 'Google ID';
+
+  @override
+  String get profileNotAvailable => '-';
+
+  @override
+  String get profileSignInPrompt => 'Sign in with Google to view your profile.';
 }

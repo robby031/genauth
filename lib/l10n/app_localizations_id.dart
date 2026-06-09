@@ -616,4 +616,40 @@ class AppLocalizationsId extends AppLocalizations {
   String versionLabel(Object version) {
     return 'Versi $version';
   }
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileRefresh => 'Muat ulang profil';
+
+  @override
+  String get profileUpdated => 'Profil berhasil diperbarui';
+
+  @override
+  String get profileSectionGoogleAccount => 'Akun Google';
+
+  @override
+  String get profileDisplayName => 'Nama tampilan';
+
+  @override
+  String get profileGivenName => 'Nama depan';
+
+  @override
+  String get profileFamilyName => 'Nama belakang';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profileLocale => 'Lokal';
+
+  @override
+  String get profileGoogleId => 'ID Google';
+
+  @override
+  String get profileNotAvailable => '-';
+
+  @override
+  String get profileSignInPrompt => 'Masuk dengan Google untuk melihat profil Anda.';
 }

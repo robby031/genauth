@@ -256,5 +256,17 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "profileTitle": "Profile",
+  "profileRefresh": "Refresh profile",
+  "profileUpdated": "Profile updated",
+  "profileSectionGoogleAccount": "Google Account",
+  "profileDisplayName": "Display name",
+  "profileGivenName": "Given name",
+  "profileFamilyName": "Family name",
+  "profileEmail": "Email",
+  "profileLocale": "Locale",
+  "profileGoogleId": "Google ID",
+  "profileNotAvailable": "-",
+  "profileSignInPrompt": "Sign in with Google to view your profile."
 }
