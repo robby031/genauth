@@ -25,17 +25,13 @@ jobs:
   build-and-release:
     name: Build and Publish Release
     runs-on: ubuntu-latest
-    env:
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Resolve release metadata
         id: release_meta
@@ -140,7 +136,18 @@ jobs:
           fi
 
       - name: Validate Android signing secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
         run: |
+          set -euo pipefail
+          echo "::add-mask::$ANDROID_KEYSTORE_BASE64"
+          echo "::add-mask::$ANDROID_KEYSTORE_PASSWORD"
+          echo "::add-mask::$ANDROID_KEY_ALIAS"
+          echo "::add-mask::$ANDROID_KEY_PASSWORD"
           test -n "$ANDROID_KEYSTORE_BASE64" || (echo "Missing secret: ANDROID_KEYSTORE_BASE64" && exit 1)
           test -n "$ANDROID_KEYSTORE_PASSWORD" || (echo "Missing secret: ANDROID_KEYSTORE_PASSWORD" && exit 1)
           test -n "$ANDROID_KEY_ALIAS" || (echo "Missing secret: ANDROID_KEY_ALIAS" && exit 1)
@@ -154,7 +161,9 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         shell: bash
         run: |
+          set -euo pipefail
           printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/genauth-production.jks
+          chmod 600 android/genauth-production.jks
 
           test -s android/genauth-production.jks || (echo "Decoded keystore is empty" && exit 1)
 
@@ -183,10 +192,15 @@ jobs:
           keyPassword=$ANDROID_KEY_PASSWORD
           storeType=$KEYSTORE_TYPE
           EOF
+          chmod 600 android/key.properties
 
       - name: Validate Android keystore contents
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         shell: bash
         run: |
+          set -euo pipefail
           STORE_TYPE=$(grep '^storeType=' android/key.properties | cut -d'=' -f2)
           keytool -list \
             -storetype "$STORE_TYPE" \
@@ -234,3 +248,9 @@ jobs:
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-x86_64-release.apk
             SHA256SUMS.txt
+
+      - name: Cleanup sensitive files
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          rm -f android/key.properties android/genauth-production.jks

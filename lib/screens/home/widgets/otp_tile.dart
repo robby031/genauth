@@ -139,6 +139,9 @@ class _OtpTileState extends State<OtpTile> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final hasDomainMapping = _hasManualDomainMapping(widget.account.tags);
+    final subtitle = widget.account.issuer.isNotEmpty
+        ? '${widget.account.issuer} · ${widget.account.label}'
+        : widget.account.label;
     return Slidable(
       key: ValueKey(widget.account.id),
       startActionPane: ActionPane(
@@ -194,10 +197,16 @@ class _OtpTileState extends State<OtpTile> {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
           ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 6,
+            ),
+            horizontalTitleGap: 12,
+            minLeadingWidth: 40,
+            minVerticalPadding: 0,
             leading: ServiceIcon(
               issuer: widget.account.issuer,
               label: widget.account.label,
@@ -221,11 +230,13 @@ class _OtpTileState extends State<OtpTile> {
               ),
             ),
             subtitle: Text(
-              widget.account.issuer.isNotEmpty
-                  ? '${widget.account.issuer} · ${widget.account.label}'
-                  : widget.account.label,
+              subtitle,
               maxLines: 1,
-              style: TextStyle(fontSize: 12, overflow: TextOverflow.ellipsis),
+              style: const TextStyle(
+                fontSize: 12,
+                overflow: TextOverflow.ellipsis,
+                height: 1.25,
+              ),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -244,17 +255,24 @@ class _OtpTileState extends State<OtpTile> {
                         : scheme.outline,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 if (widget.account.isHotp)
                   IconButton(
                     icon: const Icon(Icons.refresh),
                     tooltip: context.l10n.nextCode,
                     onPressed: widget.onHotpIncrement,
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 22,
+                      height: 22,
+                    ),
+                    splashRadius: 18,
                   )
                 else
                   _TotpProgress(period: widget.account.period),
                 if (widget.showDragHandle) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   ReorderableDragStartListener(
                     index: widget.reorderIndex ?? 0,
                     child: Icon(
@@ -269,59 +287,46 @@ class _OtpTileState extends State<OtpTile> {
             onTap: _onTap,
           ),
           if (widget.account.tags.isNotEmpty)
-            _TagChipsRow(tags: widget.account.tags, scheme: scheme),
+            Positioned(
+              top: 8,
+              left: 8,
+              child: _TagCountBadge(
+                count: widget.account.tags.length,
+                scheme: scheme,
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-class _TagChipsRow extends StatelessWidget {
-  final List<String> tags;
+class _TagCountBadge extends StatelessWidget {
+  final int count;
   final ColorScheme scheme;
 
-  const _TagChipsRow({required this.tags, required this.scheme});
+  const _TagCountBadge({required this.count, required this.scheme});
 
   @override
   Widget build(BuildContext context) {
-    final visible = tags.take(3).toList();
-    final overflow = tags.length - visible.length;
-    return Padding(
-      padding: const EdgeInsets.only(left: 72, right: 16, bottom: 8),
-      child: Wrap(
-        spacing: 4,
-        runSpacing: 4,
-        children: [
-          for (final tag in visible)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: scheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                tag,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: scheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Roboto Mono',
-                ),
-              ),
-            ),
-          if (overflow > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: scheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '+$overflow',
-                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
-              ),
-            ),
-        ],
+    final label = count > 99 ? '99+' : '$count';
+    return IgnorePointer(
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+        decoration: BoxDecoration(
+          color: scheme.primaryFixed.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 10,
+            color: scheme.onPrimaryFixed,
+            height: 1.2,
+          ),
+        ),
       ),
     );
   }
@@ -338,8 +343,8 @@ class _TotpProgress extends ConsumerWidget {
     final remaining = OtpService.remainingSeconds(period);
     final urgent = remaining <= 5;
     return SizedBox(
-      width: 24,
-      height: 24,
+      width: 20,
+      height: 20,
       child: Stack(
         alignment: Alignment.center,
         children: [

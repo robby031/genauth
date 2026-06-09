@@ -75,6 +75,25 @@ class _DrawerScreenState extends ConsumerState<DrawerScreen> {
 
   Future<void> _removePin() async {
     Navigator.pop(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.removePinOption),
+        content: Text(context.l10n.removeAccount(context.l10n.usePin)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
     await _storage.clearPin();
     await _loadDrawerState();
     if (!mounted) return;
@@ -101,6 +120,24 @@ class _DrawerScreenState extends ConsumerState<DrawerScreen> {
 
   Future<void> _removePanicPin() async {
     Navigator.pop(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.removePanicPinOption),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
     await _storage.clearPanicPin();
     await _loadDrawerState();
     if (!mounted) return;

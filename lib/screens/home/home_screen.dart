@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/models/otp_account.dart';
 import 'package:genauth/providers/home_provider.dart';
-import 'package:genauth/widgets/otp_tile.dart';
+import 'package:genauth/screens/home/widgets/otp_tile.dart';
 import 'package:genauth/widgets/tag_filter_bar.dart';
 import 'package:genauth/screens/add_account/add_account_screen.dart';
 import 'package:genauth/screens/backup/backup_screen.dart';
@@ -125,6 +126,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final scheme = Theme.of(context).colorScheme;
     final filtered = homeState.filteredAccounts;
+    final totpAccounts = filtered.where((a) => !a.isHotp).toList();
+    final hotpAccounts = filtered.where((a) => a.isHotp).toList();
     final tagBar = TagFilterBar(
       allTags: homeState.allTags,
       selectedTags: homeState.selectedTags,
@@ -162,42 +165,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ],
     );
 
-    final accountList = ReorderableListView.builder(
-      buildDefaultDragHandles: false,
-      padding: EdgeInsets.zero,
-      physics: const AlwaysScrollableScrollPhysics(),
-      onReorderItem: homeState.isSearching
-          ? (oldIdx, newIdx) {}
-          : homeNotifier.reorderAccounts,
-      proxyDecorator: (child, _, animation) => Material(
-        elevation: 4,
-        shadowColor: Colors.black26,
-        borderRadius: BorderRadius.circular(8),
-        child: child,
-      ),
-      itemCount: filtered.length,
-      itemBuilder: (_, i) {
-        final account = filtered[i];
-        return Column(
-          key: ValueKey(account.id),
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OtpTile(
-              reorderIndex: i,
-              account: account,
-              code: homeState.codeFor(account.id),
-              onDelete: () => homeNotifier.deleteAccount(account.id),
-              onHotpIncrement: account.isHotp
-                  ? () => homeNotifier.incrementHotp(account)
-                  : null,
-              showDragHandle: !homeState.isSearching,
-              onEditTags: (tags) =>
-                  homeNotifier.updateAccountTags(account.id, tags),
+    Widget buildAccountSection({
+      required String title,
+      required List<OtpAccount> accounts,
+    }) {
+      if (accounts.isEmpty) return const SizedBox.shrink();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: scheme.primary,
+                letterSpacing: 0.4,
+              ),
             ),
-            const Divider(height: 1),
-          ],
-        );
-      },
+          ),
+          ReorderableListView.builder(
+            buildDefaultDragHandles: false,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            primary: false,
+            physics: const NeverScrollableScrollPhysics(),
+            onReorderItem: homeState.isSearching
+                ? (oldIdx, newIdx) {}
+                : (oldIdx, newIdx) => homeNotifier.reorderVisibleAccounts(
+                    accounts,
+                    oldIdx,
+                    newIdx,
+                  ),
+            proxyDecorator: (child, _, animation) => Material(
+              elevation: 4,
+              shadowColor: Colors.black26,
+              borderRadius: BorderRadius.circular(8),
+              child: child,
+            ),
+            itemCount: accounts.length,
+            itemBuilder: (_, i) {
+              final account = accounts[i];
+              return Column(
+                key: ValueKey(account.id),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OtpTile(
+                    reorderIndex: i,
+                    account: account,
+                    code: homeState.codeFor(account.id),
+                    onDelete: () => homeNotifier.deleteAccount(account.id),
+                    onHotpIncrement: account.isHotp
+                        ? () => homeNotifier.incrementHotp(account)
+                        : null,
+                    showDragHandle: !homeState.isSearching,
+                    onEditTags: (tags) =>
+                        homeNotifier.updateAccountTags(account.id, tags),
+                  ),
+                  const Divider(height: 1),
+                ],
+              );
+            },
+          ),
+        ],
+      );
+    }
+
+    final accountList = ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        buildAccountSection(title: 'TOTP', accounts: totpAccounts),
+        buildAccountSection(title: 'HOTP', accounts: hotpAccounts),
+      ],
     );
 
     final body = Column(
