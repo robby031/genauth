@@ -4,17 +4,13 @@ import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/backup_provider.dart';
 import 'package:genauth/services/backup_service.dart';
-import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 import 'package:genauth/widgets/snack_message.dart';
 import 'package:genauth/providers/audit_log_provider.dart';
 
 enum RestoreAction { replace, merge }
-
-final importStorageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService.instance;
-});
 
 class Import extends ConsumerStatefulWidget {
   const Import({super.key});
@@ -58,7 +54,7 @@ class _ImportState extends ConsumerState<Import> {
   Future<void> _restore() async {
     final l10n = context.l10n;
     final audit = ref.read(auditLogProvider);
-    final storage = ref.read(importStorageServiceProvider);
+    final storage = ref.read(backupStorageServiceProvider);
 
     if (_pickedBytes == null) {
       SnackMessage.show(
