@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/app_state_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:genauth/screens/audit/audit_log_screen.dart';
 import 'package:genauth/screens/backup/backup_screen.dart';
 import 'package:genauth/screens/pin/pin_screen.dart';
 import 'package:genauth/services/app_info_service.dart';
-import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_links.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
@@ -12,7 +13,7 @@ import 'package:genauth/widgets/snack_message.dart';
 import 'widgets/drawer_header.dart';
 import 'widgets/drawer_footer.dart';
 
-class DrawerScreen extends StatefulWidget {
+class DrawerScreen extends ConsumerStatefulWidget {
   const DrawerScreen({
     super.key,
     required this.onLock,
@@ -25,10 +26,10 @@ class DrawerScreen extends StatefulWidget {
   final VoidCallback onOpenOnboarding;
 
   @override
-  State<DrawerScreen> createState() => _DrawerScreenState();
+  ConsumerState<DrawerScreen> createState() => _DrawerScreenState();
 }
 
-class _DrawerScreenState extends State<DrawerScreen> {
+class _DrawerScreenState extends ConsumerState<DrawerScreen> {
   final StorageService _storage = StorageService.instance;
 
   bool _hasPin = false;
@@ -220,7 +221,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     ? Icon(Icons.check_circle, color: scheme.primary)
                     : null,
                 onTap: () {
-                  LocaleService.changeLocale('en');
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(const Locale('en'));
                   Navigator.pop(context);
                 },
               ),
@@ -231,7 +234,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     ? Icon(Icons.check_circle, color: scheme.primary)
                     : null,
                 onTap: () {
-                  LocaleService.changeLocale('id');
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(const Locale('id'));
                   Navigator.pop(context);
                 },
               ),
@@ -245,6 +250,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final currentLocale = ref.watch(localeProvider);
 
     final securityItems = <Widget>[
       _MenuTile(
@@ -313,24 +319,17 @@ class _DrawerScreenState extends State<DrawerScreen> {
         title: l10n.getStarted,
         onTap: widget.onOpenOnboarding,
       ),
-      ValueListenableBuilder<Locale>(
-        valueListenable: LocaleService.localeNotifier,
-        builder: (context, currentLocale, child) {
-          final currentLangName = currentLocale.languageCode == 'id'
-              ? l10n.indonesian
-              : l10n.english;
-
-          return _MenuTile(
-            icon: Icons.language,
-            title: l10n.language,
-            subtitle: currentLangName,
-            trailing: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            onTap: () => _showLanguageBottomSheet(context, currentLocale),
-          );
-        },
+      _MenuTile(
+        icon: Icons.language,
+        title: l10n.language,
+        subtitle: currentLocale.languageCode == 'id'
+            ? l10n.indonesian
+            : l10n.english,
+        trailing: Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        onTap: () => _showLanguageBottomSheet(context, currentLocale),
       ),
     ];
 

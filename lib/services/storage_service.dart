@@ -24,6 +24,7 @@ class StorageService {
   static const _autoBackupIntervalKey = 'genauth_auto_backup_interval';
   static const _autoBackupPasswordKey = 'genauth_auto_backup_password';
   static const _autoBackupLastRunAtKey = 'genauth_auto_backup_last_run_at';
+  static const _preferredLocaleKey = 'genauth_preferred_locale';
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -265,6 +266,16 @@ class StorageService {
       key: _autoBackupLastRunAtKey,
       value: when.toUtc().toIso8601String(),
     );
+  }
+
+  Future<String?> getPreferredLocaleCode() async {
+    final raw = await _storage.read(key: _preferredLocaleKey);
+    if (raw == null || raw.isEmpty) return null;
+    return raw;
+  }
+
+  Future<void> setPreferredLocaleCode(String languageCode) async {
+    await _storage.write(key: _preferredLocaleKey, value: languageCode);
   }
 }
 

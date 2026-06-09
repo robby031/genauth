@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:genauth/controllers/add_account_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/add_account_provider.dart';
 import 'package:genauth/utils/l10n_extensions.dart';
 
-class ManualAdd extends StatefulWidget {
-  const ManualAdd({super.key, required this.controller});
-
-  final AddAccountController controller;
+class ManualAdd extends ConsumerStatefulWidget {
+  const ManualAdd({super.key});
 
   @override
-  State<ManualAdd> createState() => _ManualAddState();
+  ConsumerState<ManualAdd> createState() => _ManualAddState();
 }
 
-class _ManualAddState extends State<ManualAdd> {
+class _ManualAddState extends ConsumerState<ManualAdd> {
   final _formKey = GlobalKey<FormState>();
   final _labelCtrl = TextEditingController();
   final _issuerCtrl = TextEditingController();
@@ -33,25 +32,30 @@ class _ManualAddState extends State<ManualAdd> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    await widget.controller.saveManualAccount(
-      label: _labelCtrl.text,
-      issuer: _issuerCtrl.text,
-      secret: _secretCtrl.text,
-      algorithm: _algorithm,
-      digits: _digits,
-      period: _period,
-      isHotp: _isHotp,
-    );
+    await ref
+        .read(addAccountProvider.notifier)
+        .saveManualAccount(
+          label: _labelCtrl.text,
+          issuer: _issuerCtrl.text,
+          secret: _secretCtrl.text,
+          algorithm: _algorithm,
+          digits: _digits,
+          period: _period,
+          isHotp: _isHotp,
+        );
     if (mounted) Navigator.pop(context, true);
   }
 
   Future<void> _generateSecret() async {
-    final s = await widget.controller.generateSecret();
+    final s = await ref.read(addAccountProvider.notifier).generateSecret();
     setState(() => _secretCtrl.text = s);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isSaving = ref.watch(
+      addAccountProvider.select((state) => state.saving),
+    );
     final scheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
     return SingleChildScrollView(
@@ -194,21 +198,16 @@ class _ManualAddState extends State<ManualAdd> {
                   ),
                 ],
                 const SizedBox(height: 20),
-                AnimatedBuilder(
-                  animation: widget.controller,
-                  builder: (context, child) {
-                    return FilledButton.icon(
-                      onPressed: widget.controller.saving ? null : _save,
-                      icon: widget.controller.saving
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.add_task),
-                      label: Text(l10n.addAccount),
-                    );
-                  },
+                FilledButton.icon(
+                  onPressed: isSaving ? null : _save,
+                  icon: isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.add_task),
+                  label: Text(l10n.addAccount),
                 ),
               ],
             ),

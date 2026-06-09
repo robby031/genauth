@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:genauth/controllers/lock_controller.dart';
-import 'package:genauth/services/app_lock_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genauth/providers/app_state_provider.dart';
+import 'package:genauth/providers/lock_provider.dart';
 import 'package:genauth/services/auth_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';
@@ -9,7 +10,7 @@ import 'package:genauth/screens/home/home_screen.dart';
 import 'package:genauth/screens/pin/pin_screen.dart';
 import 'package:genauth/widgets/snack_message.dart';
 
-class LockScreen extends StatefulWidget {
+class LockScreen extends ConsumerStatefulWidget {
   const LockScreen({
     super.key,
     this.onAuthenticated,
@@ -22,11 +23,10 @@ class LockScreen extends StatefulWidget {
   final NavigatorState? navigatorState;
 
   @override
-  State<LockScreen> createState() => _LockScreenState();
+  ConsumerState<LockScreen> createState() => _LockScreenState();
 }
 
-class _LockScreenState extends State<LockScreen> {
-  final _controller = LockController();
+class _LockScreenState extends ConsumerState<LockScreen> {
   final _storage = StorageService.instance;
   bool _ready = false;
   bool _hasPin = false;
@@ -42,14 +42,13 @@ class _LockScreenState extends State<LockScreen> {
   @override
   void initState() {
     super.initState();
-    AppLockState.isLockScreenVisible.value = true;
+    ref.read(isLockScreenVisibleProvider.notifier).state = true;
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
   }
 
   @override
   void dispose() {
-    AppLockState.isLockScreenVisible.value = false;
-    _controller.dispose();
+    ref.read(isLockScreenVisibleProvider.notifier).state = false;
     super.dispose();
   }
 
@@ -76,7 +75,9 @@ class _LockScreenState extends State<LockScreen> {
       return;
     }
 
-    final ok = await _controller.authenticate(reportFailure: reportFailure);
+    final ok = await ref
+        .read(lockProvider.notifier)
+        .authenticate(reportFailure: reportFailure);
     if (!mounted) return;
 
     if (!ok && reportFailure) {
@@ -104,7 +105,7 @@ class _LockScreenState extends State<LockScreen> {
   Future<void> _openPin() async {
     if (!mounted) return;
 
-    _controller.clearError();
+    ref.read(lockProvider.notifier).clearError();
     final mode = _hasPin ? PinMode.verify : PinMode.setup;
     final navigator = _navigator;
     if (navigator == null) return;
@@ -123,93 +124,85 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lockState = ref.watch(lockProvider);
     final scheme = Theme.of(context).colorScheme;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Scaffold(
-          body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
-                ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 240),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Image.asset(
-                        AppAssets.logoNoBackground,
-                        width: 84,
-                        height: 84,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        context.l10n.appTitle,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        context.l10n.authenticator,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleSmall?.copyWith(color: scheme.outline),
-                      ),
-                      const SizedBox(height: 8),
-                      if (!_ready || _controller.authenticating)
-                        const Center(child: CircularProgressIndicator())
-                      else ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: FilledButton.icon(
-                                onPressed: _openPin,
-                                icon: const Icon(Icons.pin_outlined),
-                                label: Text(context.l10n.usePin),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: scheme.secondary,
-                                  foregroundColor: scheme.onSecondary,
-                                  visualDensity: VisualDensity.compact,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 240),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Image.asset(
+                    AppAssets.logoNoBackground,
+                    width: 84,
+                    height: 84,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.appTitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.authenticator,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleSmall?.copyWith(color: scheme.outline),
+                  ),
+                  const SizedBox(height: 8),
+                  if (!_ready || lockState.authenticating)
+                    const Center(child: CircularProgressIndicator())
+                  else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: _openPin,
+                            icon: const Icon(Icons.pin_outlined),
+                            label: Text(context.l10n.usePin),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: scheme.secondary,
+                              foregroundColor: scheme.onSecondary,
+                              visualDensity: VisualDensity.compact,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              onPressed: _authenticateAndRoute,
-                              style: FilledButton.styleFrom(
-                                backgroundColor: scheme.primary,
-                                foregroundColor: scheme.onPrimary,
-                                visualDensity: VisualDensity.compact,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                minimumSize: const Size(44, 40),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                              ),
-                              child: const Icon(Icons.fingerprint),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        FilledButton(
+                          onPressed: _authenticateAndRoute,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: scheme.primary,
+                            foregroundColor: scheme.onPrimary,
+                            visualDensity: VisualDensity.compact,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ],
+                            minimumSize: const Size(44, 40),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          child: const Icon(Icons.fingerprint),
                         ),
                       ],
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
