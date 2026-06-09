@@ -10,7 +10,7 @@ import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/screens/onboarding/onboarding_screen.dart';
 import 'package:genauth/screens/lock/lock_screen.dart';
-import 'package:genauth/screens/panic_corrupted_screen.dart';
+import 'package:genauth/screens/panic/panic_corrupted_screen.dart';
 
 const _brandSeedColor = Color(0xFF2F6BDE);
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:genauth/screens/panic_corrupted_screen.dart';
+import 'package:genauth/screens/panic/panic_corrupted_screen.dart';
 import 'package:genauth/services/audit_log_service.dart';
 import 'package:genauth/services/storage_service.dart';
 import 'package:genauth/utils/app_assets.dart';

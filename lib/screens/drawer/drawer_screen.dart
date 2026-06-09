@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:genauth/screens/audit/audit_log_screen.dart';
 import 'package:genauth/screens/backup/backup_screen.dart';
-import 'package:genauth/screens/pin_screen.dart';
+import 'package:genauth/screens/pin/pin_screen.dart';
 import 'package:genauth/services/app_info_service.dart';
 import 'package:genauth/services/locale_service.dart';
 import 'package:genauth/services/storage_service.dart';
