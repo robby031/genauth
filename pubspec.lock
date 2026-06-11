@@ -424,11 +424,10 @@ packages:
   genotp_flutter:
     dependency: "direct main"
     description:
-      name: genotp_flutter
-      sha256: "0fa270592be8190ddb0142025e1e6f022c9d0478f1fe0a24808afed3a7d09dfd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.7"
+      path: "../genotp-flutter"
+      relative: true
+    source: path
+    version: "0.0.8"
   google_fonts:
     dependency: "direct main"
     description:
